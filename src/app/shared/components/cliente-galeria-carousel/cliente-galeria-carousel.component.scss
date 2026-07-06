@@ -1,0 +1,112 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+.cliente-galeria {
+  width: 100%;
+
+  &__slide {
+    width: 100%;
+    height: $cliente-galeria-height;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-card;
+    overflow: hidden;
+    background-color: $cinza-claro;
+    box-sizing: border-box;
+    padding: 10px;
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+  }
+
+  &__carousel {
+    position: relative;
+
+    ::ng-deep {
+      .owl-nav {
+        margin-top: 0;
+
+        button.owl-prev,
+        button.owl-next {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 52px;
+          height: 52px;
+          margin: 0;
+          padding: 0;
+          border-radius: 50%;
+          border: 2px solid #fff;
+          background: $laranja-escuro !important;
+          color: #fff !important;
+          font-size: 34px;
+          font-weight: 700;
+          line-height: 1;
+          opacity: 1 !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+          transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+          z-index: 2;
+
+          &:hover {
+            background: $laranja-claro !important;
+            color: $preto !important;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+          }
+
+          span {
+            line-height: 1;
+            margin-top: -2px;
+          }
+        }
+
+        button.owl-prev {
+          left: 16px;
+        }
+
+        button.owl-next {
+          right: 16px;
+        }
+
+        button.disabled {
+          opacity: 0.45 !important;
+        }
+      }
+
+      .owl-dots {
+        margin-top: 14px;
+
+        .owl-dot span {
+          width: 12px;
+          height: 12px;
+          margin: 5px;
+          background: #b8b8b8;
+        }
+
+        .owl-dot.active span,
+        .owl-dot:hover span {
+          background: $laranja-escuro;
+        }
+      }
+
+      .owl-stage-outer {
+        height: $cliente-galeria-height;
+        border-radius: $radius-card;
+        overflow: hidden;
+      }
+
+      .owl-item {
+        height: $cliente-galeria-height;
+      }
+    }
+  }
+}

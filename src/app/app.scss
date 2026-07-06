@@ -1,0 +1,120 @@
+@use '../../public/variables/variables.scss' as *;
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-header-slot {
+  flex-shrink: 0;
+  z-index: 1000;
+  background: #fff;
+}
+
+.app-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.app-main {
+  position: relative;
+  min-height: 50vh;
+}
+
+.page-content--masked {
+  visibility: hidden;
+}
+
+.page-transition {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: #fff;
+}
+
+.page-transition-bar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgba($laranja-claro, 0.15);
+}
+
+.page-transition-bar::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, $laranja-claro, $laranja-escuro);
+  animation: page-transition-slide 1s ease-in-out infinite;
+}
+
+.page-transition-body {
+  min-height: 50vh;
+}
+
+.skeleton-block {
+  border-radius: 25px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+.page-transition-breadcrumb {
+  width: 220px;
+  height: 32px;
+}
+
+.page-transition-hero {
+  height: 320px;
+}
+
+.page-transition-line {
+  height: 18px;
+}
+
+.page-transition-line--short {
+  width: 65%;
+}
+
+.page-transition-side {
+  height: 260px;
+}
+
+@keyframes page-transition-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(350%);
+  }
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .page-transition-hero {
+    height: 220px;
+  }
+
+  .page-transition-side {
+    display: none;
+  }
+}

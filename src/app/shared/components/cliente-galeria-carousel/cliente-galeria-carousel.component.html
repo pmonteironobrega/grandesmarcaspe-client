@@ -1,0 +1,28 @@
+<section class="cliente-galeria" aria-label="Galeria de fotos">
+  @if (!carouselReady()) {
+    @if (slides()[0]; as firstSlide) {
+      <div class="cliente-galeria__slide">
+        <img [src]="firstSlide.url" [alt]="firstSlide.alt" loading="eager" (error)="onImageError($event)">
+      </div>
+    }
+  } @else if (slides().length > 1) {
+    @for (key of [carouselKey()]; track key) {
+      <owl-carousel-o
+        [options]="carouselOptions()"
+        class="cliente-galeria__carousel owl-theme"
+      >
+        @for (slide of slides(); track slide.id) {
+          <ng-template carouselSlide [id]="slide.id">
+            <div class="cliente-galeria__slide">
+              <img [src]="slide.url" [alt]="slide.alt" loading="lazy" (error)="onImageError($event)">
+            </div>
+          </ng-template>
+        }
+      </owl-carousel-o>
+    }
+  } @else if (slides()[0]; as singleSlide) {
+    <div class="cliente-galeria__slide">
+      <img [src]="singleSlide.url" [alt]="singleSlide.alt" loading="eager" (error)="onImageError($event)">
+    </div>
+  }
+</section>

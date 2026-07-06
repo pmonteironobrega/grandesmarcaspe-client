@@ -1,0 +1,43 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+.share-icon {
+  cursor: pointer;
+  z-index: 999;
+
+  img {
+    &:hover {
+      @include opacity(0.5);
+    }
+  }
+}
+.share-icons {
+  position: absolute;
+  margin-top: 5px;
+  z-index: 999;
+
+  img {
+    margin-bottom: 5px;
+    z-index: 999;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .share-icon {
+    margin-top: 10px;
+  }
+  .share-icons {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+    margin-left: 10px;
+
+    img {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  }
+
+  .icon-social {
+    display: inline-block;
+  }
+}

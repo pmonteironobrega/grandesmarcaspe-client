@@ -1,0 +1,14 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+.section-avaliacoes {
+  .avaliacao-item {
+    padding: 16px;
+    border: 1px solid #eee;
+    background: #fff;
+  }
+
+  .avaliacao-nota {
+    color: $laranja-escuro;
+    font-weight: bold;
+  }
+}

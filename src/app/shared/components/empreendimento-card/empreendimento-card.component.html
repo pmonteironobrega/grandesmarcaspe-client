@@ -1,0 +1,66 @@
+@if (detailUrl(); as url) {
+
+  <a [routerLink]="url" class="link-empreendimento">
+
+    <div class="empreendimento d-block mb-3 animate">
+
+      <div class="listing-thumbnail card-rounded pb-2">
+        <img
+          [src]="imageUrl()"
+          [alt]="cliente.nome"
+          class="listing-thumbnail__img"
+          loading="lazy"
+          (error)="onImageError($event)"
+        >
+      </div>
+
+      <h4 class="font-weight-bold cl-le animate">{{ cliente.nome }}</h4>
+
+      <div class="info-emp pb-1">
+
+        @if (cliente.categoria) {
+
+          <span class="badge badge-pill bg-le cl-wt pb-1 animate">{{ cliente.categoria.nome }}</span>
+
+        }
+
+        @if (cliente.avaliacao > 0) {
+          <span class="nota cl-lc ml-3">
+            <strong class="pr-1">{{ cliente.avaliacao }}</strong>
+            @if (totalAvaliacoes && totalAvaliacoes > 0) {
+              <small class="cl-lc">{{ totalAvaliacoes }} avaliação{{ totalAvaliacoes === 1 ? '' : 'ões' }}</small>
+            }
+          </span>
+        }
+
+      </div>
+
+      <p class="cl-cz font-weight-bold pt-1">{{ enderecoResumo() }}</p>
+
+    </div>
+
+  </a>
+
+} @else {
+
+  <div class="empreendimento d-block mb-3">
+
+    <div class="listing-thumbnail card-rounded pb-2">
+      <img
+        [src]="imageUrl()"
+        [alt]="cliente.nome"
+        class="listing-thumbnail__img"
+        loading="lazy"
+        (error)="onImageError($event)"
+      >
+    </div>
+
+    <h4 class="font-weight-bold cl-le">{{ cliente.nome }}</h4>
+
+    <p class="cl-cz font-weight-bold pt-1">{{ enderecoResumo() }}</p>
+
+  </div>
+
+}
+
+

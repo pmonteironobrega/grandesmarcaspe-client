@@ -1,0 +1,201 @@
+<header class="bg-cz-cl">
+
+  <div class="top-header bg-bc pt-2 pb-2">
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-6 current-uf">
+
+          <button class="btn btn-lg btn-lc" (click)="openModal(modalEstados)">Você está em: <strong>{{ locationState.uf() }}</strong></button>
+
+        </div>
+
+
+
+        <div class="col-6">
+
+          <button class="btn btn-lg btn-lc float-right">Login</button>
+
+          <button class="btn btn-lg btn-le float-right mr-2" [routerLink]="['/anuncie']">Anuncie</button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="search-header pt-4 pb-4">
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col text-center">
+
+          <a [routerLink]="['/']">
+
+            <img src="/img/logo-header.svg" alt="Logotipo do site" class="img-fluid logo-header">
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="row">
+
+        <div class="col-sm-8 offset-sm-2">
+
+          <div class="form-group">
+
+            <div class="row">
+
+              <div class="col-12 d-none d-md-block">
+
+                <div class="input-group">
+
+                  <input type="text" class="form-control input-gm search-input"
+                         placeholder="Busque por nome, categoria, descrição, slogan ou localização"
+                         name="termoBusca"
+                         [ngModel]="termoBusca()" (ngModelChange)="termoBusca.set($event)"
+                         (keydown.enter)="buscar()"
+                         aria-label="Termo de busca">
+
+                  <div class="input-group-append ipa-search">
+
+                    <button type="button" (click)="buscar()" [disabled]="!canSearch()"
+
+                            class="btn btn-lg btn-gradient float-right w-100 btn-search">Buscar
+
+                      <img src="/img/search-icon.svg" alt="Ícone de busca"
+
+                           class="img-fluid"></button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+
+              <div class="col-12 d-sm-none">
+
+                <input type="text" class="form-control input-gm search-input"
+                       placeholder="Busque por nome, categoria, descrição, slogan ou localização"
+                       name="termoBuscaMobile"
+                       [ngModel]="termoBusca()" (ngModelChange)="termoBusca.set($event)"
+                       (keydown.enter)="buscar()"
+                       aria-label="Termo de busca">
+
+              </div>
+
+              <div class="col-sm-4 col-xs-12 d-sm-none mt-2">
+
+                <button type="button" class="btn btn-lg btn-gradient float-right w-100 btn-search-mobile"
+
+                        (click)="buscar()" [disabled]="!canSearch()">Buscar</button>
+
+              </div>
+
+            </div>
+
+            @if (buscaMessage) {
+
+              <p class="busca-validation mt-2 mb-0" role="alert">{{ buscaMessage }}</p>
+
+            }
+
+            @if (canClearSearch()) {
+              <div class="text-center mt-2">
+                <button type="button" class="btn btn-link btn-limpar-busca p-0" (click)="limparBusca()">
+                  Limpar busca
+                </button>
+              </div>
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="row">
+
+        <div class="col-12">
+
+          <a (click)="toggleMenu()" [attr.aria-expanded]="isOpen" aria-controls="busca-avancada" class="cl-le d-block btn-busca-avancada">Busca Avançada <span><img src="/img/arrow-right.svg" alt="Seta para a direita"
+
+                                                                                                                                                                    class="img-fluid"></span></a>
+
+        </div>
+
+
+
+        <div class="col-12">
+
+          <div class="busca-avancada" id="busca-avancada" [collapse]="!isOpen" [isAnimated]="true">
+
+            <app-busca-avancada (filtersChange)="onBuscaFiltersChange()" />
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+
+<ng-template #modalEstados class="modal-estados">
+
+  <div class="modal-header gradient">
+
+    <h4 class="modal-title pull-left cl-wt font-weight-bold">Estado</h4>
+
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+
+      <span aria-hidden="true">&times;</span>
+
+    </button>
+
+  </div>
+
+  <div class="modal-body">
+
+    <select name="estadoUsuario" id="estadoUsuario" class="form-control"
+
+            [ngModel]="locationState.uf()" (ngModelChange)="locationState.setUf($event)">
+
+      @for (uf of ufs(); track uf.id) {
+
+        <option [value]="uf.sigla">{{ uf.nome }}</option>
+
+      }
+
+    </select>
+
+
+
+    <button class="btn-gradient btn btn-lg mt-2 w-100" (click)="modalRef?.hide()">Confirmar</button>
+
+  </div>
+
+</ng-template>
+
+

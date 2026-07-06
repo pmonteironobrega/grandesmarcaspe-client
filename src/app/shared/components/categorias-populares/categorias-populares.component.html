@@ -1,0 +1,39 @@
+<section class="section-categorias-populares bg-bc pt-5 pb-5">
+
+  <div class="container">
+
+    <div class="row">
+
+      <div class="col">
+
+        <h3 class="cl-wt font-weight-bold">Categorias mais populares</h3>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="row mt-1">
+
+      <div class="col">
+
+        @for (categoria of categorias(); track categoria.id) {
+
+          <a [routerLink]="['/c', categoria.slug, ufSlug()]" class="cat-pop bg-le cl-wt badge-pill px-3 py-2 mr-2 mt-2 d-inline-block animate text-decoration-none">
+
+            {{ formatCategoriaNome(categoria.nome) }}
+
+          </a>
+
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+

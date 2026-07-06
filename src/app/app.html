@@ -1,0 +1,72 @@
+<div class="app-shell">
+
+  <div class="app-header-slot">
+
+    <app-header></app-header>
+
+  </div>
+
+
+
+  <div class="app-scroll" #scrollContainer>
+
+    <main class="app-main">
+
+      @if (routeTransition.isActive()) {
+
+        <div class="page-transition" role="status" aria-live="polite" aria-label="Carregando página">
+
+          <div class="page-transition-bar" aria-hidden="true"></div>
+
+          <div class="page-transition-body">
+
+            <div class="container pt-5 pb-5">
+
+              <div class="page-transition-breadcrumb skeleton-block"></div>
+
+              <div class="row mt-4">
+
+                <div class="col-sm-7">
+
+                  <div class="page-transition-hero skeleton-block"></div>
+
+                  <div class="page-transition-line skeleton-block mt-3"></div>
+
+                  <div class="page-transition-line skeleton-block mt-2 page-transition-line--short"></div>
+
+                </div>
+
+                <div class="col-sm-5">
+
+                  <div class="page-transition-side skeleton-block"></div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+
+
+
+      <div class="page-content" [class.page-content--masked]="routeTransition.isActive()">
+
+        <router-outlet />
+
+      </div>
+
+    </main>
+
+
+
+    <app-footer></app-footer>
+
+  </div>
+
+</div>
+

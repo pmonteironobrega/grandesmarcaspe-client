@@ -1,0 +1,154 @@
+<app-breadcrumb [config]="breadcrumb()"></app-breadcrumb>
+
+
+
+<section class="section-categoria-list pt-5 pb-5">
+
+  <div class="container">
+
+    @if (loading()) {
+
+      <div class="row">
+
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+
+          <div class="col-sm-4 col-xs-12">
+
+            <div class="empreendimento-skeleton card-rounded mb-3"></div>
+
+          </div>
+
+        }
+
+      </div>
+
+    } @else if (error()) {
+
+      <div class="row">
+
+        <div class="col">
+
+          <p class="cl-cz">Não foi possível carregar os resultados. Tente novamente mais tarde.</p>
+
+        </div>
+
+      </div>
+
+    } @else if (listagem(); as result) {
+
+      <div class="row mb-4">
+
+        <div class="col">
+
+          <h2 class="font-weight-bold cl-bc">
+
+            {{ formatCategoriaNome(result.data[0]?.categoria?.nome ?? result.meta.filters.categoria) }}
+
+            @if (result.meta.filters.uf) {
+
+              <small class="text-uppercase">/ {{ result.meta.filters.uf }}</small>
+
+            }
+
+          </h2>
+
+          <p class="cl-cz">{{ result.meta.total }} resultados</p>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="row">
+
+        @for (cliente of result.data; track cliente.id) {
+
+          <div class="col-sm-4 col-xs-12">
+
+            <app-empreendimento [cliente]="cliente"></app-empreendimento>
+
+          </div>
+
+        } @empty {
+
+          <div class="col">
+
+            <p class="cl-cz">Nenhum resultado encontrado.</p>
+
+          </div>
+
+        }
+
+      </div>
+
+
+
+      @if (result.meta.totalPages > 1) {
+
+        <nav class="mt-5" aria-label="Paginação">
+
+          <ul class="pagination justify-content-center">
+
+            @if (result.meta.page > 1) {
+
+              <li class="page-item">
+                @let prevRoute = buildListRoute(result.meta.filters, result.meta.page - 1);
+                <a
+                  class="page-link"
+                  [routerLink]="prevRoute.commands"
+                  [queryParams]="prevRoute.queryParams"
+                >Voltar</a>
+              </li>
+
+            }
+
+            @for (page of paginationPages(result.meta.page, result.meta.totalPages); track page) {
+              @if (page === result.meta.page) {
+                <li class="page-item active">
+                  <span class="page-link">{{ page }}</span>
+                </li>
+              } @else {
+                @let pageRoute = buildListRoute(result.meta.filters, page);
+                <li class="page-item">
+                  <a
+                    class="page-link"
+                    [routerLink]="pageRoute.commands"
+                    [queryParams]="pageRoute.queryParams"
+                  >{{ page }}</a>
+                </li>
+              }
+            }
+
+            @if (result.meta.page < result.meta.totalPages) {
+
+              <li class="page-item">
+                @let nextRoute = buildListRoute(result.meta.filters, result.meta.page + 1);
+                <a
+                  class="page-link"
+                  [routerLink]="nextRoute.commands"
+                  [queryParams]="nextRoute.queryParams"
+                >Próxima</a>
+              </li>
+
+            }
+
+          </ul>
+
+        </nav>
+
+      }
+
+    }
+
+  </div>
+
+</section>
+
+
+
+<app-anuncie></app-anuncie>
+
+<app-categorias-populares></app-categorias-populares>
+
+

@@ -1,0 +1,63 @@
+<app-breadcrumb [config]="configPage"></app-breadcrumb>
+
+<section class="section-sobre-1 pt-5 pb-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h2 class="font-weight-bold">Nossa História</h2>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-6">
+        <p class="cl-cz pt-1">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar vulputate nunc et commodo. Sed ac elementum erat, id suscipit sapien.
+          Nam sed suscipit lectus. Maecenas rhoncus nisl vel efficitur mollis. Nullam a mattis velit. Phasellus quis dolor venenatis, fringilla massa at,
+          ullamcorper massa. Phasellus vel tempus nunc. Praesent egestas aliquet luctus. Vivamus nunc enim, consequat vel bibendum id, pretium at enim.
+          Integer eu scelerisque urna. Donec iaculis mauris id augue porta, a elementum metus lobortis. Quisque aliquet non eros in fringilla. Vestibulum
+          bibendum, purus fermentum euismod sagittis, mi tellus luctus neque, ac iaculis enim mi nec augue. Fusce finibus, dui ut ornare tempor, purus arcu
+          dapibus sapien, quis feugiat ante dui tincidunt est.
+          <br><br>
+          Nam sit amet sodales diam. Suspendisse malesuada blandit est nec placerat. Phasellus in tellus ipsum. Aenean id rutrum risus. Sed lacinia urna sit amet
+          purus auctor mollis. Aenean molestie hendrerit nibh quis lacinia. Vestibulum sed cursus libero. Suspendisse potenti. Proin arcu magna, egestas eget ligula
+          ut, lacinia porta dui. Suspendisse blandit mi at diam tempor ullamcorper. Maecenas faucibus tellus eu consequat aliquam. Cras lectus nulla, rutrum id odio
+          a, blandit lobortis turpis. Aenean maximus imperdiet pharetra. Morbi elementum nisi justo, sed vulputate ligula luctus non.
+        </p>
+      </div>
+
+      <div class="col-sm-6 align-self-center text-center">
+        <img src="/img/sobre/icon-logo.svg" alt="" class="img-fluid">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-regioes pt-5 pb-5 bg-cz-cl">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <h2 class="font-weight-bold">Onde estamos</h2>
+        <p class="cl-cz pt-1">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar vulputate nunc et commodo. Sed ac elementum erat, id suscipit sapien. Nam sed suscipit lectus.
+          Maecenas rhoncus nisl vel efficitur mollis. Nullam a mattis velit. Phasellus quis dolor venenatis, fringilla massa at, ullamcorper massa.
+        </p>
+      </div>
+    </div>
+
+    <div class="row my-3">
+      <div class="col-sm-3" *ngFor="let estado of ['Pernambuco', 'Alagoas', 'Paraíba', 'Bahia']">
+        <div class="estados-localidades bg-le text-center px-3 py-2">
+          <p class="cl-wt">{{ estado }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col">
+        <hr>
+      </div>
+    </div>
+
+    <app-anuncie></app-anuncie>
+  </div>
+</section>

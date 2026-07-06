@@ -1,0 +1,11 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+.cat-pop {
+  cursor: pointer;
+  border: 1px solid $laranja-escuro;
+  font-size: 12px;
+  &:hover {
+    background-color: $preto;
+    color: $laranja-escuro;
+  }
+}

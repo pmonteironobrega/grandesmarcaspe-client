@@ -1,0 +1,224 @@
+<div class="section-comentarios mt-5">
+
+  <h4 class="font-weight-bold mb-3">Comentários</h4>
+
+
+
+  <div class="comentario-form card-rounded mb-4">
+
+    <h5 class="font-weight-bold mb-3">Deixe seu comentário</h5>
+
+
+
+    @if (errorMessage()) {
+
+      <app-ui-alert class="mb-3" type="error" (dismissed)="errorMessage.set('')">{{ errorMessage() }}</app-ui-alert>
+
+    }
+
+    @if (successMessage()) {
+
+      <app-ui-alert class="mb-3" type="success" (dismissed)="successMessage.set('')">{{ successMessage() }}</app-ui-alert>
+
+    }
+
+
+
+    <div class="form-group">
+
+      <label for="comentario-texto">Comentário</label>
+
+      <textarea
+
+        id="comentario-texto"
+
+        class="form-control"
+
+        rows="4"
+
+        maxlength="2000"
+
+        placeholder="Escreva seu comentário…"
+
+        [ngModel]="conteudo()"
+
+        (ngModelChange)="conteudo.set($event)"
+
+      ></textarea>
+
+    </div>
+
+
+
+    <button
+
+      type="button"
+
+      class="btn btn-primary"
+
+      [disabled]="submitting()"
+
+      (click)="submitComment()"
+
+    >
+
+      {{ submitting() ? 'Enviando…' : 'Publicar comentário' }}
+
+    </button>
+
+  </div>
+
+
+
+  @if (loading()) {
+
+    <p class="cl-cz">Carregando comentários…</p>
+
+  } @else if (!comentarios().length) {
+
+    <p class="cl-cz">Seja o primeiro a comentar.</p>
+
+  } @else {
+
+    @for (comentario of comentarios(); track comentario.id) {
+
+      <div class="comentario-item card-rounded mb-3">
+
+        <div class="comentario-layout">
+
+          <div class="comentario-avatar" aria-hidden="true">
+
+            <img src="/img/avatar-usuario.svg" alt="">
+
+          </div>
+
+          <div class="comentario-body">
+
+            <div class="comentario-header d-flex justify-content-between align-items-start">
+
+              <strong>{{ defaultAuthor }}</strong>
+
+              <small class="cl-cz">{{ formatDate(comentario.createdAt) }}</small>
+
+            </div>
+
+            <p class="mb-2 mt-2">{{ comentario.conteudo }}</p>
+
+            <button
+
+              type="button"
+
+              class="btn btn-link btn-sm p-0 comentario-reply-btn"
+
+              (click)="toggleReply(comentario.id)"
+
+            >
+
+              {{ replyingTo() === comentario.id ? 'Cancelar' : 'Responder' }}
+
+            </button>
+
+
+
+            @if (replyingTo() === comentario.id) {
+
+              <div class="comentario-reply-form mt-3">
+
+                <div class="form-group mb-2">
+
+                  <label [for]="'reply-' + comentario.id">Sua resposta</label>
+
+                  <textarea
+
+                    [id]="'reply-' + comentario.id"
+
+                    class="form-control"
+
+                    rows="3"
+
+                    maxlength="2000"
+
+                    placeholder="Escreva sua resposta…"
+
+                    [ngModel]="replyConteudo()"
+
+                    (ngModelChange)="replyConteudo.set($event)"
+
+                  ></textarea>
+
+                </div>
+
+                <button
+
+                  type="button"
+
+                  class="btn btn-outline-primary btn-sm"
+
+                  [disabled]="submitting()"
+
+                  (click)="submitComment(comentario.id)"
+
+                >
+
+                  {{ submitting() ? 'Enviando…' : 'Enviar resposta' }}
+
+                </button>
+
+              </div>
+
+            }
+
+
+
+            @if (comentario.respostas.length) {
+
+              <div class="comentario-respostas mt-3">
+
+                @for (resposta of comentario.respostas; track resposta.id) {
+
+                  <div class="comentario-resposta card-rounded mb-2">
+
+                    <div class="comentario-layout">
+
+                      <div class="comentario-avatar comentario-avatar--sm" aria-hidden="true">
+
+                        <img src="/img/avatar-usuario.svg" alt="">
+
+                      </div>
+
+                      <div class="comentario-body">
+
+                        <div class="comentario-header d-flex justify-content-between align-items-start">
+
+                          <strong>{{ defaultAuthor }}</strong>
+
+                          <small class="cl-cz">{{ formatDate(resposta.createdAt) }}</small>
+
+                        </div>
+
+                        <p class="mb-0 mt-2">{{ resposta.conteudo }}</p>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                }
+
+              </div>
+
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+    }
+
+  }
+
+</div>
+

@@ -1,0 +1,288 @@
+<app-breadcrumb [config]="breadcrumb()" [sticky]="true"></app-breadcrumb>
+
+
+
+@if (loading()) {
+
+  <section class="section-sobre-1 pt-5 pb-5">
+
+    <div class="container">
+
+      <div class="empreendimento-skeleton card-rounded mb-3 cliente-galeria-skeleton"></div>
+
+    </div>
+
+  </section>
+
+} @else if (error()) {
+
+  <section class="section-sobre-1 pt-5 pb-5">
+
+    <div class="container">
+
+      <p class="cl-cz">Não foi possível carregar este negócio.</p>
+
+    </div>
+
+  </section>
+
+} @else if (cliente(); as detail) {
+
+  <section class="section-sobre-1 pt-5 pb-5">
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-auto">
+
+          <h2 #clienteNome class="font-weight-bold d-inline-block mr-3">{{ detail.nome }}</h2>
+
+          <app-star-rating-inline
+            class="d-inline-block align-middle"
+            [clienteId]="detail.id"
+            [fallbackNota]="detail.avaliacao"
+          />
+
+          @if (detail.categoria) {
+            <div class="mt-2">
+              <span class="badge badge-pill bg-le cl-wt pb-1">{{ detail.categoria.nome }}</span>
+            </div>
+          }
+        </div>
+
+
+
+        <div class="col">
+
+          <app-share></app-share>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="row mt-4">
+
+        <div class="col-sm-7">
+
+          <app-cliente-galeria-carousel [slides]="galeriaSlides()" />
+
+
+
+          <div class="row section-address align-items-center">
+
+            <div class="col-auto mt-2">
+
+              <img src="/img/icon-address.svg" alt="" class="w-100 ico-address">
+
+            </div>
+
+            <div class="col align-self-center">
+
+              <p class="cl-cz">{{ formatEndereco(detail) }}</p>
+
+            </div>
+
+          </div>
+
+
+
+          @if (detail.telefones.length) {
+
+            <div class="row section-address section-telefones align-items-start">
+
+              <div class="col-auto mt-2">
+
+                <img src="/img/icon-phone.svg" alt="" class="w-100 ico-address">
+
+              </div>
+
+              <div class="col align-self-center">
+
+                <div class="telefones-group">
+
+                  @for (tel of detail.telefones; track tel.id) {
+
+                    @if (isCelular(tel.telefone)) {
+
+                      <a
+                        [href]="whatsappUrl(tel.ddd, tel.telefone)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="telefone-item telefone-item--whatsapp"
+                        [attr.aria-label]="'Abrir WhatsApp de ' + formatTelefone(tel.ddd, tel.telefone)"
+                      >
+                        <img src="/img/social/whatsapp.svg" alt="" class="telefone-item-icon" aria-hidden="true">
+                        <span>{{ formatTelefone(tel.ddd, tel.telefone) }}</span>
+                      </a>
+
+                    } @else {
+
+                      <a
+                        [href]="telUrl(tel.ddd, tel.telefone)"
+                        class="telefone-item"
+                        [attr.aria-label]="'Ligar para ' + formatTelefone(tel.ddd, tel.telefone)"
+                      >
+                        <span>{{ formatTelefone(tel.ddd, tel.telefone) }}</span>
+                      </a>
+
+                    }
+
+                  }
+
+                </div>
+
+              </div>
+
+            </div>
+
+          }
+
+
+
+          <div class="section-localizacao mt-4">
+
+            <div class="row">
+
+              <div class="col">
+
+                <h4 class="font-weight-bold">Localização</h4>
+
+                <a
+                  [href]="googleMapsUrl(detail)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="localizacao-link cl-le font-weight-bold mt-3 d-inline-block"
+                >
+                  Ver localização
+                </a>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="col-sm-5">
+
+          @if (detail.descricao || detail.subdescricao) {
+
+            <div class="mais-informacoes">
+
+              <h4 class="font-weight-bold">Mais informações</h4>
+
+              @if (detail.descricao) {
+
+                <p>{{ detail.descricao }}</p>
+
+              }
+
+              @if (detail.subdescricao) {
+
+                <p>{{ detail.subdescricao }}</p>
+
+              }
+
+            </div>
+
+          }
+
+
+
+          @if (buildSocialLinks(detail.site).length) {
+
+            <div class="links-importantes mt-4">
+
+              <h4 class="font-weight-bold">Links importantes</h4>
+
+              @for (rede of buildSocialLinks(detail.site); track rede.url) {
+                <a [href]="rede.url" target="_blank" rel="noopener noreferrer">
+                  <img [src]="'/img/social/' + rede.icon" [alt]="rede.name" class="icon-social mr-2">
+                </a>
+
+              }
+
+            </div>
+
+          }
+
+
+
+          @if (detail.tags.length) {
+
+            <div class="tags mt-4">
+
+              <h4 class="font-weight-bold">Tags</h4>
+
+              @for (tag of detail.tags; track tag.id) {
+
+                <span class="cat-pop bg-wt cl-le badge-pill px-3 py-2 mr-2 mb-2 tag-item d-inline-block border-le animate">{{ tag.nome }}</span>
+
+              }
+
+            </div>
+
+          }
+
+
+
+          <div class="ads ads-left"></div>
+
+        </div>
+
+      </div>
+
+      <app-avaliacoes-section [clienteId]="detail.id" />
+
+      <app-comentarios-section [clienteId]="detail.id" />
+      @if (relacionados().length) {
+
+        <div class="section-mais-empreendimentos mt-5">
+
+          <div class="row">
+
+            <div class="col">
+
+              <h4 class="font-weight-bold">Mais em {{ detail.categoria?.nome }}</h4>
+
+            </div>
+
+          </div>
+
+          <div class="row">
+
+            @for (item of relacionados(); track item.id) {
+
+              <div class="col-sm-4">
+
+                <app-empreendimento [cliente]="item"></app-empreendimento>
+
+              </div>
+
+            }
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </section>
+
+}
+
+
+
+<app-anuncie></app-anuncie>
+
+<app-categorias-populares></app-categorias-populares>
+
+

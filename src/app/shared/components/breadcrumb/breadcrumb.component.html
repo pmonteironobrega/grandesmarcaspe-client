@@ -1,0 +1,53 @@
+<section
+  class="section-breadcrumb gradient"
+  [class.section-breadcrumb--sticky]="sticky"
+>
+
+  <div class="container">
+
+    <div class="row">
+
+      <div class="col">
+
+        <a [routerLink]="['/']"><span class="cl-wt badge badge-pill d-inline-block badge-bread animate">Início</span></a>
+
+        @for (item of config; track $index) {
+
+          <div class="d-inline-block uk-vertical-align-middle">
+
+            <span><img src="/img/breadcrumb.svg" alt="" class="icon-bread"></span>
+
+            @if (isListRoute(item.router)) {
+
+              <a [routerLink]="item.router.commands" [queryParams]="item.router.queryParams">
+
+                <span class="cl-wt badge badge-pill d-inline-block badge-bread animate">{{ item.page }}</span>
+
+              </a>
+
+            } @else if (item.router) {
+
+              <a [routerLink]="item.router">
+
+                <span class="cl-wt badge badge-pill d-inline-block badge-bread animate">{{ item.page }}</span>
+
+              </a>
+
+            } @else {
+
+              <span class="cl-wt badge badge-pill d-inline-block badge-bread">{{ item.page }}</span>
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+

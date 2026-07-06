@@ -1,0 +1,18 @@
+@if (!loading() && avaliacoes().length) {
+  <div class="section-avaliacoes mt-5">
+    <h4 class="font-weight-bold mb-3">Avaliações</h4>
+
+    @for (avaliacao of avaliacoes(); track avaliacao.id) {
+      <div class="avaliacao-item card-rounded mb-3">
+        <div class="avaliacao-header d-flex justify-content-between align-items-center">
+          <strong>{{ avaliacao.autorNome }}</strong>
+          <span class="avaliacao-nota">{{ avaliacao.nota }}/5</span>
+        </div>
+        @if (avaliacao.comentario) {
+          <p class="mb-1 mt-2">{{ avaliacao.comentario }}</p>
+        }
+        <small class="cl-cz">{{ formatDate(avaliacao.createdAt) }}</small>
+      </div>
+    }
+  </div>
+}

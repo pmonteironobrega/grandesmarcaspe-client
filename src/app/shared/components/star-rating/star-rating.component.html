@@ -1,0 +1,31 @@
+<div class="star-rating d-inline-flex align-items-center flex-wrap">
+  <span class="stars" [class.stars--interactive]="isInteractive()">
+    @for (star of stars; track star) {
+      <button
+        type="button"
+        class="star-btn"
+        [class.star-btn--filled]="star <= displayValue()"
+        [disabled]="!isInteractive()"
+        [attr.aria-label]="'Avaliar com ' + star + ' estrelas'"
+        (click)="onStarClick(star)"
+        (mouseenter)="onStarHover(star)"
+        (mouseleave)="onStarLeave()"
+      >
+        ★
+      </button>
+    }
+  </span>
+
+  @if (media() > 0 || total() > 0) {
+    <span class="rating-meta ml-2">
+      @if (media() > 0) {
+        <strong>{{ media() }}</strong>
+      }
+      @if (total() > 0) {
+        <small class="cl-cz ml-1">{{ total() }} avaliação{{ total() === 1 ? '' : 'ões' }}</small>
+      }
+    </span>
+  } @else if (isInteractive()) {
+    <small class="cl-cz ml-2">Clique para avaliar</small>
+  }
+</div>

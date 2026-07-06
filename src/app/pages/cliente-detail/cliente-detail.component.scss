@@ -1,0 +1,172 @@
+@use '../../../../public/variables/variables.scss' as *;
+
+.section-address {
+
+  p {
+
+    font-size: 14px;
+
+  }
+
+
+
+  .ico-address {
+
+    max-width: 50px;
+
+  }
+
+}
+
+
+
+.section-telefones {
+
+  .telefones-group {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+  }
+
+
+
+  .telefone-item {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 14px;
+
+    border: 1px solid #e5e5e5;
+
+    border-radius: 999px;
+
+    background: #fff;
+
+    color: $cinza;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+
+
+
+    &:hover {
+
+      border-color: $laranja-claro;
+
+      color: $laranja-escuro;
+
+      text-decoration: none;
+
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    }
+
+  }
+
+
+
+  .telefone-item--whatsapp {
+
+    border-color: rgba($laranja-claro, 0.45);
+
+
+
+    &:hover {
+
+      border-color: #25d366;
+
+      color: #1e7e34;
+
+    }
+
+  }
+
+
+
+  .telefone-item-icon {
+
+    width: 18px;
+
+    height: 18px;
+
+    flex-shrink: 0;
+
+  }
+
+}
+
+
+
+.localizacao-link {
+
+  font-size: 14px;
+
+  text-decoration: underline;
+
+
+
+  &:hover {
+
+    opacity: 0.8;
+
+  }
+
+}
+
+
+
+.section-avalie {
+
+  .card-rounded {
+
+    border: 2px solid $laranja-escuro;
+
+  }
+
+}
+
+
+
+.tag-item {
+
+  font-size: 12px;
+
+
+
+  &:hover {
+
+    background-color: $laranja-escuro;
+
+    color: #fff;
+
+  }
+
+}
+
+
+
+.links-importantes {
+
+  .icon-social {
+
+    max-height: 32px;
+
+    width: auto;
+
+  }
+
+}
+

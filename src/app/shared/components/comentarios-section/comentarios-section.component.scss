@@ -1,0 +1,56 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+.section-comentarios {
+  .comentario-form,
+  .comentario-item,
+  .comentario-resposta {
+    padding: 16px;
+    border: 1px solid #eee;
+    background: #fff;
+  }
+
+  .comentario-layout {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .comentario-avatar {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: $cinza-claro;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &--sm {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  .comentario-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .comentario-reply-btn {
+    color: $laranja-escuro;
+    font-size: 13px;
+  }
+
+  .comentario-respostas {
+    border-left: 3px solid $laranja-claro;
+    padding-left: 16px;
+  }
+
+  .comentario-resposta {
+    background: $cinza-claro;
+  }
+}

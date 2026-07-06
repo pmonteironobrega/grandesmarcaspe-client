@@ -1,0 +1,26 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+.section-breadcrumb {
+  padding: 0.5rem 0;
+
+  .badge-bread {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    line-height: 1.3;
+  }
+
+  .icon-bread {
+    width: 14px;
+    height: 14px;
+    margin: 0 0.2rem;
+    vertical-align: middle;
+  }
+}
+
+.section-breadcrumb--sticky {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

@@ -1,0 +1,84 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+
+
+.star-rating {
+
+  vertical-align: middle;
+
+  gap: 0.25rem;
+
+}
+
+
+
+.stars {
+
+  display: inline-flex;
+
+  gap: 2px;
+
+}
+
+
+
+.star-btn {
+
+  border: none;
+
+  background: none;
+
+  padding: 0;
+
+  font-size: 22px;
+
+  line-height: 1;
+
+  color: #ddd;
+
+  cursor: default;
+
+
+
+  &--filled {
+
+    color: $laranja-claro;
+
+  }
+
+
+
+  &:disabled {
+
+    cursor: default;
+
+  }
+
+}
+
+
+
+.stars--interactive .star-btn:not(:disabled) {
+
+  cursor: pointer;
+
+
+
+  &:hover {
+
+    transform: scale(1.1);
+
+  }
+
+}
+
+
+
+.rating-meta {
+
+  font-size: 14px;
+
+  color: $laranja-escuro;
+
+}
+

@@ -1,0 +1,9 @@
+<div
+  class="ui-alert card-rounded"
+  [class.ui-alert--success]="type() === 'success'"
+  [class.ui-alert--error]="type() === 'error'"
+  [class.ui-alert--info]="type() === 'info'"
+  role="alert"
+>
+  <ng-content />
+</div>

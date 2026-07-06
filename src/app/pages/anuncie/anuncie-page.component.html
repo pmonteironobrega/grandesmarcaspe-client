@@ -1,0 +1,98 @@
+<app-breadcrumb [config]="configPage"></app-breadcrumb>
+
+<div class="container py-5">
+  <div class="row">
+    <div class="col-12">
+      <h2>Anuncie seu negócio</h2>
+    </div>
+
+    <div class="col-12 py-4">
+      <form action="">
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="form-group">
+              <label for="nomeFantasia">Nome fantasia</label>
+              <input id="nomeFantasia" type="text" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="categoria">Categoria</label>
+              <select id="categoria" class="form-control">
+                <option value="">Selecione</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input id="email" type="text" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="fone">Fones
+                <button class="btn btn-sm" type="button">
+                  <img src="/img/more-icon.svg" alt="">
+                </button>
+              </label>
+              <input id="fone" type="text" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="imagemDestaque">Imagem destaque</label>
+              <input id="imagemDestaque" type="file" class="form-control">
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="form-group">
+              <label for="cep">CEP</label>
+              <input id="cep" type="text" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="endereco">Endereço</label>
+              <input id="endereco" type="text" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="bairro">Bairro</label>
+              <input id="bairro" type="text" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="cidade">Cidade</label>
+              <input id="cidade" type="text" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="estado">Estado</label>
+              <input id="estado" type="text" class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <label for="redesSociais">Redes Sociais e Links
+                <button class="btn btn-sm" type="button">
+                  <img src="/img/more-icon.svg" alt="">
+                </button>
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <label for="informacoes">Informações do negócio</label>
+            <textarea id="informacoes" cols="30" rows="5" class="form-control"></textarea>
+          </div>
+
+          <div class="col-12 mt-3">
+            <button class="btn btn-primary float-right" type="button">Solicitar anúncio</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<app-categorias-populares></app-categorias-populares>

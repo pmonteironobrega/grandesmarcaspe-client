@@ -1,0 +1,11 @@
+<div class="share-icon">
+  <img src="/img/share.svg" alt="" class="img-fluid" (click)="showIcons()">
+
+  <div class="share-icons" [hidden]="isHide">
+    <div *ngFor="let social of redes" class="icon-social">
+      <a href="">
+        <img src="/img/social/{{social.icon}}" alt="" class="mr-2">
+      </a>
+    </div>
+  </div>
+</div>

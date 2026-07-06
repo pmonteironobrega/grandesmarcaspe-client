@@ -1,0 +1,35 @@
+<div class="autocomplete-field">
+  <input
+    type="text"
+    class="form-control"
+    role="combobox"
+    aria-autocomplete="list"
+    [id]="inputId()"
+    [placeholder]="placeholder()"
+    [disabled]="disabled()"
+    [value]="inputText()"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-controls]="listboxId"
+    [attr.aria-activedescendant]="activeDescendant()"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"
+    (focus)="onFocus()"
+  />
+
+  @if (isOpen() && !disabled() && filteredOptions().length > 0) {
+    <ul class="autocomplete-list" role="listbox" [id]="listboxId">
+      @for (option of filteredOptions(); track option.value; let i = $index) {
+        <li
+          role="option"
+          [id]="optionId(i)"
+          [attr.aria-selected]="i === highlightedIndex()"
+          class="autocomplete-option"
+          [class.autocomplete-option--highlighted]="i === highlightedIndex()"
+          (mousedown)="selectOption(option); $event.preventDefault()"
+        >
+          {{ labelFormat()(option.label) }}
+        </li>
+      }
+    </ul>
+  }
+</div>

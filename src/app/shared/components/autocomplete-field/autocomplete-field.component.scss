@@ -1,0 +1,39 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+.autocomplete-field {
+  position: relative;
+
+  &:focus-within {
+    z-index: 1050;
+  }
+}
+
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: $radius-input;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-option {
+  padding: 8px 12px;
+  font-size: $f-size-txt;
+  color: $preto;
+  cursor: pointer;
+  @include animation();
+
+  &:hover,
+  &--highlighted {
+    background-color: $cinza-claro;
+  }
+}

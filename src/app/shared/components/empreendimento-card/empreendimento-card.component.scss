@@ -1,0 +1,31 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+.link-empreendimento {
+  &:hover {
+    text-decoration: none;
+
+    h4, p {
+      color: $cinza;
+    }
+    span.badge {
+      background-color: $cinza;
+      color: #fff;
+    }
+    span.nota {
+      color: $cinza !important;
+
+      small {
+        color: $cinza !important;
+      }
+    }
+  }
+}
+
+.empreendimento {
+  padding-bottom: 10px;
+  border-radius: 25px;
+  &:hover {
+    background-color: #f2f2f2;
+    padding: 10px;
+  }
+}

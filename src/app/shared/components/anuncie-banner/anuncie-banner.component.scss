@@ -1,0 +1,30 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+.section-anuncie {
+  h5 {
+    color: #fff;
+  }
+}
+
+.btn-anuncie {
+  cursor: pointer;
+  border: 1px solid #fff;
+  color: #fff;
+
+  &:hover {
+    background-color: #fff;
+    color: $laranja-escuro;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .btn-anuncie {
+    display: block;
+    margin-top: 10px;
+    margin-left: auto !important;
+    margin-right: auto;
+  }
+  .section-anuncie {
+    text-align: center;
+  }
+}

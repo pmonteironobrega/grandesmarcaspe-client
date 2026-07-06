@@ -1,0 +1,205 @@
+@use "../public/variables/variables.scss" as *;
+
+@import "ngx-owl-carousel-o/lib/styles/scss/owl.carousel";
+@import "ngx-owl-carousel-o/lib/styles/scss/owl.theme.default";
+
+.cliente-galeria__carousel.owl-theme .owl-nav {
+  button.owl-prev,
+  button.owl-next {
+    width: 52px !important;
+    height: 52px !important;
+    padding: 0 !important;
+    border: 2px solid #fff !important;
+    border-radius: 50% !important;
+    background: $laranja-escuro !important;
+    color: #fff !important;
+    font-size: 34px !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+
+    &:hover {
+      background: $laranja-claro !important;
+      color: $preto !important;
+    }
+  }
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+
+  p {
+    font-size: $f-size-txt;
+    margin-bottom: 0px;
+    color: $cinza;
+  }
+
+  h1,h2,h3,h4,h5 {
+    font-weight: bold;
+  }
+
+  button {
+    @include animation();
+  }
+}
+
+.btn-gradient {
+  @include button-gradient();
+
+}
+
+.btn-primary {
+  @include button-default($laranja-escuro, #fff);
+}
+.btn-secondary {
+  @include button-default($laranja-claro, #fff);
+}
+.btn-dark {
+  @include button-default($preto, #fff);
+}
+.btn-lc {
+  @include button-bordered($laranja-claro, $laranja-claro);
+}
+
+.btn-le {
+  @include button-bordered($laranja-escuro, $laranja-escuro);
+}
+
+.btn-bc {
+  @include button-bordered($preto, $preto);
+}
+
+.btn-wt {
+  @include button-bordered(#fff, #fff);
+}
+
+.gradient {
+  @include gradient($laranja-claro, $laranja-escuro);
+}
+
+.bg-lc {
+  background-color: $laranja-claro;
+}
+
+.bg-le {
+  background-color: $laranja-escuro;
+}
+
+.bg-wt {
+  background-color: #fff;
+}
+
+.bg-cz {
+  background-color: $cinza;
+}
+.bg-cz-cl {
+  background-color: $cinza-claro;
+}
+.bg-bc {
+  background-color: $preto;
+}
+
+.cl-lc {
+  color: $laranja-claro;
+}
+
+.cl-le {
+  color: $laranja-escuro;
+}
+
+.cl-wt {
+  color: #fff;
+}
+
+.cl-cz {
+  color: $cinza;
+}
+
+.cl-bc {
+  color: $preto;
+}
+
+.input-gm {
+  border-radius: $radius-input;
+  font-size: $f-size-btn;
+  @include placeholder();
+}
+
+.card-rounded {
+  border-radius: $radius-card;
+  overflow: hidden;
+}
+
+.listing-thumbnail {
+  width: 100%;
+  height: $listing-thumbnail-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $cinza-claro;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 10px;
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+  }
+}
+
+.empreendimento-skeleton {
+  height: $listing-thumbnail-height;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.cliente-galeria-skeleton {
+  height: $cliente-galeria-height;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.gm-border-bottom {
+  border-bottom: 1px solid white;
+}
+
+.animate {
+  transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+}
+
+.border-le {
+  border: 1px solid $laranja-escuro;
+}
+
+label {
+  font-weight: bold;
+  color: $laranja-escuro;
+  margin-bottom: 5px;
+
+}
+
+.form-group {
+  // padding-top: 10px;
+}
+.form-control {
+  border-radius: 20px;
+}

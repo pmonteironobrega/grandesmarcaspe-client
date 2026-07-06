@@ -1,0 +1,46 @@
+<div class="row">
+  <div class="col-sm-4">
+    <app-autocomplete-field
+      inputId="categoriaBusca"
+      placeholder="Selecione a categoria"
+      [options]="categoriaOptions()"
+      [selectedValue]="selectedCategoriaSlug()"
+      [labelFormat]="formatCategoriaNome"
+      (selectionChange)="onCategoriaChange($event)"
+    />
+  </div>
+
+  <div class="col-sm-4">
+    <app-autocomplete-field
+      inputId="cidadeBusca"
+      placeholder="Selecione a cidade"
+      [options]="cidadeOptions()"
+      [selectedValue]="selectedCidadeSlug()"
+      [labelFormat]="formatNome"
+      [disabled]="!selectedCategoriaSlug()"
+      (selectionChange)="onCidadeChange($event)"
+    />
+  </div>
+
+  <div class="col-sm-4">
+    <app-autocomplete-field
+      inputId="bairroBusca"
+      placeholder="Selecione o bairro"
+      [options]="bairroOptions()"
+      [selectedValue]="selectedBairroSlug()"
+      [labelFormat]="formatNome"
+      [disabled]="!selectedCidadeSlug()"
+      (selectionChange)="onBairroChange($event)"
+    />
+  </div>
+</div>
+
+@if (hasAnyFilter()) {
+  <div class="row mt-2">
+    <div class="col text-right">
+      <button type="button" class="btn btn-link btn-limpar-filtros p-0" (click)="onLimparFiltros()">
+        Limpar filtros
+      </button>
+    </div>
+  </div>
+}

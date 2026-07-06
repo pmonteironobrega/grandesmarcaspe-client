@@ -1,0 +1,17 @@
+@use '../../../../../public/variables/variables.scss' as *;
+
+:host {
+  display: block;
+  overflow: visible;
+}
+
+.btn-limpar-filtros {
+  font-size: 13px;
+  font-weight: 600;
+  color: $cinza !important;
+  text-decoration: underline;
+
+  &:hover {
+    color: $laranja-escuro !important;
+  }
+}

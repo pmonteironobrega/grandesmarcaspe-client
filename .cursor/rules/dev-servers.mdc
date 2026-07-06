@@ -1,0 +1,11 @@
+---
+description: Servidores de desenvolvimento são iniciados pelo usuário
+alwaysApply: true
+---
+
+# Servidores — somente o usuário
+
+- **Não** iniciar `npm start`, `ng serve`, `npm run serve:ssr:*` nem servidores em background.
+- **Não** matar processos em portas (4000, 4200, etc.) sem pedido explícito.
+- Informar o comando correto e deixar o usuário subir/parar o servidor.
+- Validação do agente: `npm run build` e `npm test` — sem depender de servidor local rodando.
