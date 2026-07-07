@@ -14,8 +14,12 @@ import { GeographyService } from '../../core/services/geography.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Uf } from '../../core/models/geography.model';
 import { BuscaAvancadaComponent } from '../../shared/components/busca-avancada/busca-avancada.component';
-import { buildListUrlFromFilters, parseListFiltersFromLegacyPath } from '../../core/utils/catalog-url';
-import { buildBuscaUrl, parseBuscaParamsFromQuery } from '../../core/utils/busca-url';
+import { parseListFiltersFromLegacyPath } from '../../core/utils/catalog-url';
+import {
+  buildBuscaUrl,
+  buildBuscaUrlFromGeoFilters,
+  parseBuscaParamsFromQuery,
+} from '../../core/utils/busca-url';
 import { resolveUserPhotoUrl } from '../../core/utils/user-photo';
 
 @Component({
@@ -117,18 +121,7 @@ export class HeaderComponent {
     if (termo.length >= 2) {
       return;
     }
-    const filters = this.buscaAvancada?.getFilters();
-    if (filters) {
-      void this.router.navigateByUrl(buildListUrlFromFilters(filters));
-      this.syncAdvancedSearchPanel();
-      return;
-    }
-    if (this.isSearchRoute()) {
-      void this.router.navigateByUrl('/');
-      this.isOpen = false;
-      return;
-    }
-    this.syncAdvancedSearchPanel();
+    this.navigateFromGeoFilters();
   }
 
   limparBusca(): void {
@@ -168,16 +161,32 @@ export class HeaderComponent {
       return;
     }
 
-    const filters = this.buscaAvancada?.getFilters();
-    if (filters) {
+    if (this.buscaAvancada?.getFilters()) {
       this.buscaMessage = '';
-      void this.router.navigateByUrl(buildListUrlFromFilters(filters));
-      this.syncAdvancedSearchPanel();
+      this.navigateFromGeoFilters();
       return;
     }
 
     this.buscaMessage =
       'Digite ao menos 2 caracteres ou selecione uma categoria para buscar.';
+  }
+
+  private navigateFromGeoFilters(): void {
+    const filters = this.buscaAvancada?.getFilters();
+    if (!filters) {
+      if (this.isSearchRoute()) {
+        void this.router.navigateByUrl('/');
+        this.isOpen = false;
+      } else {
+        this.syncAdvancedSearchPanel();
+      }
+      return;
+    }
+
+    void this.router.navigateByUrl(
+      buildBuscaUrlFromGeoFilters(filters, this.buscaAvancada?.getFilterLabels()),
+    );
+    this.syncAdvancedSearchPanel();
   }
 
   private syncSearchFromRoute(): void {

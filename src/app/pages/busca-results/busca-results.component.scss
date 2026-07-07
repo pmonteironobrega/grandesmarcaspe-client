@@ -1,0 +1,24 @@
+@use '../../../../public/variables/variables.scss' as *;
+
+.busca-categoria-group {
+  padding-top: 1rem;
+  border-top: 1px solid rgba($cinza, 0.2);
+
+  &:first-of-type {
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+.busca-categoria-group__title {
+  font-size: 1.35rem;
+}
+
+.btn-ver-todos {
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

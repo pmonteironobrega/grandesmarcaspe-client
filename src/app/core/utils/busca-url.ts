@@ -1,4 +1,10 @@
-import { BuscaFilters, BuscaParams } from '../models/paginated-response.model';
+import { BuscaFilters, BuscaParams, ClienteListFilters } from '../models/paginated-response.model';
+
+export interface GeoFilterLabels {
+  categoria?: string;
+  cidade?: string;
+  bairro?: string;
+}
 
 
 
@@ -117,6 +123,43 @@ export function parseBuscaParamsFromQuery(
 }
 
 
+
+/** Monta frase natural para `/busca` a partir dos filtros geo (mesmo estilo da busca textual). */
+export function buildBuscaQueryFromGeoFilters(
+  filters: ClienteListFilters,
+  labels?: GeoFilterLabels,
+): string {
+  const categoria = (labels?.categoria ?? filters.categoria).trim();
+
+  if (filters.bairro) {
+    const local = labels?.bairro ?? filters.bairro;
+    return `${categoria} em ${local}`;
+  }
+
+  if (filters.cidade) {
+    const local = labels?.cidade ?? filters.cidade;
+    return `${categoria} em ${local}`;
+  }
+
+  return categoria;
+}
+
+export function buildBuscaUrlFromGeoFilters(
+  filters: ClienteListFilters,
+  labels?: GeoFilterLabels,
+  page = 1,
+): string {
+  return buildBuscaUrl(
+    {
+      q: buildBuscaQueryFromGeoFilters(filters, labels),
+      uf: filters.uf ?? '',
+      categoria: filters.categoria,
+      cidade: filters.cidade,
+      bairro: filters.bairro,
+    },
+    page,
+  );
+}
 
 export function buildBuscaRouteFromFilters(filters: BuscaFilters, page = 1): BuscaRoute {
 

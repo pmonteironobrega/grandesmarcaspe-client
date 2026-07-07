@@ -132,7 +132,7 @@ describe('HeaderComponent', () => {
 
 
 
-  it('buscar should navigate to legacy list when only categoria is set', () => {
+  it('buscar should navigate to /busca when only categoria is set', () => {
 
     const buscaAvancada = {
 
@@ -162,6 +162,8 @@ describe('HeaderComponent', () => {
 
       }),
 
+      getFilterLabels: () => ({ categoria: 'Academias' }),
+
       hasAnyFilter: () => true,
 
     } as BuscaAvancadaComponent;
@@ -170,11 +172,11 @@ describe('HeaderComponent', () => {
 
     component.buscar();
 
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/c/academias/pe');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/busca?q=Academias&uf=pe&categoria=academias');
 
   });
 
-  it('onBuscaFiltersChange should navigate to legacy list when categoria is selected', () => {
+  it('onBuscaFiltersChange should navigate to /busca when categoria is selected', () => {
     const buscaAvancada = {
       getFilters: () => ({
         categoria: 'academias',
@@ -182,6 +184,7 @@ describe('HeaderComponent', () => {
         cidade: null,
         bairro: null,
       }),
+      getFilterLabels: () => ({ categoria: 'Academias' }),
       hasAnyFilter: () => true,
     } as BuscaAvancadaComponent;
 
@@ -189,7 +192,7 @@ describe('HeaderComponent', () => {
 
     component.onBuscaFiltersChange();
 
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/c/academias/pe');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/busca?q=Academias&uf=pe&categoria=academias');
     expect(component.isOpen).toBeTrue();
   });
 

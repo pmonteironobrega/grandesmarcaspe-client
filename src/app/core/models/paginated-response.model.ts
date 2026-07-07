@@ -35,13 +35,25 @@ export interface PaginatedClientes {
   };
 }
 
+export interface BuscaCategoriaGroup {
+  categoria: {
+    id: number;
+    nome: string;
+    slug: string;
+  };
+  total: number;
+  data: ClienteListItem[];
+}
+
 export interface PaginatedBusca {
   data: ClienteListItem[];
+  groups?: BuscaCategoriaGroup[];
   meta: {
     page: number;
     perPage: number;
     total: number;
     totalPages: number;
+    groupedByCategoria: boolean;
     filters: BuscaFilters;
   };
 }

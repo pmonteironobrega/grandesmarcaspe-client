@@ -1,7 +1,9 @@
 import {
   buildBuscaRoute,
   buildBuscaRouteFromFilters,
+  buildBuscaQueryFromGeoFilters,
   buildBuscaUrl,
+  buildBuscaUrlFromGeoFilters,
   parseBuscaParamsFromQuery,
 } from './busca-url';
 
@@ -76,5 +78,32 @@ describe('busca-url', () => {
   it('buildBuscaRoute should trim q', () => {
     const route = buildBuscaRoute({ q: '  academia  ', uf: 'pe' });
     expect(route.queryParams['q']).toBe('academia');
+  });
+
+  it('buildBuscaQueryFromGeoFilters should build categoria-only query', () => {
+    expect(
+      buildBuscaQueryFromGeoFilters(
+        { categoria: 'oticas', uf: 'pe', cidade: null, bairro: null },
+        { categoria: 'Óticas' },
+      ),
+    ).toBe('Óticas');
+  });
+
+  it('buildBuscaQueryFromGeoFilters should build categoria + cidade query', () => {
+    expect(
+      buildBuscaQueryFromGeoFilters(
+        { categoria: 'academias', uf: 'pe', cidade: 'recife', bairro: null },
+        { categoria: 'Academias', cidade: 'Recife' },
+      ),
+    ).toBe('Academias em Recife');
+  });
+
+  it('buildBuscaUrlFromGeoFilters should route advanced search through /busca', () => {
+    expect(
+      buildBuscaUrlFromGeoFilters(
+        { categoria: 'academias', uf: 'pe', cidade: 'recife', bairro: null },
+        { categoria: 'Academias', cidade: 'Recife' },
+      ),
+    ).toBe('/busca?q=Academias+em+Recife&uf=pe&categoria=academias&cidade=recife');
   });
 });

@@ -54,6 +54,7 @@ describe('BuscaResultsComponent', () => {
         perPage: 15,
         total: 0,
         totalPages: 0,
+        groupedByCategoria: false,
         filters: { q: 'academia', uf: 'pe', categoria: null, cidade: null, bairro: null },
       },
     });
@@ -87,6 +88,7 @@ describe('BuscaResultsComponent', () => {
         perPage: 15,
         total: 1,
         totalPages: 1,
+        groupedByCategoria: false,
         filters: {
           q: 'academia',
           uf: 'pe',
@@ -100,6 +102,73 @@ describe('BuscaResultsComponent', () => {
 
     expect(component.loading()).toBeFalse();
     expect(component.listagem()?.data.length).toBe(1);
+  });
+
+  it('should render grouped results by categoria', async () => {
+    await router.navigateByUrl('/busca?q=academias&uf=pe');
+    fixture.detectChanges();
+
+    httpMock.expectOne('/busca?q=academias&uf=pe').flush({
+      data: [],
+      groups: [
+        {
+          categoria: { id: 1, nome: 'Academias', slug: 'academias' },
+          total: 10,
+          data: [
+            {
+              id: 1,
+              slug: 'academia-a',
+              nome: 'Academia A',
+              slogan: null,
+              avaliacao: 4,
+              categoria: { id: 1, nome: 'Academias', slug: 'academias' },
+              plano: null,
+              endereco: null,
+              imagemPrincipal: null,
+            },
+          ],
+        },
+        {
+          categoria: { id: 2, nome: 'Academias Desportivas', slug: 'academias-desportivas' },
+          total: 3,
+          data: [
+            {
+              id: 2,
+              slug: 'academia-b',
+              nome: 'Academia B',
+              slogan: null,
+              avaliacao: 5,
+              categoria: { id: 2, nome: 'Academias Desportivas', slug: 'academias-desportivas' },
+              plano: null,
+              endereco: null,
+              imagemPrincipal: null,
+            },
+          ],
+        },
+      ],
+      meta: {
+        page: 1,
+        perPage: 6,
+        total: 13,
+        totalPages: 1,
+        groupedByCategoria: true,
+        filters: {
+          q: 'academias',
+          uf: 'pe',
+          categoria: null,
+          cidade: null,
+          bairro: null,
+        },
+      },
+    });
+    flushCategoriasPopulares();
+    fixture.detectChanges();
+
+    expect(component.listagem()?.meta.groupedByCategoria).toBeTrue();
+    expect(component.listagem()?.groups?.length).toBe(2);
+    expect(component.buildGroupListUrl(component.listagem()!.meta.filters, 'academias')).toBe(
+      '/c/academias/pe',
+    );
   });
 
   it('should mark invalid query when q is too short', async () => {

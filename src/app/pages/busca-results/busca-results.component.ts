@@ -5,7 +5,7 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { CatalogService } from '../../core/services/catalog.service';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
-import { PaginatedBusca } from '../../core/models/paginated-response.model';
+import { BuscaFilters, PaginatedBusca } from '../../core/models/paginated-response.model';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
 import { EmpreendimentoCardComponent } from '../../shared/components/empreendimento-card/empreendimento-card.component';
 import { CategoriasPopularesComponent } from '../../shared/components/categorias-populares/categorias-populares.component';
@@ -15,6 +15,7 @@ import {
   parseBuscaParamsFromQuery,
   BuscaRoute,
 } from '../../core/utils/busca-url';
+import { buildListUrlFromFilters } from '../../core/utils/catalog-url';
 import { buildPaginationWindow } from '../../core/utils/pagination';
 import { capitalizeWords } from '../../core/utils/format-text';
 
@@ -48,6 +49,15 @@ export class BuscaResultsComponent implements OnInit {
 
   paginationPages(currentPage: number, totalPages: number): number[] {
     return buildPaginationWindow(currentPage, totalPages);
+  }
+
+  buildGroupListUrl(filters: BuscaFilters, categoriaSlug: string): string {
+    return buildListUrlFromFilters({
+      categoria: categoriaSlug,
+      uf: filters.uf,
+      cidade: filters.cidade,
+      bairro: filters.bairro,
+    });
   }
 
   ngOnInit(): void {

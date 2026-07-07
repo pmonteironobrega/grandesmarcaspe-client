@@ -7,6 +7,7 @@ import { Categoria } from '../../../core/models/categoria.model';
 import { Cidade, Bairro } from '../../../core/models/geography.model';
 import { capitalizeWords } from '../../../core/utils/format-text';
 import { ClienteListFilters } from '../../../core/models/paginated-response.model';
+import { GeoFilterLabels } from '../../../core/utils/busca-url';
 import {
   AutocompleteFieldComponent,
   AutocompleteOption,
@@ -194,6 +195,20 @@ export class BuscaAvancadaComponent {
       cidade: this.selectedCidadeSlug(),
       bairro: this.selectedBairroSlug(),
       uf: this.locationState.uf().toLowerCase(),
+    };
+  }
+
+  getFilterLabels(): GeoFilterLabels {
+    const categoria = this.categorias().find(
+      (item) => item.slug === this.selectedCategoriaSlug(),
+    );
+    const cidade = this.cidades().find((item) => item.slug === this.selectedCidadeSlug());
+    const bairro = this.bairros().find((item) => item.slug === this.selectedBairroSlug());
+
+    return {
+      categoria: categoria?.nome,
+      cidade: cidade?.nome,
+      bairro: bairro?.nome,
     };
   }
 

@@ -33,61 +33,102 @@
         </div>
       </div>
 
-      <div class="row">
-        @for (cliente of result.data; track cliente.id) {
-          <div class="col-sm-4 col-xs-12">
-            <app-empreendimento [cliente]="cliente"></app-empreendimento>
-          </div>
-        } @empty {
-          <div class="col">
-            <p class="cl-cz">Nenhum resultado encontrado para &ldquo;{{ result.meta.filters.q }}&rdquo;.</p>
+      @if (result.meta.groupedByCategoria) {
+        @if (result.groups?.length) {
+          @for (group of result.groups; track group.categoria.id) {
+            <section class="busca-categoria-group mb-5">
+              <div class="row align-items-center mb-3">
+                <div class="col">
+                  <h3 class="busca-categoria-group__title font-weight-bold cl-bc mb-0">
+                    {{ formatCategoriaNome(group.categoria.nome) }}
+                  </h3>
+                  <p class="cl-cz mb-0">{{ group.total }} resultados</p>
+                </div>
+                @if (group.total > group.data.length) {
+                  <div class="col-auto">
+                    <a
+                      class="btn btn-link btn-ver-todos p-0"
+                      [routerLink]="buildGroupListUrl(result.meta.filters, group.categoria.slug)"
+                    >
+                      Ver todos ({{ group.total }})
+                    </a>
+                  </div>
+                }
+              </div>
+
+              <div class="row">
+                @for (cliente of group.data; track cliente.id) {
+                  <div class="col-sm-4 col-xs-12">
+                    <app-empreendimento [cliente]="cliente"></app-empreendimento>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+        } @else {
+          <div class="row">
+            <div class="col">
+              <p class="cl-cz">Nenhum resultado encontrado para &ldquo;{{ result.meta.filters.q }}&rdquo;.</p>
+            </div>
           </div>
         }
-      </div>
+      } @else {
+        <div class="row">
+          @for (cliente of result.data; track cliente.id) {
+            <div class="col-sm-4 col-xs-12">
+              <app-empreendimento [cliente]="cliente"></app-empreendimento>
+            </div>
+          } @empty {
+            <div class="col">
+              <p class="cl-cz">Nenhum resultado encontrado para &ldquo;{{ result.meta.filters.q }}&rdquo;.</p>
+            </div>
+          }
+        </div>
 
-      @if (result.meta.totalPages > 1) {
-        <nav class="mt-5" aria-label="Paginação">
-          <ul class="pagination justify-content-center">
-            @if (result.meta.page > 1) {
-              <li class="page-item">
-                @let prevRoute = buildBuscaRoute(result.meta.filters, result.meta.page - 1);
-                <a
-                  class="page-link"
-                  [routerLink]="prevRoute.commands"
-                  [queryParams]="prevRoute.queryParams"
-                >Voltar</a>
-              </li>
-            }
-
-            @for (page of paginationPages(result.meta.page, result.meta.totalPages); track page) {
-              @if (page === result.meta.page) {
-                <li class="page-item active">
-                  <span class="page-link">{{ page }}</span>
-                </li>
-              } @else {
-                @let pageRoute = buildBuscaRoute(result.meta.filters, page);
+        @if (result.meta.totalPages > 1) {
+          <nav class="mt-5" aria-label="Paginação">
+            <ul class="pagination justify-content-center">
+              @if (result.meta.page > 1) {
                 <li class="page-item">
+                  @let prevRoute = buildBuscaRoute(result.meta.filters, result.meta.page - 1);
                   <a
                     class="page-link"
-                    [routerLink]="pageRoute.commands"
-                    [queryParams]="pageRoute.queryParams"
-                  >{{ page }}</a>
+                    [routerLink]="prevRoute.commands"
+                    [queryParams]="prevRoute.queryParams"
+                  >Voltar</a>
                 </li>
               }
-            }
 
-            @if (result.meta.page < result.meta.totalPages) {
-              <li class="page-item">
-                @let nextRoute = buildBuscaRoute(result.meta.filters, result.meta.page + 1);
-                <a
-                  class="page-link"
-                  [routerLink]="nextRoute.commands"
-                  [queryParams]="nextRoute.queryParams"
-                >Próxima</a>
-              </li>
-            }
-          </ul>
-        </nav>
+              @for (page of paginationPages(result.meta.page, result.meta.totalPages); track page) {
+                @if (page === result.meta.page) {
+                  <li class="page-item active">
+                    <span class="page-link">{{ page }}</span>
+                  </li>
+                } @else {
+                  @let pageRoute = buildBuscaRoute(result.meta.filters, page);
+                  <li class="page-item">
+                    <a
+                      class="page-link"
+                      [routerLink]="pageRoute.commands"
+                      [queryParams]="pageRoute.queryParams"
+                    >{{ page }}</a>
+                  </li>
+                }
+              }
+
+              @if (result.meta.page < result.meta.totalPages) {
+                <li class="page-item">
+                  @let nextRoute = buildBuscaRoute(result.meta.filters, result.meta.page + 1);
+                  <a
+                    class="page-link"
+                    [routerLink]="nextRoute.commands"
+                    [queryParams]="nextRoute.queryParams"
+                  >Próxima</a>
+                </li>
+              }
+            </ul>
+          </nav>
+        }
       }
     }
   </div>
