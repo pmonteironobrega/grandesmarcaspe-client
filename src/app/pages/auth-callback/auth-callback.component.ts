@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { RouteTransitionService } from '../../core/services/route-transition.service';
 import { resolveApiErrorMessage } from '../../core/utils/api-message';
 
 @Component({
@@ -15,6 +16,7 @@ export class AuthCallbackComponent implements OnInit {
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private routeTransition = inject(RouteTransitionService);
 
   errorMessage = signal('');
 
@@ -23,12 +25,14 @@ export class AuthCallbackComponent implements OnInit {
     const error = params.get('error');
     if (error) {
       this.errorMessage.set(decodeURIComponent(error));
+      this.routeTransition.releaseContent();
       return;
     }
 
     const token = params.get('accessToken') ?? params.get('token');
     if (!token) {
       this.errorMessage.set('Não foi possível concluir o login com o Google.');
+      this.routeTransition.releaseContent();
       return;
     }
 
@@ -40,6 +44,7 @@ export class AuthCallbackComponent implements OnInit {
       error: (err) => {
         this.auth.logout(false);
         this.errorMessage.set(resolveApiErrorMessage(err, 'auth'));
+        this.routeTransition.releaseContent();
       },
     });
   }

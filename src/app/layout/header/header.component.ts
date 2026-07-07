@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { LISTA_ESTADOS } from '../../core/constants/estados';
 import { LocationStateService } from '../../core/services/location-state.service';
 import { GeographyService } from '../../core/services/geography.service';
@@ -26,6 +27,7 @@ import { resolveUserPhotoUrl } from '../../core/utils/user-photo';
     RouterLink,
     CollapseModule,
     ModalModule,
+    BsDropdownModule,
     BuscaAvancadaComponent,
   ],
   templateUrl: './header.component.html',

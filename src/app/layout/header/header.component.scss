@@ -21,6 +21,10 @@
   }
 }
 
+.top-header {
+  overflow: visible;
+}
+
 .search-input {
   padding: 12px 20px;
   height: auto !important;
@@ -73,36 +77,88 @@
 }
 
 .header-account {
-  &__profile {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+
+  &__anuncie,
+  &__login {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  &__menu {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  &__menu-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-right: 0.75rem;
-    margin-top: 0.35rem;
-    text-decoration: none;
-    color: inherit;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 2px solid rgba($laranja-claro, 0.9);
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &::after {
+      display: none;
+    }
+
+    &:hover,
+    &[aria-expanded='true'] {
+      border-color: $laranja-escuro;
+      box-shadow: 0 0 0 3px rgba($laranja-claro, 0.35);
+    }
   }
 
   &__avatar {
-    width: 34px;
-    height: 34px;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba($laranja-claro, 0.8);
-    background: #fff;
+    display: block;
   }
 
-  &__name {
-    display: inline-block;
-    margin-right: 0.75rem;
+  &__dropdown {
+    min-width: 180px;
     margin-top: 0.5rem;
-    color: $cinza;
+    padding: 0.35rem 0;
+    border: none;
+    border-radius: $radius-card;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .dropdown-item {
+    padding: 0.55rem 1rem;
     font-weight: 600;
-    max-width: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: middle;
+    color: $preto;
+
+    &:hover,
+    &:focus {
+      color: $laranja-escuro;
+      background: rgba($laranja-claro, 0.12);
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .header-account__actions {
+    margin-top: 0;
   }
 }
 
@@ -129,7 +185,26 @@
   }
 }
 
+@media (max-width: 767.98px) {
+  .header-account {
+    justify-content: flex-start;
+
+    &__actions {
+      justify-content: flex-start;
+    }
+  }
+}
+
 @media (max-width: 575.98px) {
+  .current-uf {
+    margin-bottom: 0.5rem;
+  }
+
+  .header-account__menu-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
   .logo-header {
     max-width: 80% !important;
   }

@@ -79,6 +79,10 @@
   width: 65%;
 }
 
+.page-transition-form-card {
+  height: 420px;
+}
+
 .page-transition-side {
   height: 260px;
 }
@@ -104,6 +108,10 @@
 }
 
 @media (max-width: 575.98px) {
+  .page-transition-form-card {
+    height: 360px;
+  }
+
   .page-transition-hero {
     height: 220px;
   }

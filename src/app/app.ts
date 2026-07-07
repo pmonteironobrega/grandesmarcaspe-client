@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import {
   NavigationCancel,
   NavigationEnd,
@@ -24,6 +24,7 @@ export class App {
   private destroyRef = inject(DestroyRef);
   private appScroll = inject(AppScrollService);
   readonly routeTransition = inject(RouteTransitionService);
+  readonly transitionLayout = signal<'catalog' | 'form'>('catalog');
 
   constructor() {
     this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
@@ -34,7 +35,9 @@ export class App {
 
       if (event instanceof NavigationEnd) {
         this.appScroll.scrollToTop();
-        this.routeTransition.onNavigationEnd(this.getAwaitContentFromSnapshot());
+        const meta = this.getRouteMetaFromSnapshot();
+        this.transitionLayout.set(meta.layout);
+        this.routeTransition.onNavigationEnd(meta.awaitContent);
         return;
       }
 
@@ -44,12 +47,15 @@ export class App {
     });
   }
 
-  private getAwaitContentFromSnapshot(): boolean {
+  private getRouteMetaFromSnapshot(): { awaitContent: boolean; layout: 'catalog' | 'form' } {
     let route = this.router.routerState.snapshot.root;
     while (route.firstChild) {
       route = route.firstChild;
     }
-    return route.data['awaitContent'] === true;
-  }
 
+    return {
+      awaitContent: route.data['awaitContent'] === true,
+      layout: route.data['transitionLayout'] === 'form' ? 'form' : 'catalog',
+    };
+  }
 }

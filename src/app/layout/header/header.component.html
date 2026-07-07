@@ -6,7 +6,7 @@
 
       <div class="row">
 
-        <div class="col-6 current-uf">
+        <div class="col-12 col-md-5 col-lg-4 current-uf">
 
           <button class="btn btn-lg btn-lc" (click)="openModal(modalEstados)">Você está em: <strong>{{ locationState.uf() }}</strong></button>
 
@@ -14,30 +14,45 @@
 
 
 
-        <div class="col-6 text-right header-account">
+        <div class="col-12 col-md-7 col-lg-8 header-account">
 
-          @if (auth.isAuthenticated()) {
-            <a class="header-account__profile float-right" [routerLink]="['/perfil']" aria-label="Meu perfil">
-              @if (profilePhotoUrl()) {
-                <img [src]="profilePhotoUrl()" alt="" class="header-account__avatar" aria-hidden="true">
-              } @else {
-                <img src="/img/avatar-usuario.svg" alt="" class="header-account__avatar" aria-hidden="true">
-              }
-              <span class="header-account__name d-none d-md-inline">{{ auth.currentUser()?.nome }}</span>
-            </a>
-            <button type="button" class="btn btn-lg btn-lc float-right" (click)="auth.logout()">Sair</button>
-          } @else {
-            <a
-              class="btn btn-lg btn-lc float-right"
-              routerLink="/login"
-              target="_blank"
-              rel="noopener noreferrer"
-              role="button">
-              Login
-            </a>
-          }
+          <div class="header-account__actions">
 
-          <button class="btn btn-lg btn-le float-right mr-2" [routerLink]="['/anuncie']">Anuncie</button>
+            <a class="btn btn-lg btn-le header-account__anuncie" [routerLink]="['/anuncie']">Anuncie</a>
+
+            @if (auth.isAuthenticated()) {
+              <div class="header-account__menu" dropdown placement="bottom right" container="body">
+                <button
+                  type="button"
+                  class="header-account__menu-toggle"
+                  dropdownToggle
+                  [attr.aria-label]="'Menu da conta: ' + (auth.currentUser()?.nome ?? 'Usuário')">
+                  @if (profilePhotoUrl()) {
+                    <img [src]="profilePhotoUrl()" alt="" class="header-account__avatar" aria-hidden="true">
+                  } @else {
+                    <img src="/img/avatar-usuario.svg" alt="" class="header-account__avatar" aria-hidden="true">
+                  }
+                </button>
+
+                <ul *dropdownMenu class="dropdown-menu dropdown-menu-right header-account__dropdown" role="menu">
+                  <li role="menuitem">
+                    <a class="dropdown-item" routerLink="/perfil">Editar perfil</a>
+                  </li>
+                  <li role="menuitem">
+                    <button type="button" class="dropdown-item" (click)="auth.logout()">Sair</button>
+                  </li>
+                </ul>
+              </div>
+            } @else {
+              <a
+                class="btn btn-lg btn-lc header-account__login"
+                routerLink="/login"
+                role="button">
+                Login
+              </a>
+            }
+
+          </div>
 
         </div>
 

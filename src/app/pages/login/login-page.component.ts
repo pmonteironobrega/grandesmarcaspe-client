@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, afterNextRender, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -6,6 +6,7 @@ import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcru
 import { UiAlertComponent } from '../../shared/components/ui-alert/ui-alert.component';
 import { AuthService } from '../../core/services/auth.service';
 import { resolveApiErrorMessage } from '../../core/utils/api-message';
+import { RouteTransitionService } from '../../core/services/route-transition.service';
 
 @Component({
   selector: 'app-login-page',
@@ -18,6 +19,7 @@ export class LoginPageComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private routeTransition = inject(RouteTransitionService);
 
   readonly breadcrumb = [{ page: 'Login', router: '/login' }];
 
@@ -25,6 +27,12 @@ export class LoginPageComponent {
   senha = '';
   loading = signal(false);
   errorMessage = signal('');
+
+  constructor() {
+    afterNextRender(() => {
+      this.routeTransition.releaseContent();
+    });
+  }
 
   authQueryParams(): Record<string, string> {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');

@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, afterNextRender, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
@@ -6,6 +6,7 @@ import { UiAlertComponent } from '../../shared/components/ui-alert/ui-alert.comp
 import { AuthService } from '../../core/services/auth.service';
 import { resolveApiErrorMessage } from '../../core/utils/api-message';
 import { resolveUserPhotoUrl } from '../../core/utils/user-photo';
+import { RouteTransitionService } from '../../core/services/route-transition.service';
 
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
 
@@ -18,6 +19,7 @@ const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
 })
 export class PerfilPageComponent {
   private auth = inject(AuthService);
+  private routeTransition = inject(RouteTransitionService);
 
   private photoInput = viewChild<ElementRef<HTMLInputElement>>('photoInput');
 
@@ -46,6 +48,10 @@ export class PerfilPageComponent {
       this.nome = user.nome;
       this.email = user.email;
     }
+
+    afterNextRender(() => {
+      this.routeTransition.releaseContent();
+    });
   }
 
   openPhotoPicker(): void {

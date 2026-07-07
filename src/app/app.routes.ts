@@ -51,13 +51,13 @@ export const routes: Routes = [
 
   { path: 'fale-conosco', component: FaleConoscoPageComponent },
 
-  { path: 'login', component: LoginPageComponent },
+  { path: 'login', component: LoginPageComponent, data: { awaitContent: true, transitionLayout: 'form' } },
 
-  { path: 'cadastro', component: CadastroPageComponent },
+  { path: 'cadastro', component: CadastroPageComponent, data: { awaitContent: true, transitionLayout: 'form' } },
 
-  { path: 'auth/callback', component: AuthCallbackComponent },
+  { path: 'auth/callback', component: AuthCallbackComponent, data: { awaitContent: true, transitionLayout: 'form' } },
 
-  { path: 'perfil', component: PerfilPageComponent, canActivate: [authGuard] },
+  { path: 'perfil', component: PerfilPageComponent, canActivate: [authGuard], data: { awaitContent: true, transitionLayout: 'form' } },
 
   { path: 'busca', component: BuscaResultsComponent, data: { awaitContent: true } },
 

@@ -11,6 +11,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 
@@ -50,7 +51,7 @@ describe('HeaderComponent', () => {
 
         provideHttpClientTesting(),
 
-        importProvidersFrom(ModalModule.forRoot(), CollapseModule.forRoot()),
+        importProvidersFrom(ModalModule.forRoot(), CollapseModule.forRoot(), BsDropdownModule.forRoot()),
 
         {
           provide: AuthService,
