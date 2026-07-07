@@ -47,11 +47,11 @@ describe('BuscaResultsComponent', () => {
     await router.navigateByUrl('/busca?q=academia&uf=pe');
     fixture.detectChanges();
 
-    httpMock.expectOne('/busca?q=academia&uf=pe').flush({
+    httpMock.expectOne('/busca?q=academia&uf=pe&perPage=10').flush({
       data: [],
       meta: {
         page: 1,
-        perPage: 15,
+        perPage: 10,
         total: 0,
         totalPages: 0,
         groupedByCategoria: false,
@@ -67,7 +67,7 @@ describe('BuscaResultsComponent', () => {
     await router.navigateByUrl('/busca?q=academia&uf=pe');
     fixture.detectChanges();
 
-    const req = httpMock.expectOne('/busca?q=academia&uf=pe');
+    const req = httpMock.expectOne('/busca?q=academia&uf=pe&perPage=10');
     expect(req.request.method).toBe('GET');
     req.flush({
       data: [
@@ -85,7 +85,7 @@ describe('BuscaResultsComponent', () => {
       ],
       meta: {
         page: 1,
-        perPage: 15,
+        perPage: 10,
         total: 1,
         totalPages: 1,
         groupedByCategoria: false,
@@ -105,10 +105,10 @@ describe('BuscaResultsComponent', () => {
   });
 
   it('should render grouped results by categoria', async () => {
-    await router.navigateByUrl('/busca?q=academias&uf=pe');
+    await router.navigateByUrl('/busca?q=academias+em+olinda&uf=pe');
     fixture.detectChanges();
 
-    httpMock.expectOne('/busca?q=academias&uf=pe').flush({
+    httpMock.expectOne('/busca?q=academias+em+olinda&uf=pe&perPage=10').flush({
       data: [],
       groups: [
         {
@@ -148,15 +148,15 @@ describe('BuscaResultsComponent', () => {
       ],
       meta: {
         page: 1,
-        perPage: 6,
+        perPage: 10,
         total: 13,
         totalPages: 1,
         groupedByCategoria: true,
         filters: {
-          q: 'academias',
+          q: 'academias em olinda',
           uf: 'pe',
-          categoria: null,
-          cidade: null,
+          categoria: 'academias',
+          cidade: 'olinda',
           bairro: null,
         },
       },
@@ -166,9 +166,15 @@ describe('BuscaResultsComponent', () => {
 
     expect(component.listagem()?.meta.groupedByCategoria).toBeTrue();
     expect(component.listagem()?.groups?.length).toBe(2);
-    expect(component.listagem()?.meta.filters.categoria).toBeNull();
+    expect(component.listagem()?.meta.filters.categoria).toBe('academias');
+    expect(component.listagem()?.meta.filters.cidade).toBe('olinda');
+    expect(component.breadcrumb().map((crumb) => crumb.page)).toEqual([
+      'Busca',
+      'Academias',
+      'Olinda',
+    ]);
     expect(component.buildGroupListUrl(component.listagem()!.meta.filters, 'academias')).toBe(
-      '/c/academias/pe',
+      '/c/academias/olinda/pe',
     );
   });
 

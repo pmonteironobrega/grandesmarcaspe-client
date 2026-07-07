@@ -17,6 +17,7 @@ import { BuscaAvancadaComponent } from '../../shared/components/busca-avancada/b
 import { parseListFiltersFromLegacyPath } from '../../core/utils/catalog-url';
 import {
   buildBuscaUrl,
+  buildBuscaQueryFromGeoFilters,
   buildBuscaUrlFromGeoFilters,
   parseBuscaParamsFromQuery,
 } from '../../core/utils/busca-url';
@@ -54,6 +55,7 @@ export class HeaderComponent {
   modalRef?: BsModalRef;
   buscaMessage = '';
   termoBusca = signal('');
+  private lastGeoSearchQuery = signal('');
   ufs = signal<Uf[]>([]);
 
   constructor() {
@@ -117,10 +119,35 @@ export class HeaderComponent {
 
   onBuscaFiltersChange(): void {
     this.buscaMessage = '';
+    const filters = this.buscaAvancada?.getFilters();
     const termo = this.termoBusca().trim();
-    if (termo.length >= 2) {
+    const lastGeo = this.lastGeoSearchQuery().trim();
+
+    if (filters) {
+      const labels = this.buscaAvancada?.getFilterLabels();
+      const geoQuery = buildBuscaQueryFromGeoFilters(filters, labels).trim();
+      const geoDriven = termo.length < 2 || termo === lastGeo || termo === geoQuery;
+      if (termo.length >= 2 && !geoDriven) {
+        return;
+      }
+      this.termoBusca.set(geoQuery);
+      this.lastGeoSearchQuery.set(geoQuery);
+      void this.router.navigateByUrl(buildBuscaUrlFromGeoFilters(filters, labels));
+      this.syncAdvancedSearchPanel();
       return;
     }
+
+    if (!(this.buscaAvancada?.hasAnyFilter() ?? false)) {
+      if (!termo || termo === lastGeo) {
+        this.termoBusca.set('');
+      }
+      this.lastGeoSearchQuery.set('');
+    }
+
+    if (this.termoBusca().trim().length >= 2) {
+      return;
+    }
+
     this.navigateFromGeoFilters();
   }
 
@@ -132,6 +159,7 @@ export class HeaderComponent {
 
   private clearSearchState(): void {
     this.termoBusca.set('');
+    this.lastGeoSearchQuery.set('');
     this.buscaMessage = '';
     this.buscaAvancada?.clearFilters();
   }
@@ -163,7 +191,13 @@ export class HeaderComponent {
 
     if (this.buscaAvancada?.getFilters()) {
       this.buscaMessage = '';
-      this.navigateFromGeoFilters();
+      const filters = this.buscaAvancada.getFilters()!;
+      const labels = this.buscaAvancada.getFilterLabels();
+      const geoQuery = buildBuscaQueryFromGeoFilters(filters, labels);
+      this.termoBusca.set(geoQuery);
+      this.lastGeoSearchQuery.set(geoQuery);
+      void this.router.navigateByUrl(buildBuscaUrlFromGeoFilters(filters, labels));
+      this.syncAdvancedSearchPanel();
       return;
     }
 
@@ -214,6 +248,7 @@ export class HeaderComponent {
       const params = parseBuscaParamsFromQuery(urlTree.queryParams);
       if (params) {
         this.termoBusca.set(params.q);
+        this.lastGeoSearchQuery.set(params.q);
         this.buscaAvancada?.setFiltersFromRoute({
           categoria: params.categoria ?? null,
           cidade: params.cidade ?? null,

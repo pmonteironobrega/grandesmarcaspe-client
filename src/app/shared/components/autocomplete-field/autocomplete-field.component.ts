@@ -53,6 +53,8 @@ export class AutocompleteFieldComponent {
     return items.filter((option) => option.label.toLowerCase().includes(query));
   });
 
+  private previousSelectedValue: string | null = null;
+
   constructor() {
     effect(() => {
       if (this.skipSync) {
@@ -61,9 +63,19 @@ export class AutocompleteFieldComponent {
 
       const value = this.selectedValue();
       const items = this.options();
+      const previousValue = this.previousSelectedValue;
+      this.previousSelectedValue = value;
 
       if (!value) {
-        this.inputText.set('');
+        if (previousValue) {
+          const previousOption = items.find((item) => item.value === previousValue);
+          const formattedPrevious = previousOption
+            ? this.labelFormat()(previousOption.label)
+            : '';
+          if (this.inputText() === formattedPrevious || !this.inputText().trim()) {
+            this.inputText.set('');
+          }
+        }
         return;
       }
 

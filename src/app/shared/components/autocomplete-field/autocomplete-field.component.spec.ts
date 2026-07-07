@@ -50,6 +50,16 @@ describe('AutocompleteFieldComponent', () => {
     expect(emitted).toEqual([null]);
   });
 
+  it('should keep partial text when editing a selected option', () => {
+    fixture.componentRef.setInput('selectedValue', 'academias');
+    fixture.componentRef.setInput('labelFormat', (value: string) => value);
+    fixture.detectChanges();
+
+    component.onInput({ target: { value: 'rest' } } as unknown as Event);
+
+    expect(component.inputText()).toBe('rest');
+  });
+
   it('should navigate options with arrow keys and select with Enter', () => {
     component.onFocus();
     expect(component.highlightedIndex()).toBe(0);

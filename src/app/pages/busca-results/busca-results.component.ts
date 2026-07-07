@@ -120,7 +120,7 @@ export class BuscaResultsComponent implements OnInit {
       },
     ];
 
-    if (filters.categoria && !response.meta.groupedByCategoria) {
+    if (filters.categoria) {
       crumbs.push({
         page: capitalizeWords(filters.categoria),
         router: buildBuscaRouteFromFilters({ ...filters, cidade: null, bairro: null }, 1),

@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { Categoria } from '../models/categoria.model';
 import { ClienteDetail } from '../models/cliente-detail.model';
 import { ClienteListItem } from '../models/cliente-list-item.model';
+import { BUSCA_PAGE_SIZE } from '../constants/catalog';
 import { PaginatedClientes, PaginatedBusca, BuscaParams } from '../models/paginated-response.model';
 
 @Injectable({
@@ -67,6 +68,7 @@ export class CatalogService {
       searchParams.set('bairro', params.bairro);
     }
     const page = params.page ?? 1;
+    searchParams.set('perPage', String(BUSCA_PAGE_SIZE));
     if (page >= 2) {
       searchParams.set('page', String(page));
     }

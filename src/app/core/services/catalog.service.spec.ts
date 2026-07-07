@@ -104,7 +104,7 @@ describe('CatalogService', () => {
       .subscribe();
 
     const req = httpMock.expectOne(
-      '/busca?q=academia&uf=pe&categoria=academias&cidade=recife&page=2',
+      '/busca?q=academia&uf=pe&categoria=academias&cidade=recife&perPage=10&page=2',
     );
 
     expect(req.request.method).toBe('GET');
@@ -113,9 +113,10 @@ describe('CatalogService', () => {
       data: [],
       meta: {
         page: 2,
-        perPage: 15,
+        perPage: 10,
         total: 0,
         totalPages: 0,
+        groupedByCategoria: false,
         filters: {
           q: 'academia',
           uf: 'pe',

@@ -192,8 +192,34 @@ describe('HeaderComponent', () => {
 
     component.onBuscaFiltersChange();
 
+    expect(component.termoBusca()).toBe('Academias');
     expect(router.navigateByUrl).toHaveBeenCalledWith('/busca?q=Academias&uf=pe&categoria=academias');
     expect(component.isOpen).toBeTrue();
+  });
+
+  it('onBuscaFiltersChange should switch categoria after a geo search query', () => {
+    component.termoBusca.set('Academias');
+    (component as unknown as { lastGeoSearchQuery: { set: (value: string) => void } }).lastGeoSearchQuery.set(
+      'Academias',
+    );
+
+    const buscaAvancada = {
+      getFilters: () => ({
+        categoria: 'oticas',
+        uf: 'pe',
+        cidade: null,
+        bairro: null,
+      }),
+      getFilterLabels: () => ({ categoria: 'Óticas' }),
+      hasAnyFilter: () => true,
+    } as BuscaAvancadaComponent;
+
+    component.buscaAvancada = buscaAvancada;
+
+    component.onBuscaFiltersChange();
+
+    expect(component.termoBusca()).toBe('Óticas');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/busca?q=%C3%93ticas&uf=pe&categoria=oticas');
   });
 
   it('onBuscaFiltersChange should not navigate when text search is active', () => {
@@ -206,6 +232,7 @@ describe('HeaderComponent', () => {
         cidade: null,
         bairro: null,
       }),
+      getFilterLabels: () => ({ categoria: 'Academias' }),
     } as BuscaAvancadaComponent;
 
     component.buscaAvancada = buscaAvancada;
@@ -234,6 +261,7 @@ describe('HeaderComponent', () => {
     spyOnProperty(router, 'url', 'get').and.returnValue('/c/academias/pe');
     const buscaAvancada = {
       getFilters: () => null,
+      hasAnyFilter: () => false,
     } as BuscaAvancadaComponent;
     component.buscaAvancada = buscaAvancada;
 
