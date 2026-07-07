@@ -80,7 +80,7 @@ jobs:
           rsync -avz \
             --exclude environments/.env.production \
             -e "ssh -p ${{ secrets.SSH_PORT || 22 }}" \
-            ./dist ./package.json ./package-lock.json ./ecosystem.config.cjs ./deploy/nginx \
+            ./dist ./package.json ./package-lock.json ./ecosystem.config.cjs \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_TARGET }}
 
       - name: Install prod deps and restart SSR
