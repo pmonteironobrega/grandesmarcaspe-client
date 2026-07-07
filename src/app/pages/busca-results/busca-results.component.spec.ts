@@ -166,6 +166,7 @@ describe('BuscaResultsComponent', () => {
 
     expect(component.listagem()?.meta.groupedByCategoria).toBeTrue();
     expect(component.listagem()?.groups?.length).toBe(2);
+    expect(component.listagem()?.meta.filters.categoria).toBeNull();
     expect(component.buildGroupListUrl(component.listagem()!.meta.filters, 'academias')).toBe(
       '/c/academias/pe',
     );

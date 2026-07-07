@@ -12,6 +12,7 @@ import { CategoriasPopularesComponent } from '../../shared/components/categorias
 import { AnuncieBannerComponent } from '../../shared/components/anuncie-banner/anuncie-banner.component';
 import {
   buildBuscaRouteFromFilters,
+  buildBuscaUrl,
   parseBuscaParamsFromQuery,
   BuscaRoute,
 } from '../../core/utils/busca-url';
@@ -86,6 +87,7 @@ export class BuscaResultsComponent implements OnInit {
         next: (response) => {
           this.listagem.set(response);
           this.breadcrumb.set(this.buildBreadcrumb(response));
+          this.stripCategoriaFromUrlWhenGrouped(response);
           this.loading.set(false);
           this.routeTransition.releaseContent();
         },
@@ -118,7 +120,7 @@ export class BuscaResultsComponent implements OnInit {
       },
     ];
 
-    if (filters.categoria) {
+    if (filters.categoria && !response.meta.groupedByCategoria) {
       crumbs.push({
         page: capitalizeWords(filters.categoria),
         router: buildBuscaRouteFromFilters({ ...filters, cidade: null, bairro: null }, 1),
@@ -137,5 +139,31 @@ export class BuscaResultsComponent implements OnInit {
     }
 
     return crumbs;
+  }
+
+  private stripCategoriaFromUrlWhenGrouped(response: PaginatedBusca): void {
+    if (!response.meta.groupedByCategoria) {
+      return;
+    }
+
+    const urlTree = this.router.parseUrl(this.router.url);
+    if (!urlTree.queryParams['categoria']) {
+      return;
+    }
+
+    const params = parseBuscaParamsFromQuery(urlTree.queryParams);
+    if (!params) {
+      return;
+    }
+
+    void this.router.navigateByUrl(
+      buildBuscaUrl({
+        q: params.q,
+        uf: params.uf,
+        cidade: params.cidade,
+        bairro: params.bairro,
+      }),
+      { replaceUrl: true },
+    );
   }
 }

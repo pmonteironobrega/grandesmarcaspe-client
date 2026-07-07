@@ -214,19 +214,11 @@ export class HeaderComponent {
       const params = parseBuscaParamsFromQuery(urlTree.queryParams);
       if (params) {
         this.termoBusca.set(params.q);
-        if (params.categoria) {
-          this.buscaAvancada?.setFiltersFromRoute({
-            categoria: params.categoria,
-            cidade: params.cidade,
-            bairro: params.bairro,
-          });
-        } else {
-          this.buscaAvancada?.setFiltersFromRoute({
-            categoria: null,
-            cidade: null,
-            bairro: null,
-          });
-        }
+        this.buscaAvancada?.setFiltersFromRoute({
+          categoria: params.categoria ?? null,
+          cidade: params.cidade ?? null,
+          bairro: params.bairro ?? null,
+        });
       }
     }
   }
@@ -247,7 +239,7 @@ export class HeaderComponent {
 
     if (path === 'busca') {
       const params = parseBuscaParamsFromQuery(urlTree.queryParams);
-      return !!params?.categoria;
+      return !!(params?.categoria || params?.cidade || params?.bairro);
     }
 
     return false;
