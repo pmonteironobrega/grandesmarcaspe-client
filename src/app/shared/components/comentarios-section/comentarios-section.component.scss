@@ -9,6 +9,14 @@
     background: #fff;
   }
 
+  .comentario-form-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: $cinza;
+    font-size: 14px;
+  }
+
   .comentario-layout {
     display: flex;
     gap: 12px;

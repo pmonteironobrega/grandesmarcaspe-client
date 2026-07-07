@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:grandesmarcaspe-site": "node dist/grandesmarcaspe-site/server/server.mjs"
+    "serve:ssr:grandesmarcaspe-site": "node dist/grandesmarcaspe-site/server/server.mjs",
+    "db:migrate:server": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/db-migrate-server.ps1"
   },
   "prettier": {
     "overrides": [

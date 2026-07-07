@@ -11,12 +11,13 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import {
   provideHttpClient,
-  withInterceptorsFromDi,
+  withInterceptors,
   withFetch,
   withXsrfConfiguration,
 } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -39,7 +40,7 @@ export const appConfig: ApplicationConfig = {
     ),
     importProvidersFrom(ModalModule.forRoot(), CollapseModule.forRoot()),
     provideHttpClient(
-      withInterceptorsFromDi(),
+      withInterceptors([authInterceptor]),
       withFetch(),
       withXsrfConfiguration({
         cookieName: 'XSRF-TOKEN',

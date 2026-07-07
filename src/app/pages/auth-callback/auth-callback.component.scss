@@ -1,0 +1,10 @@
+@use '../../../../public/variables/variables.scss' as *;
+
+.auth-callback {
+  min-height: 40vh;
+
+  &__message {
+    color: $cinza;
+    margin: 1rem 0 1.5rem;
+  }
+}

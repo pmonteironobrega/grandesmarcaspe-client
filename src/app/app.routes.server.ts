@@ -33,4 +33,20 @@ export const serverRoutes: ServerRoute[] = [
     path: 'fale-conosco',
     renderMode: RenderMode.Prerender,
   },
+  {
+    path: 'login',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'cadastro',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'auth/callback',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'perfil',
+    renderMode: RenderMode.Client,
+  },
 ];

@@ -1,0 +1,141 @@
+<app-breadcrumb [config]="breadcrumb"></app-breadcrumb>
+
+<div class="container py-5 perfil-page">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="perfil-card">
+        <h2 class="perfil-card__title">Meu perfil</h2>
+        <p class="perfil-card__subtitle">Atualize seus dados e foto de perfil.</p>
+
+        @if (successMessage()) {
+          <app-ui-alert type="success" (dismissed)="successMessage.set('')">
+            {{ successMessage() }}
+          </app-ui-alert>
+        }
+
+        @if (errorMessage()) {
+          <app-ui-alert type="error" [autoDismissMs]="0">
+            {{ errorMessage() }}
+          </app-ui-alert>
+        }
+
+        <section class="perfil-photo" aria-label="Foto de perfil">
+          <button
+            type="button"
+            class="perfil-photo__preview"
+            (click)="openPhotoPicker()"
+            [disabled]="loadingPhoto()"
+            aria-label="Alterar foto de perfil">
+            @if (photoPreviewUrl() ?? profilePhotoUrl()) {
+              <img
+                [src]="photoPreviewUrl() ?? profilePhotoUrl()"
+                alt=""
+                class="perfil-photo__image"
+                aria-hidden="true">
+            } @else {
+              <img src="/img/avatar-usuario.svg" alt="" class="perfil-photo__placeholder" aria-hidden="true">
+            }
+          </button>
+
+          <input
+            #photoInput
+            type="file"
+            class="perfil-photo__input"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            (change)="onPhotoSelected($event)">
+
+          <div class="perfil-photo__actions">
+            <button
+              type="button"
+              class="btn btn-lg btn-gradient"
+              (click)="openPhotoPicker()"
+              [disabled]="loadingPhoto()">
+              @if (loadingPhoto()) { Enviando foto... } @else { Alterar foto }
+            </button>
+
+            @if (profilePhotoUrl()) {
+              <button
+                type="button"
+                class="btn btn-link perfil-photo__remove"
+                (click)="removePhoto()"
+                [disabled]="loadingPhoto()">
+                Remover foto
+              </button>
+            }
+          </div>
+
+          <p class="perfil-photo__hint">JPG, PNG, WEBP ou GIF. Máximo 2 MB.</p>
+        </section>
+
+        <form (ngSubmit)="saveProfile()" novalidate>
+          <div class="form-group">
+            <label for="nome">Nome</label>
+            <input
+              id="nome"
+              type="text"
+              class="form-control input-gm"
+              name="nome"
+              [(ngModel)]="nome"
+              autocomplete="name"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input
+              id="email"
+              type="email"
+              class="form-control input-gm"
+              name="email"
+              [(ngModel)]="email"
+              autocomplete="email"
+              required>
+          </div>
+
+          <div class="perfil-card__section-title">Alterar senha</div>
+          <p class="perfil-card__section-hint">Deixe em branco se não quiser alterar.</p>
+
+          <div class="form-group">
+            <label for="senhaAtual">Senha atual</label>
+            <input
+              id="senhaAtual"
+              type="password"
+              class="form-control input-gm"
+              name="senhaAtual"
+              [(ngModel)]="senhaAtual"
+              autocomplete="current-password">
+          </div>
+
+          <div class="form-group">
+            <label for="senha">Nova senha</label>
+            <input
+              id="senha"
+              type="password"
+              class="form-control input-gm"
+              name="senha"
+              [(ngModel)]="senha"
+              autocomplete="new-password">
+          </div>
+
+          <div class="form-group">
+            <label for="confirmarSenha">Confirmar nova senha</label>
+            <input
+              id="confirmarSenha"
+              type="password"
+              class="form-control input-gm"
+              name="confirmarSenha"
+              [(ngModel)]="confirmarSenha"
+              autocomplete="new-password">
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-lg btn-gradient"
+            [disabled]="loadingProfile()">
+            @if (loadingProfile()) { Aguarde... } @else { Salvar alterações }
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

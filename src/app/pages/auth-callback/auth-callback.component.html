@@ -1,0 +1,12 @@
+<div class="auth-callback container py-5 text-center">
+  @if (errorMessage()) {
+    <h2>Não foi possível entrar</h2>
+    <p class="auth-callback__message">{{ errorMessage() }}</p>
+    <button type="button" class="btn btn-lg btn-gradient" (click)="backToLogin()">
+      Voltar ao login
+    </button>
+  } @else {
+    <h2>Conectando sua conta...</h2>
+    <p class="auth-callback__message">Aguarde enquanto validamos seu acesso.</p>
+  }
+</div>

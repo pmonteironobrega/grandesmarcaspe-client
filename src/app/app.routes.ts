@@ -16,6 +16,16 @@ import { FaleConoscoPageComponent } from './pages/fale-conosco/fale-conosco.comp
 
 import { BuscaResultsComponent } from './pages/busca-results/busca-results.component';
 
+import { LoginPageComponent } from './pages/login/login-page.component';
+
+import { CadastroPageComponent } from './pages/cadastro/cadastro-page.component';
+
+import { AuthCallbackComponent } from './pages/auth-callback/auth-callback.component';
+
+import { PerfilPageComponent } from './pages/perfil/perfil-page.component';
+
+import { authGuard } from './core/guards/auth.guard';
+
 
 
 export const routes: Routes = [
@@ -40,6 +50,14 @@ export const routes: Routes = [
   { path: 'termos-privacidade', component: TermosPrivacidadeComponent },
 
   { path: 'fale-conosco', component: FaleConoscoPageComponent },
+
+  { path: 'login', component: LoginPageComponent },
+
+  { path: 'cadastro', component: CadastroPageComponent },
+
+  { path: 'auth/callback', component: AuthCallbackComponent },
+
+  { path: 'perfil', component: PerfilPageComponent, canActivate: [authGuard] },
 
   { path: 'busca', component: BuscaResultsComponent, data: { awaitContent: true } },
 

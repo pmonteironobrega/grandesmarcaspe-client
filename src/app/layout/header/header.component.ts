@@ -1,4 +1,4 @@
-import { afterNextRender, Component, DestroyRef, inject, signal, TemplateRef, ViewChild } from '@angular/core';
+import { afterNextRender, Component, computed, DestroyRef, inject, signal, TemplateRef, ViewChild } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,10 +10,12 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { LISTA_ESTADOS } from '../../core/constants/estados';
 import { LocationStateService } from '../../core/services/location-state.service';
 import { GeographyService } from '../../core/services/geography.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Uf } from '../../core/models/geography.model';
 import { BuscaAvancadaComponent } from '../../shared/components/busca-avancada/busca-avancada.component';
 import { buildListUrlFromFilters, parseListFiltersFromLegacyPath } from '../../core/utils/catalog-url';
 import { buildBuscaUrl, parseBuscaParamsFromQuery } from '../../core/utils/busca-url';
+import { resolveUserPhotoUrl } from '../../core/utils/user-photo';
 
 @Component({
   selector: 'app-header',
@@ -35,6 +37,10 @@ export class HeaderComponent {
   private destroyRef = inject(DestroyRef);
   private geographyService = inject(GeographyService);
   readonly locationState = inject(LocationStateService);
+  readonly auth = inject(AuthService);
+  readonly profilePhotoUrl = computed(() =>
+    resolveUserPhotoUrl(this.auth.currentUser()?.fotoCaminho ?? null),
+  );
 
   @ViewChild(BuscaAvancadaComponent) buscaAvancada?: BuscaAvancadaComponent;
 

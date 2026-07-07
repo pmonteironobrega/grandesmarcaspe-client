@@ -18,6 +18,8 @@ module.exports = {
   '/categorias': apiDefaults,
   '/clientes': apiDefaults,
   '/busca': apiDefaults,
+  '/auth': apiDefaults,
+  '/usuarios': apiDefaults,
   '/c/': {
     ...apiDefaults,
     bypass(req) {

@@ -72,6 +72,40 @@
   }
 }
 
+.header-account {
+  &__profile {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 0.75rem;
+    margin-top: 0.35rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  &__avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba($laranja-claro, 0.8);
+    background: #fff;
+  }
+
+  &__name {
+    display: inline-block;
+    margin-right: 0.75rem;
+    margin-top: 0.5rem;
+    color: $cinza;
+    font-weight: 600;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+}
+
 .search-header {
   .logo-header {
     margin-left: auto;

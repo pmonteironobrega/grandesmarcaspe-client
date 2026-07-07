@@ -58,6 +58,8 @@ export function isApiProxyRoute(path: string): boolean {
     path.startsWith('/categorias') ||
     path.startsWith('/clientes') ||
     path.startsWith('/busca') ||
+    path.startsWith('/auth') ||
+    path.startsWith('/usuarios') ||
     path.startsWith('/c/') ||
     path.startsWith('/r/')
   );

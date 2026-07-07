@@ -1,0 +1,109 @@
+@use '../../../../public/variables/variables.scss' as *;
+
+.perfil-page {
+  min-height: 50vh;
+}
+
+.perfil-card {
+  background: #fff;
+  border-radius: $radius-card;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+
+  &__title {
+    color: $preto;
+    margin-bottom: 0.5rem;
+  }
+
+  &__subtitle {
+    color: $cinza;
+    margin-bottom: 1.5rem;
+  }
+
+  &__section-title {
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+    color: $preto;
+  }
+
+  &__section-hint {
+    color: $cinza;
+    margin-bottom: 1rem;
+  }
+}
+
+.perfil-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba($cinza, 0.2);
+
+  &__preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: $cinza-claro;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: wait;
+      opacity: 0.7;
+    }
+  }
+
+  &__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  &__image,
+  &__placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__remove {
+    color: $cinza !important;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  &__hint {
+    margin-bottom: 0;
+    color: $cinza;
+    font-size: 13px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .perfil-card {
+    padding: 1.25rem;
+  }
+}

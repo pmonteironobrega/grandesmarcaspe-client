@@ -2,6 +2,7 @@ export interface Comentario {
   id: number;
   conteudo: string;
   autorNome: string;
+  autorFotoCaminho: string | null;
   createdAt: string;
   respostas: Comentario[];
 }

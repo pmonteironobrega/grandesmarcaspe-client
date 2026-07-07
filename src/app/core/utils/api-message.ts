@@ -10,7 +10,7 @@ export interface ApiErrorBody {
   details?: ApiErrorDetail[];
 }
 
-type ApiMessageContext = 'avaliacao' | 'comentario' | 'generic';
+type ApiMessageContext = 'avaliacao' | 'comentario' | 'auth' | 'generic';
 
 function extractErrorBody(error: unknown): ApiErrorBody | null {
   if (!error || typeof error !== 'object') {
@@ -52,6 +52,19 @@ function mapValidationMessage(context: ApiMessageContext, body: ApiErrorBody | n
     return 'Não foi possível publicar seu comentário. Tente novamente.';
   }
 
+  if (context === 'auth') {
+    if (fields.has('email')) {
+      return 'Informe um e-mail válido.';
+    }
+    if (fields.has('senha')) {
+      return 'Informe uma senha válida.';
+    }
+    if (fields.has('nome')) {
+      return 'Informe seu nome.';
+    }
+    return 'Não foi possível concluir o login. Verifique os dados e tente novamente.';
+  }
+
   return 'Não foi possível concluir a ação. Verifique os dados e tente novamente.';
 }
 
@@ -76,6 +89,25 @@ function mapKnownServerMessage(message: string, context: ApiMessageContext): str
 
   if (context === 'comentario' && normalized.includes('comentário pai inválido')) {
     return 'Não foi possível responder a este comentário.';
+  }
+
+  if (context === 'auth') {
+    if (
+      normalized.includes('credenciais inválidas') ||
+      normalized.includes('credenciais invalidas') ||
+      normalized.includes('invalid credentials')
+    ) {
+      return 'E-mail ou senha incorretos.';
+    }
+    if (normalized.includes('senha atual incorreta')) {
+      return 'Senha atual incorreta.';
+    }
+    if (normalized.includes('e-mail já cadastrado') || normalized.includes('email já cadastrado')) {
+      return 'Este e-mail já está cadastrado.';
+    }
+    if (normalized.includes('acesso permitido apenas')) {
+      return 'Acesso permitido apenas para usuários da plataforma.';
+    }
   }
 
   return null;
@@ -108,6 +140,10 @@ export function resolveApiErrorMessage(error: unknown, context: ApiMessageContex
     }
   }
 
+  if (status === 404 && context === 'auth') {
+    return 'Serviço de autenticação indisponível. Reinicie a API do backend.';
+  }
+
   if (status === 0 || status === undefined) {
     return 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.';
   }
@@ -116,5 +152,7 @@ export function resolveApiErrorMessage(error: unknown, context: ApiMessageContex
     ? 'Não foi possível registrar sua avaliação. Tente novamente.'
     : context === 'comentario'
       ? 'Não foi possível publicar seu comentário. Tente novamente.'
-      : 'Não foi possível concluir a ação. Tente novamente.';
+      : context === 'auth'
+        ? 'Não foi possível concluir o login. Tente novamente.'
+        : 'Não foi possível concluir a ação. Tente novamente.';
 }

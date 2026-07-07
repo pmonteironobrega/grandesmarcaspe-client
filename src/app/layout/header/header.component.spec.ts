@@ -18,6 +18,10 @@ import { HeaderComponent } from './header.component';
 
 import { BuscaAvancadaComponent } from '../../shared/components/busca-avancada/busca-avancada.component';
 
+import { AuthService } from '../../core/services/auth.service';
+
+import { signal } from '@angular/core';
+
 
 
 describe('HeaderComponent', () => {
@@ -47,6 +51,15 @@ describe('HeaderComponent', () => {
         provideHttpClientTesting(),
 
         importProvidersFrom(ModalModule.forRoot(), CollapseModule.forRoot()),
+
+        {
+          provide: AuthService,
+          useValue: {
+            isAuthenticated: signal(false).asReadonly(),
+            currentUser: signal(null).asReadonly(),
+            logout: jasmine.createSpy('logout'),
+          },
+        },
 
       ],
 
@@ -147,6 +160,8 @@ describe('HeaderComponent', () => {
         bairro: null,
 
       }),
+
+      hasAnyFilter: () => true,
 
     } as BuscaAvancadaComponent;
 

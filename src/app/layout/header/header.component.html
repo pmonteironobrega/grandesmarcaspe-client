@@ -14,9 +14,28 @@
 
 
 
-        <div class="col-6">
+        <div class="col-6 text-right header-account">
 
-          <button class="btn btn-lg btn-lc float-right">Login</button>
+          @if (auth.isAuthenticated()) {
+            <a class="header-account__profile float-right" [routerLink]="['/perfil']" aria-label="Meu perfil">
+              @if (profilePhotoUrl()) {
+                <img [src]="profilePhotoUrl()" alt="" class="header-account__avatar" aria-hidden="true">
+              } @else {
+                <img src="/img/avatar-usuario.svg" alt="" class="header-account__avatar" aria-hidden="true">
+              }
+              <span class="header-account__name d-none d-md-inline">{{ auth.currentUser()?.nome }}</span>
+            </a>
+            <button type="button" class="btn btn-lg btn-lc float-right" (click)="auth.logout()">Sair</button>
+          } @else {
+            <a
+              class="btn btn-lg btn-lc float-right"
+              routerLink="/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              role="button">
+              Login
+            </a>
+          }
 
           <button class="btn btn-lg btn-le float-right mr-2" [routerLink]="['/anuncie']">Anuncie</button>
 
