@@ -88,7 +88,7 @@ export function createApiProxyMiddleware(apiUrl: string) {
         }
 
         const lower = name.toLowerCase();
-        if (['host', 'connection', 'content-length'].includes(lower)) {
+        if (['host', 'connection', 'transfer-encoding'].includes(lower)) {
           continue;
         }
 
@@ -103,19 +103,14 @@ export function createApiProxyMiddleware(apiUrl: string) {
         headers.set('accept', 'application/json');
       }
 
-      const init: RequestInit = {
+      const init: RequestInit & { duplex?: 'half' } = {
         method: req.method,
         headers,
       };
 
       if (req.method !== 'GET' && req.method !== 'HEAD') {
-        const body = (req as Request & { body?: unknown }).body;
-        if (body !== undefined && body !== null && body !== '') {
-          init.body = typeof body === 'string' ? body : JSON.stringify(body);
-          if (!headers.has('content-type')) {
-            headers.set('content-type', 'application/json');
-          }
-        }
+        init.body = req as unknown as BodyInit;
+        init.duplex = 'half';
       }
 
       const response = await fetch(target, init);

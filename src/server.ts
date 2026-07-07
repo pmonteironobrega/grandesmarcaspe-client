@@ -43,7 +43,6 @@ const app = express();
 const angularApp = new AngularNodeAppEngine({ allowedHosts });
 
 app.use(compression({ level: 6 }));
-app.use(express.json());
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
