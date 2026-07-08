@@ -63,7 +63,7 @@ describe('CategoriaListComponent', () => {
       data: [],
       meta: {
         page: 2,
-        perPage: 15,
+        perPage: 10,
         total: 0,
         totalPages: 0,
         filters: { categoria: 'academias', uf: 'pe', cidade: null, bairro: null },
@@ -84,7 +84,7 @@ describe('CategoriaListComponent', () => {
       data: [],
       meta: {
         page: 1,
-        perPage: 15,
+        perPage: 10,
         total: 0,
         totalPages: 0,
         filters: { categoria: 'academias', uf: 'pe', cidade: 'recife', bairro: null },

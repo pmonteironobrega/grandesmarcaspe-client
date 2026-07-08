@@ -5,11 +5,13 @@ import {
   ElementRef,
   inject,
   Injector,
+  OnDestroy,
   OnInit,
   signal,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CatalogService } from '../../core/services/catalog.service';
@@ -35,6 +37,7 @@ import {
   buildClienteMarcaPath,
   resolveClienteImageUrl,
 } from '../../core/utils/catalog-url';
+import { buildClientePageTitle } from '../../core/utils/cliente-page-title';
 import { buildSocialLinks } from '../../core/utils/social-links';
 import {
   buildTelUrl,
@@ -78,13 +81,15 @@ import { environment } from '../../../environments/environment';
 
 })
 
-export class ClienteDetailComponent implements OnInit {
+export class ClienteDetailComponent implements OnInit, OnDestroy {
 
   private route = inject(ActivatedRoute);
   private catalogService = inject(CatalogService);
   private routeTransition = inject(RouteTransitionService);
   private appScroll = inject(AppScrollService);
+  private title = inject(Title);
   private injector = inject(Injector);
+  private readonly defaultPageTitle = 'Grandes Marcas PE';
 
   @ViewChild('clienteNome') clienteNome?: ElementRef<HTMLElement>;
 
@@ -132,6 +137,7 @@ export class ClienteDetailComponent implements OnInit {
         next: (detail) => {
 
           this.cliente.set(detail);
+          this.title.setTitle(buildClientePageTitle(detail));
 
           this.breadcrumb.set(this.buildBreadcrumb(detail));
 
@@ -146,6 +152,7 @@ export class ClienteDetailComponent implements OnInit {
         error: () => {
 
           this.error.set(true);
+          this.title.setTitle(this.defaultPageTitle);
 
           this.loading.set(false);
           this.routeTransition.releaseContent();
@@ -156,6 +163,10 @@ export class ClienteDetailComponent implements OnInit {
 
     });
 
+  }
+
+  ngOnDestroy(): void {
+    this.title.setTitle(this.defaultPageTitle);
   }
 
 

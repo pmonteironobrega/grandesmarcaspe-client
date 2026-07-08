@@ -69,7 +69,7 @@ describe('CatalogService', () => {
 
     expect(req.request.method).toBe('GET');
 
-    req.flush({ data: [], meta: { page: 2, perPage: 15, total: 0, totalPages: 0, filters: {} } });
+    req.flush({ data: [], meta: { page: 2, perPage: 10, total: 0, totalPages: 0, filters: {} } });
   });
 
   it('should request categorias populares by uf', () => {

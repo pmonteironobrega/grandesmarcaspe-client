@@ -1,1 +1,2 @@
-export const BUSCA_PAGE_SIZE = 10;
+export const CATALOG_PAGE_SIZE = 10;
+export const BUSCA_PAGE_SIZE = CATALOG_PAGE_SIZE;
