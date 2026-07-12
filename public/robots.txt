@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Disallow: /login
+Disallow: /cadastro
+Disallow: /auth/
+Disallow: /perfil
+
+Sitemap: https://www.grandesmarcaspe.com.br/sitemap.xml

@@ -11,10 +11,10 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CatalogService } from '../../core/services/catalog.service';
+import { ClienteSeoService } from '../../core/services/cliente-seo.service';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
 import { AppScrollService } from '../../core/services/app-scroll.service';
 import { ClienteDetail } from '../../core/models/cliente-detail.model';
@@ -37,7 +37,6 @@ import {
   buildClienteMarcaPath,
   resolveClienteImageUrl,
 } from '../../core/utils/catalog-url';
-import { buildClientePageTitle } from '../../core/utils/cliente-page-title';
 import { buildSocialLinks } from '../../core/utils/social-links';
 import {
   buildTelUrl,
@@ -87,9 +86,8 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
   private catalogService = inject(CatalogService);
   private routeTransition = inject(RouteTransitionService);
   private appScroll = inject(AppScrollService);
-  private title = inject(Title);
+  private clienteSeo = inject(ClienteSeoService);
   private injector = inject(Injector);
-  private readonly defaultPageTitle = 'Grandes Marcas PE';
 
   @ViewChild('clienteNome') clienteNome?: ElementRef<HTMLElement>;
 
@@ -137,7 +135,10 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
         next: (detail) => {
 
           this.cliente.set(detail);
-          this.title.setTitle(buildClientePageTitle(detail));
+          this.clienteSeo.apply(detail, {
+            siteUrl: environment.siteUrl,
+            assetsBaseUrl: environment.assetsBaseUrl,
+          });
 
           this.breadcrumb.set(this.buildBreadcrumb(detail));
 
@@ -152,7 +153,7 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
         error: () => {
 
           this.error.set(true);
-          this.title.setTitle(this.defaultPageTitle);
+          this.clienteSeo.reset();
 
           this.loading.set(false);
           this.routeTransition.releaseContent();
@@ -166,7 +167,7 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.title.setTitle(this.defaultPageTitle);
+    this.clienteSeo.reset();
   }
 
 

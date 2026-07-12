@@ -17,7 +17,14 @@ module.exports = {
   '/catalog': apiDefaults,
   '/categorias': apiDefaults,
   '/clientes': apiDefaults,
-  '/busca': apiDefaults,
+  '/busca': {
+    ...apiDefaults,
+    bypass(req) {
+      if (shouldServeSpa(req)) {
+        return '/index.html';
+      }
+    },
+  },
   '/auth': apiDefaults,
   '/usuarios': apiDefaults,
   '/c/': {

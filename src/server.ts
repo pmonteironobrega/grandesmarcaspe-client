@@ -62,6 +62,26 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+app.get('/sitemap.xml', async (_req, res) => {
+  try {
+    const response = await fetch(`${apiUrl}/catalog/sitemap.xml`, {
+      headers: { accept: 'application/xml' },
+    });
+
+    if (!response.ok) {
+      res.status(response.status).send('Sitemap unavailable');
+      return;
+    }
+
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    res.send(await response.text());
+  } catch (error) {
+    console.error('Sitemap proxy error:', error);
+    res.status(500).send('Sitemap unavailable');
+  }
+});
+
 app.use(createApiProxyMiddleware(apiUrl));
 
 app.use(
