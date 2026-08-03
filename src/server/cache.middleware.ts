@@ -1,3 +1,4 @@
+import type { IncomingHttpHeaders } from 'node:http';
 import type { Request, Response, NextFunction } from 'express';
 
 export const PRERENDER_ROUTES = new Set([
@@ -9,6 +10,27 @@ export const PRERENDER_ROUTES = new Set([
 ]);
 
 const STATIC_ASSET_PATTERN = /\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/;
+
+/** Headers that must not be forwarded from the upstream API. */
+const HOP_BY_HOP_HEADERS = new Set([
+  'connection',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailers',
+  'transfer-encoding',
+  'upgrade',
+  'host',
+  // Dual HTML/JSON URLs must not inherit API cache semantics.
+  'cache-control',
+  'expires',
+  'pragma',
+  'etag',
+  'last-modified',
+  'vary',
+  'age',
+]);
 
 export interface SsrCacheEntry {
   body: Buffer;
@@ -65,15 +87,49 @@ export function isApiProxyRoute(path: string): boolean {
   );
 }
 
+/**
+ * Decide if a request to a dual HTML/JSON path should go to the API.
+ * Prefer Sec-Fetch-Dest (document → SSR) so browsers never get JSON as the page.
+ */
+export function shouldProxyToApi(req: {
+  path: string;
+  headers: IncomingHttpHeaders;
+}): boolean {
+  if (!isApiProxyRoute(req.path)) {
+    return false;
+  }
+
+  const dest = String(req.headers['sec-fetch-dest'] ?? '')
+    .split(',')[0]
+    ?.trim()
+    .toLowerCase();
+
+  // Top-level navigations must always render Angular HTML.
+  if (dest === 'document' || dest === 'iframe') {
+    return false;
+  }
+
+  // fetch()/XHR from the app (same URL as the page for /c, /r, /busca).
+  if (dest === 'empty' || dest === 'cors') {
+    return true;
+  }
+
+  const accept = String(req.headers.accept ?? '');
+  if (accept.includes('text/html')) {
+    return false;
+  }
+
+  return true;
+}
+
+function applyApiProxyCacheHeaders(res: Response): void {
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('Vary', 'Accept, Sec-Fetch-Dest');
+}
+
 export function createApiProxyMiddleware(apiUrl: string) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    if (!isApiProxyRoute(req.path)) {
-      next();
-      return;
-    }
-
-    const accept = req.headers.accept ?? '';
-    if (accept.includes('text/html')) {
+    if (!shouldProxyToApi(req)) {
       next();
       return;
     }
@@ -117,10 +173,11 @@ export function createApiProxyMiddleware(apiUrl: string) {
 
       res.status(response.status);
       response.headers.forEach((value, key) => {
-        if (key.toLowerCase() !== 'transfer-encoding') {
+        if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase())) {
           res.setHeader(key, value);
         }
       });
+      applyApiProxyCacheHeaders(res);
 
       const body = Buffer.from(await response.arrayBuffer());
       res.send(body);

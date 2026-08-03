@@ -54,7 +54,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   } else if (isPrerenderRoute(req.path)) {
     res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
   } else if (isServerRenderRoute(req.path)) {
+    // Same URL also serves JSON via the API proxy — Vary prevents browsers from
+    // replaying a cached JSON body as the HTML document after idle/tab discard.
     res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Vary', 'Accept, Sec-Fetch-Dest');
   } else {
     res.setHeader('Cache-Control', 'no-cache');
   }
@@ -125,6 +128,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     .then(async (response) => {
       clearTimeout(timeout);
       if (response) {
+        if (isServerRenderRoute(req.path)) {
+          response.headers.set('cache-control', 'no-cache');
+          response.headers.set('vary', 'Accept, Sec-Fetch-Dest');
+        }
+
         if (ttl > 0 && isServerRenderRoute(req.path)) {
           const body = Buffer.from(await response.clone().arrayBuffer());
           const headers: Record<string, string> = {};
