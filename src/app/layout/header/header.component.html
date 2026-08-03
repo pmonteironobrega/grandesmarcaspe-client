@@ -8,7 +8,16 @@
 
         <div class="col-12 col-md-5 col-lg-4 current-uf">
 
-          <button class="btn btn-lg btn-lc" (click)="openModal(modalEstados)">Você está em: <strong>{{ locationState.uf() }}</strong></button>
+          <button class="btn btn-lg btn-lc" (click)="openModal(modalEstados)">
+            Você está em:
+            <strong>
+              @if (locationState.detecting()) {
+                detectando…
+              } @else {
+                {{ locationState.uf() }}
+              }
+            </strong>
+          </button>
 
         </div>
 
