@@ -117,6 +117,10 @@ export function resolveApiErrorMessage(error: unknown, context: ApiMessageContex
   const body = extractErrorBody(error);
   const status = body?.statusCode ?? (error as { status?: number })?.status;
 
+  if (status === 401 && context === 'comentario') {
+    return 'Faça login para comentar.';
+  }
+
   if (status === 409) {
     return context === 'comentario'
       ? 'Esta ação não pode ser repetida.'

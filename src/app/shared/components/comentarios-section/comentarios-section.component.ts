@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { ComentarioService } from '../../../core/services/comentario.service';
 import { Comentario } from '../../../core/models/comentario.model';
 import { resolveApiErrorMessage } from '../../../core/utils/api-message';
@@ -11,7 +12,7 @@ import { UiAlertComponent } from '../ui-alert/ui-alert.component';
 @Component({
   selector: 'app-comentarios-section',
   standalone: true,
-  imports: [CommonModule, FormsModule, UiAlertComponent],
+  imports: [CommonModule, FormsModule, RouterLink, UiAlertComponent],
   templateUrl: './comentarios-section.component.html',
   styleUrl: './comentarios-section.component.scss',
 })
@@ -20,6 +21,7 @@ export class ComentariosSectionComponent {
 
   private comentarioService = inject(ComentarioService);
   private auth = inject(AuthService);
+  private router = inject(Router);
 
   comentarios = signal<Comentario[]>([]);
   loading = signal(true);
@@ -31,6 +33,8 @@ export class ComentariosSectionComponent {
   conteudo = signal('');
   replyConteudo = signal('');
 
+  readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
+  readonly returnUrl = computed(() => this.router.url || '/');
   readonly currentAuthorName = computed(() => this.auth.currentUser()?.nome ?? null);
   readonly currentAuthorPhotoUrl = computed(() =>
     resolveUserPhotoUrl(this.auth.currentUser()?.fotoCaminho ?? null),
@@ -65,12 +69,20 @@ export class ComentariosSectionComponent {
   }
 
   toggleReply(comentarioId: number): void {
+    if (!this.isAuthenticated()) {
+      return;
+    }
     this.replyingTo.set(this.replyingTo() === comentarioId ? null : comentarioId);
     this.replyConteudo.set('');
     this.errorMessage.set('');
   }
 
   submitComment(parentId?: number): void {
+    if (!this.isAuthenticated()) {
+      this.errorMessage.set('Faça login para comentar.');
+      return;
+    }
+
     const texto = (parentId ? this.replyConteudo() : this.conteudo()).trim();
 
     if (texto.length < 2) {

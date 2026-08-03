@@ -20,6 +20,12 @@ describe('resolveApiErrorMessage', () => {
     expect(resolveApiErrorMessage({ status: 409, error: {} }, 'avaliacao')).toContain('já avaliou');
   });
 
+  it('maps unauthorized comentario to login message', () => {
+    expect(resolveApiErrorMessage({ status: 401, error: {} }, 'comentario')).toBe(
+      'Faça login para comentar.',
+    );
+  });
+
   it('maps known server message', () => {
     const message = resolveApiErrorMessage(
       {
