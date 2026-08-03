@@ -36,6 +36,53 @@
   background: rgba(245, 245, 245, 0.92);
 }
 
+:host ::ng-deep {
+  .cliente-mapa__pin {
+    background: transparent;
+    border: 0;
+  }
+
+  .cliente-mapa__pin-marker {
+    display: block;
+    width: 28px;
+    height: 28px;
+    margin: 0 auto;
+    border: 3px solid #fff;
+    border-radius: 50% 50% 50% 0;
+    background: $laranja-escuro;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    transform: rotate(-45deg);
+  }
+
+  .cliente-mapa__popup .leaflet-popup-content-wrapper {
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  }
+
+  .cliente-mapa__popup .leaflet-popup-content {
+    margin: 10px 12px;
+    font-family: 'Roboto', sans-serif;
+    color: $cinza;
+  }
+
+  .cliente-mapa__popup-title {
+    display: block;
+    margin-bottom: 4px;
+    color: $laranja-escuro;
+    font-size: 13px;
+  }
+
+  .cliente-mapa__popup-text {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .cliente-mapa__popup .leaflet-popup-tip {
+    box-shadow: none;
+  }
+}
+
 @media (max-width: 575.98px) {
   .cliente-mapa__frame {
     height: 220px;

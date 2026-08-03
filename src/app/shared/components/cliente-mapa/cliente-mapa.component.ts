@@ -130,9 +130,10 @@ export class ClienteMapaComponent implements OnDestroy {
     this.hasMapView = false;
     this.loading.set(true);
 
+    const label = buildGeocodeSearchText(this.toQuery(end));
     const coords = this.readCoords(end);
     if (coords) {
-      void this.initLeaflet(coords.lat, coords.lng);
+      void this.initLeaflet(coords.lat, coords.lng, label);
       return;
     }
 
@@ -146,7 +147,7 @@ export class ClienteMapaComponent implements OnDestroy {
           this.showGoogleFallback(query);
           return;
         }
-        void this.initLeaflet(result.lat, result.lng);
+        void this.initLeaflet(result.lat, result.lng, label || result.displayName);
       },
       error: () => {
         if (this.destroyed) {
@@ -173,7 +174,7 @@ export class ClienteMapaComponent implements OnDestroy {
     this.loading.set(false);
   }
 
-  private async initLeaflet(lat: number, lng: number): Promise<void> {
+  private async initLeaflet(lat: number, lng: number, label: string): Promise<void> {
     const container = this.mapContainer()?.nativeElement;
     if (!container || this.destroyed) {
       this.showGoogleFallback(this.toQuery(this.endereco()));
@@ -185,10 +186,12 @@ export class ClienteMapaComponent implements OnDestroy {
       return;
     }
 
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: '/leaflet/marker-icon-2x.png',
-      iconUrl: '/leaflet/marker-icon.png',
-      shadowUrl: '/leaflet/marker-shadow.png',
+    const pinIcon = L.divIcon({
+      className: 'cliente-mapa__pin',
+      html: '<span class="cliente-mapa__pin-marker" aria-hidden="true"></span>',
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+      popupAnchor: [0, -38],
     });
 
     this.destroyMap();
@@ -204,15 +207,34 @@ export class ClienteMapaComponent implements OnDestroy {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(this.map);
 
-    this.marker = L.marker([lat, lng]).addTo(this.map);
+    const popupHtml = this.buildPopupHtml(label);
+    this.marker = L.marker([lat, lng], { icon: pinIcon })
+      .addTo(this.map)
+      .bindPopup(popupHtml, {
+        className: 'cliente-mapa__popup',
+        maxWidth: 280,
+        autoPan: true,
+      })
+      .openPopup();
 
     requestAnimationFrame(() => {
       this.map?.invalidateSize();
+      this.marker?.openPopup();
     });
 
     this.mode.set('leaflet');
     this.hasMapView = true;
     this.loading.set(false);
+  }
+
+  private buildPopupHtml(label: string): string {
+    const text = (label || 'Localização').trim();
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    return `<strong class="cliente-mapa__popup-title">Localização</strong><p class="cliente-mapa__popup-text">${escaped}</p>`;
   }
 
   private destroyMap(): void {
