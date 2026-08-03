@@ -3,11 +3,18 @@
     @if (loading()) {
       <div class="cliente-mapa__overlay" role="status">Carregando mapa…</div>
     }
-    @if (error() && !loading()) {
-      <div class="cliente-mapa__overlay" role="status">
-        Não foi possível localizar o endereço no mapa.
-      </div>
+
+    @if (mode() === 'google' && googleEmbedUrl(); as embedUrl) {
+      <iframe
+        class="cliente-mapa__embed"
+        [src]="embedUrl"
+        title="Mapa da localização"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen
+      ></iframe>
+    } @else {
+      <div #mapContainer class="cliente-mapa__canvas" aria-label="Mapa da localização"></div>
     }
-    <div #mapContainer class="cliente-mapa__canvas" aria-label="Mapa da localização"></div>
   </div>
 </div>

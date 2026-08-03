@@ -13,9 +13,18 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import type { Map as LeafletMap, Marker } from 'leaflet';
 import { Subscription } from 'rxjs';
+import { ClienteEndereco } from '../../../core/models/cliente-shared.model';
+import {
+  buildGeocodeSearchText,
+  GeocodeQuery,
+  geocodeCacheKey,
+} from '../../../core/models/geocode.model';
 import { GeocodeService } from '../../../core/services/geocode.service';
+
+type MapaMode = 'leaflet' | 'google' | 'idle';
 
 @Component({
   selector: 'app-cliente-mapa',
@@ -25,22 +34,25 @@ import { GeocodeService } from '../../../core/services/geocode.service';
 })
 export class ClienteMapaComponent implements OnDestroy {
   private readonly geocode = inject(GeocodeService);
+  private readonly sanitizer = inject(DomSanitizer);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly injector = inject(Injector);
 
-  readonly endereco = input.required<string>();
+  readonly endereco = input.required<ClienteEndereco>();
 
   private readonly mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
 
   readonly loading = signal(true);
-  readonly error = signal(false);
+  readonly mode = signal<MapaMode>('idle');
+  readonly googleEmbedUrl = signal<SafeResourceUrl | null>(null);
 
   private readonly browserReady = signal(false);
   private map: LeafletMap | null = null;
   private marker: Marker | null = null;
   private destroyed = false;
-  private lastAddress = '';
+  private lastKey = '';
   private geocodeSub: Subscription | null = null;
+  private hasMapView = false;
 
   constructor() {
     afterNextRender(
@@ -51,16 +63,19 @@ export class ClienteMapaComponent implements OnDestroy {
     );
 
     effect(() => {
-      const address = this.endereco().trim();
+      const end = this.endereco();
       const ready = this.browserReady();
-      if (!ready || !address || !isPlatformBrowser(this.platformId)) {
+      if (!ready || !end || !isPlatformBrowser(this.platformId)) {
         return;
       }
-      if (address === this.lastAddress && this.map) {
+
+      const query = this.toQuery(end);
+      const key = geocodeCacheKey(query);
+      if (key === this.lastKey && this.hasMapView) {
         return;
       }
-      this.lastAddress = address;
-      untracked(() => this.loadMap(address));
+      this.lastKey = key;
+      untracked(() => this.loadMap(query));
     });
   }
 
@@ -71,20 +86,32 @@ export class ClienteMapaComponent implements OnDestroy {
     this.destroyMap();
   }
 
-  private loadMap(address: string): void {
+  private toQuery(end: ClienteEndereco): GeocodeQuery {
+    return {
+      logradouro: end.logradouro,
+      numero: end.numero,
+      bairro: end.bairro?.nome,
+      cidade: end.cidade?.nome,
+      uf: end.uf?.sigla,
+      cep: end.cep,
+    };
+  }
+
+  private loadMap(query: GeocodeQuery): void {
     this.geocodeSub?.unsubscribe();
     this.destroyMap();
+    this.googleEmbedUrl.set(null);
+    this.mode.set('idle');
+    this.hasMapView = false;
     this.loading.set(true);
-    this.error.set(false);
 
-    this.geocodeSub = this.geocode.geocode(address).subscribe({
+    this.geocodeSub = this.geocode.geocode(query).subscribe({
       next: (result) => {
         if (this.destroyed) {
           return;
         }
         if (!result) {
-          this.loading.set(false);
-          this.error.set(true);
+          this.showGoogleFallback(query);
           return;
         }
         void this.initLeaflet(result.lat, result.lng);
@@ -93,17 +120,31 @@ export class ClienteMapaComponent implements OnDestroy {
         if (this.destroyed) {
           return;
         }
-        this.loading.set(false);
-        this.error.set(true);
+        this.showGoogleFallback(query);
       },
     });
+  }
+
+  private showGoogleFallback(query: GeocodeQuery): void {
+    const search = buildGeocodeSearchText(query);
+    if (!search) {
+      this.loading.set(false);
+      this.mode.set('idle');
+      this.hasMapView = false;
+      return;
+    }
+
+    const url = `https://maps.google.com/maps?q=${encodeURIComponent(search)}&z=16&hl=pt-BR&output=embed`;
+    this.googleEmbedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    this.mode.set('google');
+    this.hasMapView = true;
+    this.loading.set(false);
   }
 
   private async initLeaflet(lat: number, lng: number): Promise<void> {
     const container = this.mapContainer()?.nativeElement;
     if (!container || this.destroyed) {
-      this.loading.set(false);
-      this.error.set(true);
+      this.showGoogleFallback(this.toQuery(this.endereco()));
       return;
     }
 
@@ -137,8 +178,9 @@ export class ClienteMapaComponent implements OnDestroy {
       this.map?.invalidateSize();
     });
 
+    this.mode.set('leaflet');
+    this.hasMapView = true;
     this.loading.set(false);
-    this.error.set(false);
   }
 
   private destroyMap(): void {

@@ -150,7 +150,7 @@
 
                 <h4 class="font-weight-bold">Localização</h4>
 
-                <app-cliente-mapa [endereco]="formatEnderecoMapa(detail)" />
+                <app-cliente-mapa [endereco]="detail.endereco" />
 
                 <a
                   [href]="googleMapsUrl(detail)"
