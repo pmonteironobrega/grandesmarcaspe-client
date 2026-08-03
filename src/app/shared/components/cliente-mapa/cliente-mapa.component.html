@@ -1,0 +1,13 @@
+<div class="cliente-mapa">
+  <div class="cliente-mapa__frame">
+    @if (loading()) {
+      <div class="cliente-mapa__overlay" role="status">Carregando mapa…</div>
+    }
+    @if (error() && !loading()) {
+      <div class="cliente-mapa__overlay" role="status">
+        Não foi possível localizar o endereço no mapa.
+      </div>
+    }
+    <div #mapContainer class="cliente-mapa__canvas" aria-label="Mapa da localização"></div>
+  </div>
+</div>

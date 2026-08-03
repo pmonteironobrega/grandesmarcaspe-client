@@ -31,6 +31,7 @@ import {
   GaleriaSlide,
 } from '../../shared/components/cliente-galeria-carousel/cliente-galeria-carousel.component';
 import { StarRatingInlineComponent } from '../../shared/components/star-rating-inline/star-rating-inline.component';
+import { ClienteMapaComponent } from '../../shared/components/cliente-mapa/cliente-mapa.component';
 import {
   buildClienteDefaultImagePath,
   buildListUrlFromFilters,
@@ -73,6 +74,7 @@ import { environment } from '../../../environments/environment';
     AvaliacoesSectionComponent,
     ComentariosSectionComponent,
     StarRatingInlineComponent,
+    ClienteMapaComponent,
   ],
   templateUrl: './cliente-detail.component.html',
 
@@ -187,6 +189,22 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
 
   }
 
+  /** Endereço otimizado para geocoding (Nominatim / Google Maps). */
+  formatEnderecoMapa(cliente: ClienteDetail): string {
+    const end = cliente.endereco;
+    const parts = [
+      end.logradouro,
+      end.numero,
+      end.bairro?.nome,
+      end.cidade?.nome,
+      end.uf?.sigla,
+      end.cep ? `CEP ${end.cep}` : null,
+      'Brasil',
+    ].filter((part): part is string => !!part && part.trim().length > 0);
+
+    return parts.join(', ');
+  }
+
 
 
   private buildBreadcrumb(detail: ClienteDetail): { page: string; router: string }[] {
@@ -227,7 +245,7 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
 
 
   googleMapsUrl(detail: ClienteDetail): string {
-    const query = encodeURIComponent(this.formatEndereco(detail));
+    const query = encodeURIComponent(this.formatEnderecoMapa(detail));
     return `https://www.google.com/maps/search/?api=1&query=${query}`;
   }
 

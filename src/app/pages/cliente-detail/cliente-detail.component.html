@@ -150,13 +150,15 @@
 
                 <h4 class="font-weight-bold">Localização</h4>
 
+                <app-cliente-mapa [endereco]="formatEnderecoMapa(detail)" />
+
                 <a
                   [href]="googleMapsUrl(detail)"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="localizacao-link cl-le font-weight-bold mt-3 d-inline-block"
                 >
-                  Ver localização
+                  Abrir no Google Maps
                 </a>
 
               </div>
