@@ -22,6 +22,8 @@ export interface ClienteEndereco {
   complemento: string | null;
   numero: string;
   cep: string;
+  latitude: number | null;
+  longitude: number | null;
   uf: GeographySummary;
   cidade: GeographySummary | null;
   bairro: GeographySummary | null;

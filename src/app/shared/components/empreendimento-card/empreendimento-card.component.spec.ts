@@ -17,6 +17,8 @@ const mockCliente: ClienteListItem = {
     complemento: null,
     numero: '100',
     cep: '50000-000',
+    latitude: null,
+    longitude: null,
     uf: { id: 1, nome: 'Pernambuco', sigla: 'PE' },
     cidade: { id: 1, nome: 'Recife', slug: 'recife' },
     bairro: { id: 1, nome: 'Boa Viagem', slug: 'boa-viagem' },

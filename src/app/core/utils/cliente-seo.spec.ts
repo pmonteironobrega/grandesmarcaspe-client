@@ -27,6 +27,8 @@ function buildDetail(overrides: Partial<ClienteDetail> = {}): ClienteDetail {
       complemento: null,
       numero: '1000',
       cep: '51020-000',
+      latitude: -8.12,
+      longitude: -34.9,
       uf: { id: 1, nome: 'Pernambuco', sigla: 'pe' },
       cidade: { id: 1, nome: 'recife', slug: 'recife' },
       bairro: { id: 1, nome: 'boa viagem', slug: 'boa-viagem' },

@@ -69,13 +69,12 @@ export class ClienteMapaComponent implements OnDestroy {
         return;
       }
 
-      const query = this.toQuery(end);
-      const key = geocodeCacheKey(query);
+      const key = this.mapKey(end);
       if (key === this.lastKey && this.hasMapView) {
         return;
       }
       this.lastKey = key;
-      untracked(() => this.loadMap(query));
+      untracked(() => this.loadMap(end));
     });
   }
 
@@ -84,6 +83,32 @@ export class ClienteMapaComponent implements OnDestroy {
     this.geocodeSub?.unsubscribe();
     this.geocodeSub = null;
     this.destroyMap();
+  }
+
+  private mapKey(end: ClienteEndereco): string {
+    const coords = this.readCoords(end);
+    if (coords) {
+      return `coords:${coords.lat},${coords.lng}`;
+    }
+    return geocodeCacheKey(this.toQuery(end));
+  }
+
+  private readCoords(end: ClienteEndereco): { lat: number; lng: number } | null {
+    const lat = end.latitude;
+    const lng = end.longitude;
+    if (
+      typeof lat !== 'number' ||
+      typeof lng !== 'number' ||
+      Number.isNaN(lat) ||
+      Number.isNaN(lng) ||
+      (lat === 0 && lng === 0)
+    ) {
+      return null;
+    }
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return null;
+    }
+    return { lat, lng };
   }
 
   private toQuery(end: ClienteEndereco): GeocodeQuery {
@@ -97,7 +122,7 @@ export class ClienteMapaComponent implements OnDestroy {
     };
   }
 
-  private loadMap(query: GeocodeQuery): void {
+  private loadMap(end: ClienteEndereco): void {
     this.geocodeSub?.unsubscribe();
     this.destroyMap();
     this.googleEmbedUrl.set(null);
@@ -105,6 +130,13 @@ export class ClienteMapaComponent implements OnDestroy {
     this.hasMapView = false;
     this.loading.set(true);
 
+    const coords = this.readCoords(end);
+    if (coords) {
+      void this.initLeaflet(coords.lat, coords.lng);
+      return;
+    }
+
+    const query = this.toQuery(end);
     this.geocodeSub = this.geocode.geocode(query).subscribe({
       next: (result) => {
         if (this.destroyed) {

@@ -245,6 +245,15 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
 
 
   googleMapsUrl(detail: ClienteDetail): string {
+    const end = detail.endereco;
+    if (
+      typeof end?.latitude === 'number' &&
+      typeof end?.longitude === 'number' &&
+      !Number.isNaN(end.latitude) &&
+      !Number.isNaN(end.longitude)
+    ) {
+      return `https://www.google.com/maps/search/?api=1&query=${end.latitude},${end.longitude}`;
+    }
     const query = encodeURIComponent(this.formatEnderecoMapa(detail));
     return `https://www.google.com/maps/search/?api=1&query=${query}`;
   }
