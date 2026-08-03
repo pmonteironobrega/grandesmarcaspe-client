@@ -20,7 +20,13 @@
     &__actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
+      align-items: center;
+
+      .btn {
+        min-width: 140px;
+        text-align: center;
+      }
     }
   }
 

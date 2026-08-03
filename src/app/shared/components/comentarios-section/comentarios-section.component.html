@@ -36,7 +36,7 @@
 
       <button
         type="button"
-        class="btn btn-primary"
+        class="btn btn-lg btn-gradient"
         [disabled]="submitting()"
         (click)="submitComment()"
       >
@@ -47,10 +47,10 @@
     <div class="comentario-login-prompt card-rounded mb-4">
       <p class="mb-3">Faça login para deixar um comentário neste estabelecimento.</p>
       <div class="comentario-login-prompt__actions">
-        <a class="btn btn-primary" [routerLink]="['/login']" [queryParams]="{ returnUrl: returnUrl() }">
+        <a class="btn btn-lg btn-gradient" [routerLink]="['/login']" [queryParams]="{ returnUrl: returnUrl() }">
           Entrar
         </a>
-        <a class="btn btn-outline-primary" [routerLink]="['/cadastro']" [queryParams]="{ returnUrl: returnUrl() }">
+        <a class="btn btn-lg btn-lc" [routerLink]="['/cadastro']" [queryParams]="{ returnUrl: returnUrl() }">
           Criar conta
         </a>
       </div>
@@ -111,7 +111,7 @@
                 </div>
                 <button
                   type="button"
-                  class="btn btn-outline-primary btn-sm"
+                  class="btn btn-sm btn-le"
                   [disabled]="submitting()"
                   (click)="submitComment(comentario.id)"
                 >
