@@ -1,10 +1,11 @@
-name: Deploy Frontend to Locaweb
+# Deploy do ambiente de desenvolvimento (servidor atual).
+# Produção (ainda não configurada) usará a branch master em workflow separado.
+name: Deploy Frontend (development)
 
 on:
   push:
     branches:
-      - main
-      - master
+      - develop
 
 jobs:
   deploy:

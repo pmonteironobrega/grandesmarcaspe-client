@@ -2,7 +2,7 @@
 
 Cadastre em **Settings → Secrets and variables → Actions** do repositório `pmonteironobrega/grandesmarcaspe-client`.
 
-O workflow só roda nesse repo (`if: github.repository == 'pmonteironobrega/grandesmarcaspe-client'`).
+O workflow de **desenvolvimento** só roda nesse repo (`if: github.repository == 'pmonteironobrega/grandesmarcaspe-client'`) e só em push na branch **`develop`**. A branch **`master`** fica reservada para produção (workflow ainda não configurado).
 
 ## Secrets obrigatórios
 

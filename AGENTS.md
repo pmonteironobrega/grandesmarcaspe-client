@@ -57,7 +57,9 @@ npm test
 ng generate component nome-do-componente
 ```
 
-**Deploy:** push na branch `main` → `.github/workflows/deploy.yml` → rsync + PM2 (`server/server.mjs`).
+**Deploy:**
+- **Desenvolvimento** (servidor atual): push na branch `develop` → `.github/workflows/deploy.yml` → rsync + PM2 (`server/server.mjs`).
+- **Produção:** branch `master` (workflow ainda não configurado).
 
 ### Imagens de clientes
 

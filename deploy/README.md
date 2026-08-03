@@ -1,19 +1,25 @@
 # Deploy — GMPE Site (Angular SSR)
 
-Mesmo servidor da API de catálogo (`191.252.222.63`).
+## Branches
 
-## Domínios
+| Branch | Ambiente | Deploy |
+|--------|----------|--------|
+| `develop` | Desenvolvimento (servidor atual) | Automático via [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) |
+| `master` | Produção | Ainda não configurado |
+
+## Domínios (desenvolvimento)
 
 | App | URL | Porta interna |
 |-----|-----|----------------|
 | Site (SSR) | `https://catalog.pmonteirodev.com.br` | `4001` |
 | API | `https://api.catalog.pmonteirodev.com.br` | `3001` |
 
-## Servidor
+## Servidor (desenvolvimento)
 
+- **Host:** `191.252.222.63`
 - **Diretório:** `/var/www/catalog-site/`
 - **PM2:** `catalog-site` (`ecosystem.config.cjs`)
-- **Workflow:** [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml)
+- **Workflow:** [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) (só `develop`)
 - **Secrets:** [`GITHUB-SECRETS.md`](GITHUB-SECRETS.md)
 
 ## Primeira vez no servidor
