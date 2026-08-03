@@ -15,14 +15,12 @@ import {
 } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import type { Map as LeafletMap, Marker } from 'leaflet';
-import { Subscription } from 'rxjs';
 import { ClienteEndereco } from '../../../core/models/cliente-shared.model';
 import {
   buildGeocodeSearchText,
   GeocodeQuery,
   geocodeCacheKey,
 } from '../../../core/models/geocode.model';
-import { GeocodeService } from '../../../core/services/geocode.service';
 
 type MapaMode = 'leaflet' | 'google' | 'idle';
 
@@ -33,7 +31,6 @@ type MapaMode = 'leaflet' | 'google' | 'idle';
   styleUrl: './cliente-mapa.component.scss',
 })
 export class ClienteMapaComponent implements OnDestroy {
-  private readonly geocode = inject(GeocodeService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly injector = inject(Injector);
@@ -51,7 +48,6 @@ export class ClienteMapaComponent implements OnDestroy {
   private marker: Marker | null = null;
   private destroyed = false;
   private lastKey = '';
-  private geocodeSub: Subscription | null = null;
   private hasMapView = false;
 
   constructor() {
@@ -80,8 +76,6 @@ export class ClienteMapaComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.destroyed = true;
-    this.geocodeSub?.unsubscribe();
-    this.geocodeSub = null;
     this.destroyMap();
   }
 
@@ -94,15 +88,9 @@ export class ClienteMapaComponent implements OnDestroy {
   }
 
   private readCoords(end: ClienteEndereco): { lat: number; lng: number } | null {
-    const lat = end.latitude;
-    const lng = end.longitude;
-    if (
-      typeof lat !== 'number' ||
-      typeof lng !== 'number' ||
-      Number.isNaN(lat) ||
-      Number.isNaN(lng) ||
-      (lat === 0 && lng === 0)
-    ) {
+    const lat = Number(end.latitude);
+    const lng = Number(end.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0)) {
       return null;
     }
     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
@@ -123,42 +111,27 @@ export class ClienteMapaComponent implements OnDestroy {
   }
 
   private loadMap(end: ClienteEndereco): void {
-    this.geocodeSub?.unsubscribe();
     this.destroyMap();
     this.googleEmbedUrl.set(null);
     this.mode.set('idle');
     this.hasMapView = false;
     this.loading.set(true);
 
-    const label = buildGeocodeSearchText(this.toQuery(end));
+    const query = this.toQuery(end);
+    const label = buildGeocodeSearchText(query);
     const coords = this.readCoords(end);
+
+    // Com coordenadas da API: Leaflet imediato.
+    // Sem coordenadas: Google embed direto (evita Nominatim lento + múltiplas tentativas).
     if (coords) {
       void this.initLeaflet(coords.lat, coords.lng, label);
       return;
     }
 
-    const query = this.toQuery(end);
-    this.geocodeSub = this.geocode.geocode(query).subscribe({
-      next: (result) => {
-        if (this.destroyed) {
-          return;
-        }
-        if (!result) {
-          this.showGoogleFallback(query);
-          return;
-        }
-        void this.initLeaflet(result.lat, result.lng, label || result.displayName);
-      },
-      error: () => {
-        if (this.destroyed) {
-          return;
-        }
-        this.showGoogleFallback(query);
-      },
-    });
+    this.showGoogleEmbed(query);
   }
 
-  private showGoogleFallback(query: GeocodeQuery): void {
+  private showGoogleEmbed(query: GeocodeQuery): void {
     const search = buildGeocodeSearchText(query);
     if (!search) {
       this.loading.set(false);
@@ -175,9 +148,15 @@ export class ClienteMapaComponent implements OnDestroy {
   }
 
   private async initLeaflet(lat: number, lng: number, label: string): Promise<void> {
+    // Garante o container no DOM (ramo @else do template) antes de montar o mapa.
+    this.mode.set('idle');
+    this.googleEmbedUrl.set(null);
+
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
     const container = this.mapContainer()?.nativeElement;
     if (!container || this.destroyed) {
-      this.showGoogleFallback(this.toQuery(this.endereco()));
+      this.showGoogleEmbed(this.toQuery(this.endereco()));
       return;
     }
 
@@ -207,10 +186,9 @@ export class ClienteMapaComponent implements OnDestroy {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(this.map);
 
-    const popupHtml = this.buildPopupHtml(label);
     this.marker = L.marker([lat, lng], { icon: pinIcon })
       .addTo(this.map)
-      .bindPopup(popupHtml, {
+      .bindPopup(this.buildPopupHtml(label), {
         className: 'cliente-mapa__popup',
         maxWidth: 280,
         autoPan: true,
