@@ -40,7 +40,12 @@ const envAllowedHosts = process.env['NG_ALLOWED_HOSTS']?.split(',').map((host) =
 const allowedHosts = [...new Set([...defaultAllowedHosts, ...envAllowedHosts])];
 
 const app = express();
-const angularApp = new AngularNodeAppEngine({ allowedHosts });
+// nginx sempre envia X-Forwarded-For; qualquer x-forwarded-* fora desta lista faz o
+// Angular abandonar o SSR e servir só o index.csr.html.
+const angularApp = new AngularNodeAppEngine({
+  allowedHosts,
+  trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-for'],
+});
 
 app.use(compression({ level: 6 }));
 
