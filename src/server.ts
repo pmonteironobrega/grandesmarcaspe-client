@@ -162,12 +162,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
-  app.listen(Number(port), (error) => {
+  const host =
+    process.env['HOST'] ||
+    (process.env['NODE_ENV'] === 'production' ? '127.0.0.1' : '0.0.0.0');
+  app.listen(Number(port), host, (error) => {
     if (error) {
       throw error;
     }
 
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    console.log(`Node Express server listening on http://${host}:${port}`);
     console.log(`Environment: ${process.env['NODE_ENV'] || 'development'}`);
   });
 }

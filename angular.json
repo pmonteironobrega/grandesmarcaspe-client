@@ -86,6 +86,35 @@
                 "fonts": true
               }
             },
+            "catalog": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.catalog.ts"
+                }
+              ],
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": true
+                },
+                "fonts": true
+              }
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -102,6 +131,9 @@
           "configurations": {
             "production": {
               "buildTarget": "grandesmarcaspe-site:build:production"
+            },
+            "catalog": {
+              "buildTarget": "grandesmarcaspe-site:build:catalog"
             },
             "development": {
               "buildTarget": "grandesmarcaspe-site:build:development"

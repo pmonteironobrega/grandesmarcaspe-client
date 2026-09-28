@@ -1,22 +1,28 @@
-# Deploy do ambiente de desenvolvimento (catalog.pmonteirodev.com.br — 191.252.222.63).
-# Produção: ver deploy-production.yml (master → 191.252.223.249).
-name: Deploy Frontend (development)
+# Deploy do ambiente de produção (grandesmarcaspe.com.br — 191.252.223.249).
+# Desenvolvimento: ver deploy.yml (develop → catalog.pmonteirodev.com.br).
+name: Deploy Frontend (production)
 
 on:
   push:
     branches:
-      - develop
+      - master
+      - main
 
 jobs:
   deploy:
     if: github.repository == 'pmonteironobrega/grandesmarcaspe-client'
     runs-on: ubuntu-latest
+    environment: production
     env:
       API_INTERNAL_URL: ${{ secrets.API_INTERNAL_URL || 'http://127.0.0.1:3001' }}
-      ASSETS_BASE_URL: ${{ secrets.ASSETS_BASE_URL || 'https://api.catalog.pmonteirodev.com.br' }}
-      SITE_DOMAIN: ${{ secrets.SITE_DOMAIN || 'catalog.pmonteirodev.com.br' }}
-      SITE_URL: ${{ secrets.SITE_URL || 'https://catalog.pmonteirodev.com.br' }}
+      ASSETS_BASE_URL: ${{ secrets.ASSETS_BASE_URL || 'https://api.grandesmarcaspe.com.br' }}
+      SITE_DOMAIN: ${{ secrets.SITE_DOMAIN || 'grandesmarcaspe.com.br,www.grandesmarcaspe.com.br' }}
+      SITE_URL: ${{ secrets.SITE_URL || 'https://www.grandesmarcaspe.com.br' }}
       SSR_PORT: ${{ secrets.SSR_PORT || '4001' }}
+      SSH_HOST: ${{ secrets.SSH_HOST || '191.252.223.249' }}
+      SSH_USER: ${{ secrets.SSH_USER || 'root' }}
+      SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
+      SSH_TARGET: ${{ secrets.SSH_TARGET || '/var/www/gmpe-site/' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,12 +34,12 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
-      - name: Overwrite environment.catalog.ts from CI secrets
+      - name: Overwrite environment.prod.ts from CI secrets
         run: |
-          cat > src/environments/environment.catalog.ts <<EOF
+          cat > src/environments/environment.prod.ts <<EOF
           export const environment = {
             production: true,
-            appEnv: 'catalog' as const,
+            appEnv: 'production' as const,
             apiUrl: '${API_INTERNAL_URL}',
             assetsBaseUrl: '${ASSETS_BASE_URL}',
             siteUrl: '${SITE_URL}',
@@ -44,19 +50,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build catalog bundle
-        run: npm run build:catalog
+      - name: Build production bundle
+        run: npm run build:production
 
       - name: Verify SSH secrets
         env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_TARGET: ${{ secrets.SSH_TARGET }}
         run: |
           missing=0
-          [ -n "$SSH_HOST" ] || { echo "SSH_HOST is missing"; missing=1; }
           [ -n "$SSH_PRIVATE_KEY" ] || { echo "SSH_PRIVATE_KEY is missing"; missing=1; }
-          [ -n "$SSH_TARGET" ] || { echo "SSH_TARGET is missing"; missing=1; }
           exit $missing
 
       - name: Install SSH Key
@@ -68,34 +70,21 @@ jobs:
           if_key_exists: replace
 
       - name: Adding Known Hosts
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
         run: ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
 
       - name: Ensure directories on server
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER || 'root' }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
-          SSH_TARGET: ${{ secrets.SSH_TARGET }}
         run: |
           ssh -p "$SSH_PORT" -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes \
             "${SSH_USER}@${SSH_HOST}" \
             "mkdir -p ${SSH_TARGET}/environments"
 
       - name: Write .env.production for PM2/SSR
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER || 'root' }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
-          SSH_TARGET: ${{ secrets.SSH_TARGET }}
         run: |
           ssh -p "$SSH_PORT" -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes \
             "${SSH_USER}@${SSH_HOST}" \
             "cat > ${SSH_TARGET}/environments/.env.production << EOF
           NODE_ENV=production
-          APP_ENV=catalog
+          APP_ENV=production
           HOST=127.0.0.1
           PORT=${SSR_PORT}
           API_URL=${API_INTERNAL_URL}
@@ -104,55 +93,38 @@ jobs:
           EOF"
 
       - name: Secure env file permissions
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER || 'root' }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
-          SSH_TARGET: ${{ secrets.SSH_TARGET }}
         run: |
           ssh -p "$SSH_PORT" -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes \
             "${SSH_USER}@${SSH_HOST}" \
             "chmod 600 ${SSH_TARGET}/environments/.env.production && chown root:root ${SSH_TARGET}/environments/.env.production"
 
       - name: Deploy with rsync
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER || 'root' }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
-          SSH_TARGET: ${{ secrets.SSH_TARGET }}
         run: |
           rsync -avz \
             -e "ssh -p ${SSH_PORT} -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes" \
-            ./package.json ./package-lock.json ./ecosystem.config.cjs \
+            ./package.json ./package-lock.json \
             "${SSH_USER}@${SSH_HOST}:${SSH_TARGET}/"
+          scp -P "$SSH_PORT" -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes \
+            ./ecosystem.production.cjs \
+            "${SSH_USER}@${SSH_HOST}:${SSH_TARGET}/ecosystem.config.cjs"
           rsync -avz --delete \
             -e "ssh -p ${SSH_PORT} -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes" \
             ./dist/ \
             "${SSH_USER}@${SSH_HOST}:${SSH_TARGET}/dist/"
 
       - name: Install prod deps and restart SSR
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER || 'root' }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
-          SSH_TARGET: ${{ secrets.SSH_TARGET }}
         run: |
           ssh -p "$SSH_PORT" -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes \
             "${SSH_USER}@${SSH_HOST}" \
             "cd ${SSH_TARGET} && \
              npm ci --omit=dev && \
-             if pm2 describe catalog-site > /dev/null 2>&1; then \
-               pm2 restart catalog-site --update-env; \
+             if pm2 describe gmpe-site > /dev/null 2>&1; then \
+               pm2 restart gmpe-site --update-env; \
              else \
                pm2 start ecosystem.config.cjs --env production; \
              fi && pm2 save"
 
       - name: Fix permissions for nginx
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER || 'root' }}
-          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
-          SSH_TARGET: ${{ secrets.SSH_TARGET }}
         run: |
           ssh -p "$SSH_PORT" -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes \
             "${SSH_USER}@${SSH_HOST}" \

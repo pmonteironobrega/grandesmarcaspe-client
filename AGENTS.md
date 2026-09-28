@@ -58,8 +58,8 @@ ng generate component nome-do-componente
 ```
 
 **Deploy:**
-- **Desenvolvimento** (servidor atual): push na branch `develop` → `.github/workflows/deploy.yml` → rsync + PM2 (`server/server.mjs`).
-- **Produção:** branch `master` (workflow ainda não configurado).
+- **Desenvolvimento** (`191.252.222.63`): push na branch `develop` → `.github/workflows/deploy.yml` → `/var/www/catalog-site` + PM2 `catalog-site`.
+- **Produção** (`191.252.223.249`): push na branch `master` → `.github/workflows/deploy-production.yml` → `/var/www/gmpe-site` + PM2 `gmpe-site`.
 
 ### Imagens de clientes
 
@@ -79,7 +79,10 @@ ng generate component nome-do-componente
 
 ## API Backend (grandesmarcaspe-server)
 
-Backend NestJS read-only em `http://localhost:3000` (sem prefixo `/api`). Produção: `environment.prod.ts` → `https://api.grandesmarcaspe.com.br`.
+Backend NestJS read-only em `http://localhost:3000` (sem prefixo `/api`).  
+- Bundle catalog: `environment.catalog.ts` → SSR `apiUrl` loopback; assets `api.catalog.pmonteirodev.com.br`.  
+- Bundle produção: `environment.prod.ts` → SSR `apiUrl` loopback; assets `api.grandesmarcaspe.com.br`; `siteUrl` `https://www.grandesmarcaspe.com.br`.  
+No browser, JSON usa paths relativos (proxy SSR / nginx).
 
 ### Catálogo público implementado (GET)
 

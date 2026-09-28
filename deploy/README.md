@@ -1,46 +1,46 @@
 # Deploy — GMPE Site (Angular SSR)
 
-## Branches
+## Bundle Angular
 
-| Branch | Ambiente | Deploy |
-|--------|----------|--------|
-| `develop` | Desenvolvimento (servidor atual) | Automático via [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) |
-| `master` | Produção | Ainda não configurado |
+| Script | Config | Arquivo | Uso |
+|--------|--------|---------|-----|
+| `npm run build:catalog` | `catalog` | `environment.catalog.ts` | develop → servidor de dev |
+| `npm run build:production` | `production` | `environment.prod.ts` | master → servidor de produção |
+| `npm start` | development | `environment.ts` | local |
 
-## Domínios (desenvolvimento)
+O CI **sempre sobrescreve** o `environment.*.ts` com secrets (`API_INTERNAL_URL`, `ASSETS_BASE_URL`, `SITE_URL`) antes do build, e reescreve `environments/.env.production` no servidor no deploy (`API_URL`, `NG_ALLOWED_HOSTS`, `APP_ENV`).
 
-| App | URL | Porta interna |
-|-----|-----|----------------|
-| Site (SSR) | `https://catalog.pmonteirodev.com.br` | `4001` |
-| API | `https://api.catalog.pmonteirodev.com.br` | `3001` |
+## Ambientes
 
-## Servidor (desenvolvimento)
+| Branch | Ambiente | Host | URL | Diretório |
+|--------|----------|------|-----|-----------|
+| `develop` | Desenvolvimento | `191.252.222.63` | `https://catalog.pmonteirodev.com.br` | `/var/www/catalog-site/` |
+| `master` | Produção | `191.252.223.249` | `https://www.grandesmarcaspe.com.br` | `/var/www/gmpe-site/` |
 
-- **Host:** `191.252.222.63`
-- **Diretório:** `/var/www/catalog-site/`
-- **PM2:** `catalog-site` (`ecosystem.config.cjs`)
-- **Workflow:** [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) (só `develop`)
-- **Secrets:** [`GITHUB-SECRETS.md`](GITHUB-SECRETS.md)
+## Produção
 
-## Primeira vez no servidor
+- **PM2:** `gmpe-site` (`ecosystem.production.cjs`)
+- **Porta SSR:** `4001`
+- **API interna:** `http://127.0.0.1:3001`
+- **Workflow:** [`.github/workflows/deploy-production.yml`](../.github/workflows/deploy-production.yml)
+- **Secrets:** environment GitHub **production** — ver [`GITHUB-SECRETS.md`](GITHUB-SECRETS.md)
+
+### Nginx + SSL (após DNS)
 
 ```bash
-mkdir -p /var/www/catalog-site/environments
-sudo bash deploy/scripts/setup-nginx-catalog-site.sh
-sudo bash deploy/scripts/certbot-catalog-site.sh
+sudo bash deploy/scripts/setup-nginx-prod-site.sh   # se ainda não instalado
+sudo bash deploy/scripts/certbot-prod-site.sh
 ```
 
-DNS: registro **A** `catalog.pmonteirodev.com.br` → `191.252.222.63`
+DNS:
 
-## Fluxo do deploy
+- **A** `grandesmarcaspe.com.br` → `191.252.223.249`
+- **A** `www.grandesmarcaspe.com.br` → `191.252.223.249`
 
-1. Gera `environment.prod.ts` com secrets (`API_INTERNAL_URL`, `ASSETS_BASE_URL`)
-2. `npm ci` + `ng build`
-3. rsync `dist/`, `package.json`, `ecosystem.config.cjs`
-4. Escreve `environments/.env.production` (`API_URL`, `PORT`, `NG_ALLOWED_HOSTS`)
-5. `npm ci --omit=dev` + `pm2 restart catalog-site`
+## Desenvolvimento
+
+Ver tabela acima; workflow [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) (só `develop`).
 
 ## Imagens
 
-Servidas pela API em `https://api.catalog.pmonteirodev.com.br/clientes/...`  
-(`ASSETS_BASE_URL` no build de produção).
+Em produção, preferir `ASSETS_BASE_URL=https://www.grandesmarcaspe.com.br` (ou a API) e sincronizar `clientes/` no servidor da API (`/var/www/gmpe-api/clientes/`) ou na origem configurada no build.
