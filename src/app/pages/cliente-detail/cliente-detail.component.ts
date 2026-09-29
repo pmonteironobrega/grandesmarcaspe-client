@@ -49,6 +49,8 @@ import {
 } from '../../core/utils/telefone';
 import { environment } from '../../../environments/environment';
 
+const RELACIONADOS_LIMIT = 6;
+
 
 @Component({
 
@@ -342,7 +344,9 @@ export class ClienteDetailComponent implements OnInit {
 
       next: (response) => {
 
-        const filtered = response.data.filter((item) => item.slug !== detail.slug).slice(0, 3);
+        const filtered = response.data
+          .filter((item) => item.slug !== detail.slug)
+          .slice(0, RELACIONADOS_LIMIT);
 
         this.relacionados.set(filtered);
 
