@@ -87,7 +87,9 @@ export class EmpreendimentoCardComponent {
 
     const uf = end.uf?.sigla ?? '';
 
-    return `${end.logradouro}, ${end.numero} - ${bairro} - ${cidade}/${uf}${this.telefone ? ` Fone: ${this.telefone}` : ''}`;
+    const local = [bairro, `${cidade}/${uf}`].filter(Boolean).join(' - ');
+
+    return `${end.logradouro}, ${end.numero} - ${local}${this.telefone ? ` Fone: ${this.telefone}` : ''}`;
 
   }
 

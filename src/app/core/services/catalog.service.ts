@@ -7,6 +7,7 @@ import { Categoria } from '../models/categoria.model';
 import { ClienteDetail } from '../models/cliente-detail.model';
 import { ClienteListItem } from '../models/cliente-list-item.model';
 import { BUSCA_PAGE_SIZE } from '../constants/catalog';
+import { buildClienteDetailPath } from '../utils/catalog-url';
 import { PaginatedClientes, PaginatedBusca, BuscaParams } from '../models/paginated-response.model';
 
 @Injectable({
@@ -33,11 +34,11 @@ export class CatalogService {
   getClienteDetail(
     clienteSlug: string,
     cidadeSlug: string,
-    bairroSlug: string,
+    bairroSlug: string | null,
     uf: string,
   ): Observable<ClienteDetail> {
     return this.http.get<ClienteDetail>(
-      this.buildUrl(`r/${clienteSlug}/${cidadeSlug}/${bairroSlug}/${uf.toLowerCase()}`),
+      this.buildUrl(buildClienteDetailPath(clienteSlug, cidadeSlug, bairroSlug, uf)),
     );
   }
 

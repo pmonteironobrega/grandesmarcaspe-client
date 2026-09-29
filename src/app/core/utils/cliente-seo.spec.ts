@@ -53,6 +53,15 @@ describe('cliente SEO helpers', () => {
     );
   });
 
+  it('should build canonical url without bairro segment when endereco has no bairro', () => {
+    const base = buildDetail();
+    const detail = buildDetail({ endereco: { ...base.endereco, bairro: null } });
+
+    expect(buildClienteCanonicalUrl(seoContext.siteUrl, detail)).toBe(
+      'https://www.grandesmarcaspe.com.br/r/academia-corpo-e-energia/recife/pe',
+    );
+  });
+
   it('should prefer slogan for meta description', () => {
     expect(buildClienteMetaDescription(buildDetail())).toBe('Saúde e bem-estar em Boa Viagem');
   });

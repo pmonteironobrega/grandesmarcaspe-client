@@ -1,4 +1,5 @@
 import {
+  buildClienteDetailPath,
   buildListRouteFromFilters,
   buildListUrlFromFilters,
   parseListFiltersFromLegacyPath,
@@ -9,6 +10,22 @@ import {
 
 
 describe('catalog-url', () => {
+
+  describe('buildClienteDetailPath', () => {
+
+    it('builds cliente + cidade + bairro + uf', () => {
+      expect(buildClienteDetailPath('loja-exemplo', 'recife', 'boa-viagem', 'PE')).toBe(
+        'r/loja-exemplo/recife/boa-viagem/pe',
+      );
+    });
+
+    it('omits bairro segment when endereco has no bairro', () => {
+      expect(buildClienteDetailPath('loja-exemplo', 'petrolina', null, 'PE')).toBe(
+        'r/loja-exemplo/petrolina/pe',
+      );
+    });
+
+  });
 
   describe('buildListRouteFromFilters', () => {
 

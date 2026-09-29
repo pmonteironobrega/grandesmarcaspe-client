@@ -45,6 +45,12 @@ export const routes: Routes = [
     data: { awaitContent: true },
   },
 
+  {
+    path: 'r/:clienteSlug/:cidadeSlug/:uf',
+    component: ClienteDetailComponent,
+    data: { awaitContent: true },
+  },
+
   { path: 'c/:categoriaSlug/:a', component: CategoriaListComponent, data: { awaitContent: true } },
   { path: 'c/:categoriaSlug/:a/:b', component: CategoriaListComponent, data: { awaitContent: true } },
   { path: 'c/:categoriaSlug/:a/:b/:c', component: CategoriaListComponent, data: { awaitContent: true } },

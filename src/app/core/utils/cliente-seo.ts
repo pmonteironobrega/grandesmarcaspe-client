@@ -27,7 +27,7 @@ export function buildClienteCanonicalUrl(siteUrl: string, detail: ClienteDetail)
   const bairro = detail.endereco.bairro?.slug;
   const uf = detail.endereco.uf?.sigla?.toLowerCase();
 
-  if (!cidade || !bairro || !uf) {
+  if (!cidade || !uf) {
     return base;
   }
 

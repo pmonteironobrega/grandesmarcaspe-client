@@ -147,13 +147,15 @@ export function nextClienteMarcaFallbackUrl(clienteId: number, failedUrl: string
   return buildClienteMarcaPath(id, order[index + 1]);
 }
 
+/** `r/{cliente}/{cidade}/{bairro}/{uf}`, or `r/{cliente}/{cidade}/{uf}` when the endereco has no bairro. */
 export function buildClienteDetailPath(
   clienteSlug: string,
   cidadeSlug: string,
-  bairroSlug: string,
+  bairroSlug: string | null | undefined,
   uf: string,
 ): string {
-  return `r/${clienteSlug}/${cidadeSlug}/${bairroSlug}/${uf.toLowerCase()}`;
+  const geo = bairroSlug ? `${cidadeSlug}/${bairroSlug}` : cidadeSlug;
+  return `r/${clienteSlug}/${geo}/${uf.toLowerCase()}`;
 }
 
 export function buildClienteDetailUrlFromListItem(cliente: ClienteListItem): string | null {
@@ -161,7 +163,7 @@ export function buildClienteDetailUrlFromListItem(cliente: ClienteListItem): str
   const bairro = cliente.endereco?.bairro?.slug;
   const uf = cliente.endereco?.uf?.sigla;
 
-  if (!cidade || !bairro || !uf) {
+  if (!cidade || !uf) {
     return null;
   }
 

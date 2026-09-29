@@ -126,7 +126,7 @@ export class ClienteDetailComponent implements OnInit {
 
       const cidadeSlug = params.get('cidadeSlug') ?? '';
 
-      const bairroSlug = params.get('bairroSlug') ?? '';
+      const bairroSlug = params.get('bairroSlug');
 
       const uf = params.get('uf') ?? '';
 
@@ -187,7 +187,9 @@ export class ClienteDetailComponent implements OnInit {
 
     const complemento = end.complemento ? ` - ${end.complemento}` : '';
 
-    return `${end.logradouro}, ${end.numero}${complemento} - ${bairro} - ${cidade}/${uf} CEP: ${end.cep}`;
+    const local = [bairro, `${cidade}/${uf}`].filter(Boolean).join(' - ');
+
+    return `${end.logradouro}, ${end.numero}${complemento} - ${local} CEP: ${end.cep}`;
 
   }
 
