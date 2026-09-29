@@ -6,4 +6,6 @@ export const environment = {
   assetsBaseUrl: 'http://localhost:3000',
   siteUrl: 'http://localhost:4200',
   defaultUf: 'pe',
+  googleAnalyticsId: '',
+  adsenseClient: '',
 };

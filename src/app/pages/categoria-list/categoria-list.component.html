@@ -48,6 +48,10 @@
 
       </div>
 
+      @if (result.data.length) {
+        <app-ad-slot [slot]="adSlots.detalhesTopo" />
+      }
+
 
 
       <div class="row">

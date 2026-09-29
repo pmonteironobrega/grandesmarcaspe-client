@@ -11,6 +11,8 @@ import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcru
 import { EmpreendimentoCardComponent } from '../../shared/components/empreendimento-card/empreendimento-card.component';
 import { CategoriasPopularesComponent } from '../../shared/components/categorias-populares/categorias-populares.component';
 import { AnuncieBannerComponent } from '../../shared/components/anuncie-banner/anuncie-banner.component';
+import { AdSlotComponent } from '../../shared/components/ad-slot/ad-slot.component';
+import { ADSENSE_SLOTS } from '../../core/constants/adsense';
 import { buildListRouteFromFilters, ListRoute } from '../../core/utils/catalog-url';
 import { buildPaginationWindow } from '../../core/utils/pagination';
 import { capitalizeWords } from '../../core/utils/format-text';
@@ -30,6 +32,7 @@ import { environment } from '../../../environments/environment';
     EmpreendimentoCardComponent,
     CategoriasPopularesComponent,
     AnuncieBannerComponent,
+    AdSlotComponent,
   ],
   templateUrl: './categoria-list.component.html',
   styleUrl: './categoria-list.component.scss',
@@ -47,6 +50,7 @@ export class CategoriaListComponent implements OnInit {
   error = signal(false);
   breadcrumb = signal<{ page: string; router: string | ListRoute }[]>([]);
   buildListRoute = buildListRouteFromFilters;
+  readonly adSlots = ADSENSE_SLOTS;
 
   paginationPages(currentPage: number, totalPages: number): number[] {
     return buildPaginationWindow(currentPage, totalPages);

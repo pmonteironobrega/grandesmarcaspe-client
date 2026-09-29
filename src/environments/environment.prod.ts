@@ -11,4 +11,7 @@ export const environment = {
   assetsBaseUrl: 'https://api.grandesmarcaspe.com.br',
   siteUrl: 'https://www.grandesmarcaspe.com.br',
   defaultUf: 'pe',
+  /** Only loaded when the page is served from the siteUrl host (or its apex). */
+  googleAnalyticsId: 'G-ZF566WYRCG',
+  adsenseClient: 'ca-pub-2939962114779483',
 };

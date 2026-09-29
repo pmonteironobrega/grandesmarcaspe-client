@@ -11,4 +11,6 @@ export const environment = {
   assetsBaseUrl: 'https://api.catalog.pmonteirodev.com.br',
   siteUrl: 'https://catalog.pmonteirodev.com.br',
   defaultUf: 'pe',
+  googleAnalyticsId: '',
+  adsenseClient: '',
 };

@@ -13,6 +13,7 @@ import { FooterComponent } from './layout/footer/footer.component';
 import { RouteTransitionService } from './core/services/route-transition.service';
 import { AppScrollService } from './core/services/app-scroll.service';
 import { SeoService } from './core/services/seo.service';
+import { GoogleTagsService } from './core/services/google-tags.service';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +30,8 @@ export class App {
   readonly transitionLayout = signal<'catalog' | 'form'>('catalog');
 
   constructor() {
+    inject(GoogleTagsService).initAnalytics();
+
     this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.seo.resetForUrl(event.url);

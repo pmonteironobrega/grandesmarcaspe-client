@@ -19,6 +19,8 @@ jobs:
       SITE_DOMAIN: ${{ secrets.SITE_DOMAIN || 'grandesmarcaspe.com.br,www.grandesmarcaspe.com.br' }}
       SITE_URL: ${{ secrets.SITE_URL || 'https://www.grandesmarcaspe.com.br' }}
       SSR_PORT: ${{ secrets.SSR_PORT || '4001' }}
+      GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID || 'G-ZF566WYRCG' }}
+      ADSENSE_CLIENT: ${{ secrets.ADSENSE_CLIENT || 'ca-pub-2939962114779483' }}
       SSH_HOST: ${{ secrets.SSH_HOST || '191.252.223.249' }}
       SSH_USER: ${{ secrets.SSH_USER || 'root' }}
       SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
@@ -44,6 +46,8 @@ jobs:
             assetsBaseUrl: '${ASSETS_BASE_URL}',
             siteUrl: '${SITE_URL}',
             defaultUf: 'pe',
+            googleAnalyticsId: '${GA_MEASUREMENT_ID}',
+            adsenseClient: '${ADSENSE_CLIENT}',
           };
           EOF
 

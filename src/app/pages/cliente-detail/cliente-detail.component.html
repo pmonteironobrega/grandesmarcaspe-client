@@ -61,6 +61,8 @@
 
       </div>
 
+      <app-ad-slot [slot]="adSlots.detalhesTopo" />
+
 
 
       <div class="row mt-4">
@@ -234,11 +236,15 @@
 
 
 
-          <div class="ads ads-left"></div>
+          <div class="ads ads-left">
+            <app-ad-slot [slot]="adSlots.lateral" />
+          </div>
 
         </div>
 
       </div>
+
+      <app-ad-slot [slot]="adSlots.detalhesConteudo" />
 
       <app-avaliacoes-section [clienteId]="detail.id" />
 

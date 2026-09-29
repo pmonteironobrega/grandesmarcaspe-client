@@ -38,6 +38,8 @@ jobs:
             assetsBaseUrl: '${ASSETS_BASE_URL}',
             siteUrl: '${SITE_URL}',
             defaultUf: 'pe',
+            googleAnalyticsId: '',
+            adsenseClient: '',
           };
           EOF
 

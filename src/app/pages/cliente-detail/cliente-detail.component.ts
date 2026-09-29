@@ -32,6 +32,8 @@ import {
 } from '../../shared/components/cliente-galeria-carousel/cliente-galeria-carousel.component';
 import { StarRatingInlineComponent } from '../../shared/components/star-rating-inline/star-rating-inline.component';
 import { ClienteMapaComponent } from '../../shared/components/cliente-mapa/cliente-mapa.component';
+import { AdSlotComponent } from '../../shared/components/ad-slot/ad-slot.component';
+import { ADSENSE_SLOTS } from '../../core/constants/adsense';
 import {
   buildClienteDefaultImagePath,
   buildListUrlFromFilters,
@@ -75,6 +77,7 @@ import { environment } from '../../../environments/environment';
     ComentariosSectionComponent,
     StarRatingInlineComponent,
     ClienteMapaComponent,
+    AdSlotComponent,
   ],
   templateUrl: './cliente-detail.component.html',
 
@@ -111,6 +114,7 @@ export class ClienteDetailComponent implements OnInit {
   readonly whatsappUrl = buildWhatsappUrl;
   readonly telUrl = buildTelUrl;
   readonly assetsBaseUrl = environment.assetsBaseUrl;
+  readonly adSlots = ADSENSE_SLOTS;
 
   ngOnInit(): void {
 

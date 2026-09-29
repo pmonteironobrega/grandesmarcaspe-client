@@ -13,6 +13,8 @@ import { EmpreendimentoCardComponent } from '../../shared/components/empreendime
 import { CategoriasPopularesComponent } from '../../shared/components/categorias-populares/categorias-populares.component';
 
 import { AnuncieBannerComponent } from '../../shared/components/anuncie-banner/anuncie-banner.component';
+import { AdSlotComponent } from '../../shared/components/ad-slot/ad-slot.component';
+import { ADSENSE_SLOTS } from '../../core/constants/adsense';
 
 
 
@@ -32,6 +34,8 @@ import { AnuncieBannerComponent } from '../../shared/components/anuncie-banner/a
 
     AnuncieBannerComponent,
 
+    AdSlotComponent,
+
   ],
 
   templateUrl: './home.component.html',
@@ -46,6 +50,7 @@ export class HomeComponent {
   private locationState = inject(LocationStateService);
   private routeTransition = inject(RouteTransitionService);
 
+  readonly adSlots = ADSENSE_SLOTS;
 
 
   clientes = signal<ClienteListItem[] | null>(null);
