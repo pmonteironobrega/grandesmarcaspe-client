@@ -1,5 +1,38 @@
 @use '../../../../public/variables/variables.scss' as *;
 
+.cliente-nome {
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 575.98px) {
+  .cliente-header ::ng-deep .star-btn {
+    font-size: 30px;
+    padding: 4px 2px;
+  }
+
+  .section-mais-empreendimentos ::ng-deep {
+    .listing-thumbnail {
+      height: 130px;
+    }
+
+    h4 {
+      font-size: 1rem;
+      overflow-wrap: break-word;
+    }
+
+    p {
+      font-size: 12px;
+    }
+
+    .nota {
+      display: block;
+      margin-left: 0 !important;
+      margin-top: 4px;
+    }
+  }
+}
+
 .section-address {
 
   p {
