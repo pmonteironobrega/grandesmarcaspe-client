@@ -4,7 +4,7 @@ import { RESPONSE_INIT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
-import { DEFAULT_PAGE_TITLE, SeoService } from './seo.service';
+import { DEFAULT_PAGE_TITLE, SeoService, serializeJsonLd } from './seo.service';
 
 describe('SeoService', () => {
   let service: SeoService;
@@ -66,6 +66,15 @@ describe('SeoService', () => {
     expect(responseInit.status).toBe(404);
     expect(robots()).toBe('noindex, follow');
     expect(canonical()).toBeNull();
+  });
+
+  it('should not allow JSON-LD values to close the script tag', () => {
+    const payload = { name: '</script><script>alert(1)</script> & <!-- x' };
+    const serialized = serializeJsonLd(payload);
+
+    expect(serialized).not.toContain('<');
+    expect(serialized).not.toContain('>');
+    expect(JSON.parse(serialized)).toEqual(payload);
   });
 
   it('should set 503 for API failures so crawlers retry', () => {

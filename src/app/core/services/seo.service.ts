@@ -144,7 +144,7 @@ export class SeoService {
     const script = this.document.createElement('script');
     script.id = JSON_LD_SCRIPT_ID;
     script.type = 'application/ld+json';
-    script.text = JSON.stringify(data);
+    script.text = serializeJsonLd(data);
     this.document.head.appendChild(script);
   }
 
@@ -152,6 +152,19 @@ export class SeoService {
     OG_PROPERTIES.forEach((property) => this.meta.removeTag(`property='${property}'`));
     TWITTER_NAMES.forEach((name) => this.meta.removeTag(`name='${name}'`));
   }
+}
+
+/**
+ * SSR serializes <script> contents verbatim, so a value containing `</script>` or `<!--`
+ * would break out of the tag. Unicode-escaping <, >, & keeps the JSON equivalent.
+ */
+export function serializeJsonLd(data: JsonLd): string {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
 }
 
 export function normalizeSiteUrl(siteUrl: string): string {
