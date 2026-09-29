@@ -77,19 +77,6 @@
           </button>
         </form>
 
-        <div class="auth-card__divider" aria-hidden="true">
-          <span>ou</span>
-        </div>
-
-        <button
-          type="button"
-          class="btn btn-lg btn-wt w-100 auth-card__google"
-          (click)="loginWithGoogle()"
-          [disabled]="loading()">
-          <img src="/img/social/google.svg" alt="" class="auth-card__google-icon" aria-hidden="true">
-          Continuar com Google
-        </button>
-
         <p class="auth-card__switch">
           Já tem conta?
           <a [routerLink]="['/login']" [queryParams]="authQueryParams()">Entrar</a>

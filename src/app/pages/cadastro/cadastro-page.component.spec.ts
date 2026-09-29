@@ -15,7 +15,7 @@ describe('CadastroPageComponent', () => {
   beforeEach(async () => {
     authSpy = jasmine.createSpyObj<AuthService>(
       'AuthService',
-      ['register', 'loginWithGoogle'],
+      ['register'],
       {
         isAuthenticated: signal(false).asReadonly(),
         currentUser: signal(null).asReadonly(),

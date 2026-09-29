@@ -15,7 +15,7 @@ describe('LoginPageComponent', () => {
   beforeEach(async () => {
     authSpy = jasmine.createSpyObj<AuthService>(
       'AuthService',
-      ['login', 'loginWithGoogle'],
+      ['login'],
       {
         isAuthenticated: signal(false).asReadonly(),
         currentUser: signal(null).asReadonly(),

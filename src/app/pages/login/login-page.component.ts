@@ -61,11 +61,6 @@ export class LoginPageComponent {
     });
   }
 
-  loginWithGoogle(): void {
-    this.errorMessage.set('');
-    this.auth.loginWithGoogle();
-  }
-
   private navigateAfterAuth(): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/';
     void this.router.navigateByUrl(returnUrl);
