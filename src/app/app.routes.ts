@@ -24,6 +24,8 @@ import { AuthCallbackComponent } from './pages/auth-callback/auth-callback.compo
 
 import { PerfilPageComponent } from './pages/perfil/perfil-page.component';
 
+import { NotFoundComponent } from './pages/not-found/not-found.component';
+
 import { authGuard } from './core/guards/auth.guard';
 
 
@@ -43,13 +45,13 @@ export const routes: Routes = [
   { path: 'c/:categoriaSlug/:a/:b/:c', component: CategoriaListComponent, data: { awaitContent: true } },
   { path: 'c/:categoriaSlug/:a/:b/:c/:d', component: CategoriaListComponent, data: { awaitContent: true } },
 
-  { path: 'sobre', component: SobreComponent },
+  { path: 'sobre', component: SobreComponent, title: 'Sobre | GrandesMarcasPE' },
 
-  { path: 'anuncie', component: AnunciePageComponent },
+  { path: 'anuncie', component: AnunciePageComponent, title: 'Anuncie seu negócio | GrandesMarcasPE' },
 
-  { path: 'termos-privacidade', component: TermosPrivacidadeComponent },
+  { path: 'termos-privacidade', component: TermosPrivacidadeComponent, title: 'Termos e Privacidade | GrandesMarcasPE' },
 
-  { path: 'fale-conosco', component: FaleConoscoPageComponent },
+  { path: 'fale-conosco', component: FaleConoscoPageComponent, title: 'Fale Conosco | GrandesMarcasPE' },
 
   { path: 'login', component: LoginPageComponent, data: { awaitContent: true, transitionLayout: 'form' } },
 
@@ -60,6 +62,8 @@ export const routes: Routes = [
   { path: 'perfil', component: PerfilPageComponent, canActivate: [authGuard], data: { awaitContent: true, transitionLayout: 'form' } },
 
   { path: 'busca', component: BuscaResultsComponent, data: { awaitContent: true } },
+
+  { path: '**', component: NotFoundComponent },
 
 ];
 

@@ -5,7 +5,6 @@ import {
   ElementRef,
   inject,
   Injector,
-  OnDestroy,
   OnInit,
   signal,
   ViewChild,
@@ -14,7 +13,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CatalogService } from '../../core/services/catalog.service';
-import { ClienteSeoService } from '../../core/services/cliente-seo.service';
+import { SeoService } from '../../core/services/seo.service';
+import { buildClienteSeoPayload } from '../../core/utils/cliente-seo';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
 import { AppScrollService } from '../../core/services/app-scroll.service';
 import { ClienteDetail } from '../../core/models/cliente-detail.model';
@@ -82,13 +82,13 @@ import { environment } from '../../../environments/environment';
 
 })
 
-export class ClienteDetailComponent implements OnInit, OnDestroy {
+export class ClienteDetailComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
   private catalogService = inject(CatalogService);
   private routeTransition = inject(RouteTransitionService);
   private appScroll = inject(AppScrollService);
-  private clienteSeo = inject(ClienteSeoService);
+  private seo = inject(SeoService);
   private injector = inject(Injector);
 
   @ViewChild('clienteNome') clienteNome?: ElementRef<HTMLElement>;
@@ -137,10 +137,12 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
         next: (detail) => {
 
           this.cliente.set(detail);
-          this.clienteSeo.apply(detail, {
-            siteUrl: environment.siteUrl,
-            assetsBaseUrl: environment.assetsBaseUrl,
-          });
+          this.seo.apply(
+            buildClienteSeoPayload(
+              { siteUrl: environment.siteUrl, assetsBaseUrl: environment.assetsBaseUrl },
+              detail,
+            ),
+          );
 
           this.breadcrumb.set(this.buildBreadcrumb(detail));
 
@@ -152,10 +154,10 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
 
         },
 
-        error: () => {
+        error: (err: unknown) => {
 
           this.error.set(true);
-          this.clienteSeo.reset();
+          this.seo.markError(err);
 
           this.loading.set(false);
           this.routeTransition.releaseContent();
@@ -167,12 +169,6 @@ export class ClienteDetailComponent implements OnInit, OnDestroy {
     });
 
   }
-
-  ngOnDestroy(): void {
-    this.clienteSeo.reset();
-  }
-
-
 
   formatEndereco(cliente: ClienteDetail): string {
     const end = cliente.endereco;

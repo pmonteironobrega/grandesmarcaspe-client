@@ -12,6 +12,7 @@ import { HeaderComponent } from './layout/header/header.component';
 import { FooterComponent } from './layout/footer/footer.component';
 import { RouteTransitionService } from './core/services/route-transition.service';
 import { AppScrollService } from './core/services/app-scroll.service';
+import { SeoService } from './core/services/seo.service';
 
 @Component({
   selector: 'app-root',
@@ -23,12 +24,14 @@ export class App {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private appScroll = inject(AppScrollService);
+  private seo = inject(SeoService);
   readonly routeTransition = inject(RouteTransitionService);
   readonly transitionLayout = signal<'catalog' | 'form'>('catalog');
 
   constructor() {
     this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
       if (event instanceof NavigationStart) {
+        this.seo.resetForUrl(event.url);
         this.routeTransition.onNavigationStart();
         return;
       }

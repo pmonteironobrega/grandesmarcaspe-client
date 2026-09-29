@@ -40,17 +40,7 @@
 
         <div class="col">
 
-          <h2 class="font-weight-bold cl-bc">
-
-            {{ formatCategoriaNome(result.data[0]?.categoria?.nome ?? result.meta.filters.categoria) }}
-
-            @if (result.meta.filters.uf) {
-
-              <small class="text-uppercase">/ {{ result.meta.filters.uf }}</small>
-
-            }
-
-          </h2>
+          <h1 class="h2 font-weight-bold cl-bc">{{ heading() }}</h1>
 
           <p class="cl-cz">{{ result.meta.total }} resultados</p>
 
