@@ -37,7 +37,7 @@ export function buildListagemSeoPayload(
 
   const estabelecimentos = meta.total === 1 ? '1 estabelecimento' : `${meta.total} estabelecimentos`;
   const description = truncate(
-    `${names.categoria} em ${location}: ${estabelecimentos} com endereço, telefone e avaliações no Grandes Marcas PE.${pageSuffix}`,
+    `${names.categoria} em ${location}: ${estabelecimentos} com endereço, telefone e avaliações no Grandes Marcas PE.${meta.page >= 2 ? ` Página ${meta.page}.` : ''}`,
   );
 
   return {
