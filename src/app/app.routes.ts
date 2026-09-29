@@ -32,7 +32,12 @@ import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
 
-  { path: '', component: HomeComponent, data: { awaitContent: true } },
+  {
+    path: '',
+    component: HomeComponent,
+    title: 'GrandesMarcasPE | O guia de endereços online',
+    data: { awaitContent: true },
+  },
 
   {
     path: 'r/:clienteSlug/:cidadeSlug/:bairroSlug/:uf',
