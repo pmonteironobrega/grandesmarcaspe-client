@@ -50,6 +50,11 @@
 }
 
 .btn-busca-avancada {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: center;
   color: $laranja-escuro !important;
   cursor: pointer;
 }
@@ -88,7 +93,6 @@
     justify-content: flex-end;
     gap: 0.65rem;
     width: 100%;
-    margin-top: 0.25rem;
   }
 
   &__anuncie,
@@ -156,12 +160,6 @@
   }
 }
 
-@media (min-width: 768px) {
-  .header-account__actions {
-    margin-top: 0;
-  }
-}
-
 .search-header {
   .logo-header {
     margin-left: auto;
@@ -185,37 +183,53 @@
   }
 }
 
-@media (max-width: 767.98px) {
-  .header-account {
-    justify-content: flex-start;
+@media (max-width: 575.98px) {
+  .top-header {
+    .row > [class*='col'] {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
 
-    &__actions {
-      justify-content: flex-start;
+    .btn-lg {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8125rem;
     }
   }
-}
 
-@media (max-width: 575.98px) {
-  .current-uf {
-    margin-bottom: 0.5rem;
+  .header-account__actions {
+    gap: 0.4rem;
   }
 
   .header-account__menu-toggle {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
 
-  .logo-header {
-    max-width: 80% !important;
+  .search-header {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+
+    .logo-header {
+      max-width: 70% !important;
+      margin-bottom: 16px;
+    }
+
+    button.btn-search {
+      padding: 0.5rem 1rem;
+
+      img {
+        max-width: 22px;
+      }
+    }
   }
 
-  .btn-search {
-    margin-top: 10px;
+  .btn-search__label {
+    display: none;
   }
 
   .search-input {
-    padding: 8px 10px;
-    font-size: 14px;
-    height: 100%;
+    padding: 8px 14px;
+    font-size: 16px;
+    height: auto;
   }
 }
