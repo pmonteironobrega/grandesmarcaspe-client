@@ -11,7 +11,7 @@
     padding: 4px 2px;
   }
 
-  .section-mais-empreendimentos ::ng-deep {
+  .section-mais-empreendimentos app-empreendimento ::ng-deep {
     .listing-thumbnail {
       height: 130px;
     }
