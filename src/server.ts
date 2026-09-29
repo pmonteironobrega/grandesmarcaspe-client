@@ -21,7 +21,8 @@ import {
 
 const envProductionPath = join(import.meta.dirname, '../../../environments/.env.production');
 if (existsSync(envProductionPath)) {
-  loadEnv({ path: envProductionPath });
+  // Written by CI on every deploy; must win over values cached by PM2.
+  loadEnv({ path: envProductionPath, override: true });
 }
 
 const apiUrl = process.env['API_URL'] ?? 'http://localhost:3000';
