@@ -80,6 +80,23 @@ describe('cliente SEO helpers', () => {
     expect(business['aggregateRating']).toEqual(jasmine.objectContaining({ ratingValue: 4 }));
   });
 
+  it('should include geo coordinates when precision is at street level or better', () => {
+    const base = buildDetail();
+    const detail = buildDetail({ endereco: { ...base.endereco, geoPrecisao: 'endereco' } });
+    const [business] = buildClienteSeoPayload(seoContext, detail).jsonLd;
+
+    expect(business['geo']).toEqual({ '@type': 'GeoCoordinates', latitude: -8.12, longitude: -34.9 });
+  });
+
+  it('should omit geo coordinates when precision is only cep/bairro or unknown', () => {
+    const base = buildDetail();
+    for (const geoPrecisao of ['cep', 'bairro', null, undefined]) {
+      const detail = buildDetail({ endereco: { ...base.endereco, geoPrecisao } });
+      const [business] = buildClienteSeoPayload(seoContext, detail).jsonLd;
+      expect(business['geo']).toBeUndefined();
+    }
+  });
+
   it('should build breadcrumb json-ld through categoria and cidade listings', () => {
     const [, breadcrumb] = buildClienteSeoPayload(seoContext, buildDetail()).jsonLd;
 

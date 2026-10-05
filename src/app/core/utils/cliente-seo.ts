@@ -135,6 +135,28 @@ function resolveClientePrimaryImageUrl(
   return `${normalizeSiteUrl(context.siteUrl)}${relative.startsWith('/') ? relative : `/${relative}`}`;
 }
 
+/** Precisões em que a coordenada representa o próprio estabelecimento, não o centro do CEP/bairro. */
+const GEO_PRECISOES_SCHEMA = new Set(['endereco', 'numero_proximo', 'logradouro']);
+
+function buildSchemaGeo(endereco: ClienteDetail['endereco']): Record<string, unknown> | null {
+  if (!endereco.geoPrecisao || !GEO_PRECISOES_SCHEMA.has(endereco.geoPrecisao)) {
+    return null;
+  }
+  if (endereco.latitude == null || endereco.longitude == null) {
+    return null;
+  }
+  const latitude = Number(endereco.latitude);
+  const longitude = Number(endereco.longitude);
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return null;
+  }
+  return {
+    '@type': 'GeoCoordinates',
+    latitude: Number(latitude.toFixed(6)),
+    longitude: Number(longitude.toFixed(6)),
+  };
+}
+
 function buildClienteLocalBusinessJsonLd(
   context: ClienteSeoContext,
   detail: ClienteDetail,
@@ -162,6 +184,11 @@ function buildClienteLocalBusinessJsonLd(
       addressCountry: 'BR',
     },
   };
+
+  const geo = buildSchemaGeo(endereco);
+  if (geo) {
+    schema['geo'] = geo;
+  }
 
   if (detail.categoria?.nome) {
     schema['@type'] = ['LocalBusiness', 'ProfessionalService'];
