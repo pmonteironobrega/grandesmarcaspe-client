@@ -1,12 +1,8 @@
-import { isPlatformBrowser } from '@angular/common';
-
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-
-import { environment } from '../../../environments/environment';
 
 import { GeographyListOptions } from '../models/geography-list-options.model';
 
@@ -23,8 +19,6 @@ import { Bairro, Cidade, Uf } from '../models/geography.model';
 export class GeographyService {
 
   private http = inject(HttpClient);
-
-  private platformId = inject(PLATFORM_ID);
 
 
 
@@ -106,15 +100,7 @@ export class GeographyService {
 
   private buildUrl(path: string): string {
 
-    const normalized = path.startsWith('/') ? path : `/${path}`;
-
-    if (isPlatformBrowser(this.platformId)) {
-
-      return normalized;
-
-    }
-
-    return `${environment.apiUrl}${normalized}`;
+    return path.startsWith('/') ? path : `/${path}`;
 
   }
 

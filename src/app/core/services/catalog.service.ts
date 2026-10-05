@@ -1,8 +1,6 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { Categoria } from '../models/categoria.model';
 import { ClienteDetail } from '../models/cliente-detail.model';
 import { ClienteListItem } from '../models/cliente-list-item.model';
@@ -15,7 +13,6 @@ import { PaginatedClientes, PaginatedBusca, BuscaParams } from '../models/pagina
 })
 export class CatalogService {
   private http = inject(HttpClient);
-  private platformId = inject(PLATFORM_ID);
 
   getCategorias(uf: string): Observable<Categoria[]> {
     const params = new URLSearchParams({
@@ -78,10 +75,6 @@ export class CatalogService {
   }
 
   private buildUrl(path: string): string {
-    const normalized = path.startsWith('/') ? path : `/${path}`;
-    if (isPlatformBrowser(this.platformId)) {
-      return normalized;
-    }
-    return `${environment.apiUrl}${normalized}`;
+    return path.startsWith('/') ? path : `/${path}`;
   }
 }

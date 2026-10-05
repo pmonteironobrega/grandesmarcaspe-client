@@ -1,6 +1,8 @@
+import { HttpBackend } from '@angular/common/http';
 import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
 import { provideServerRendering, withRoutes } from '@angular/ssr';
 import { appConfig } from './app.config';
+import { ServerApiBackend } from './core/http/server-api.backend';
 import { serverRoutes } from './app.routes.server';
 
 /**
@@ -17,6 +19,8 @@ const serverConfig: ApplicationConfig = {
     provideServerRendering(
       withRoutes(serverRoutes),
     ),
+    ServerApiBackend,
+    { provide: HttpBackend, useExisting: ServerApiBackend },
   ]
 };
 
