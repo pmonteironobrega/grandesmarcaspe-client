@@ -10,6 +10,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CatalogService } from '../../core/services/catalog.service';
 import { SeoService } from '../../core/services/seo.service';
+import { LocationStateService } from '../../core/services/location-state.service';
 import { buildClienteSeoPayload } from '../../core/utils/cliente-seo';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
 import { ClienteDetail } from '../../core/models/cliente-detail.model';
@@ -92,6 +93,7 @@ export class ClienteDetailComponent implements OnInit {
   private catalogService = inject(CatalogService);
   private routeTransition = inject(RouteTransitionService);
   private seo = inject(SeoService);
+  private locationState = inject(LocationStateService);
 
   cliente = signal<ClienteDetail | null>(null);
 
@@ -148,6 +150,10 @@ export class ClienteDetailComponent implements OnInit {
         next: (detail) => {
 
           this.cliente.set(detail);
+          const ufSigla = detail.endereco?.uf?.sigla;
+          if (ufSigla) {
+            this.locationState.setUf(ufSigla);
+          }
           this.seo.apply(
             buildClienteSeoPayload(
               { siteUrl: environment.siteUrl, assetsBaseUrl: environment.assetsBaseUrl },
