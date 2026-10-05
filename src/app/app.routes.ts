@@ -65,7 +65,7 @@ export const routes: Routes = [
       import('./pages/termos-privacidade/termos-privacidade.component').then(
         (m) => m.TermosPrivacidadeComponent,
       ),
-    title: 'Termos e Privacidade | GrandesMarcasPE',
+    title: 'Política de Privacidade e Termo de Uso | GrandesMarcasPE',
   },
 
   {
