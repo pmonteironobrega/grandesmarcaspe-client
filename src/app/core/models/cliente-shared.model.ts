@@ -24,6 +24,8 @@ export interface ClienteEndereco {
   cep: string;
   latitude: number | null;
   longitude: number | null;
+  /** endereco | numero_proximo | logradouro | cep | bairro */
+  geoPrecisao?: string | null;
   uf: GeographySummary;
   cidade: GeographySummary | null;
   bairro: GeographySummary | null;

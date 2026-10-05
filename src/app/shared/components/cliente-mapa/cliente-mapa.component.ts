@@ -24,6 +24,16 @@ import {
 
 type MapaMode = 'leaflet' | 'google' | 'idle';
 
+/** Coordenada só do centro do bairro: o embed do Google pelo endereço é mais preciso. */
+const PRECISOES_SEM_PIN = new Set(['bairro']);
+
+const ZOOM_POR_PRECISAO: Record<string, number> = {
+  endereco: 17,
+  numero_proximo: 17,
+  logradouro: 16,
+  cep: 15,
+};
+
 @Component({
   selector: 'app-cliente-mapa',
   standalone: true,
@@ -88,6 +98,9 @@ export class ClienteMapaComponent implements OnDestroy {
   }
 
   private readCoords(end: ClienteEndereco): { lat: number; lng: number } | null {
+    if (end.geoPrecisao && PRECISOES_SEM_PIN.has(end.geoPrecisao)) {
+      return null;
+    }
     const lat = Number(end.latitude);
     const lng = Number(end.longitude);
     if (!Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0)) {
@@ -124,7 +137,11 @@ export class ClienteMapaComponent implements OnDestroy {
     // Com coordenadas da API: Leaflet imediato.
     // Sem coordenadas: Google embed direto (evita Nominatim lento + múltiplas tentativas).
     if (coords) {
-      void this.initLeaflet(coords.lat, coords.lng, label);
+      const zoom = ZOOM_POR_PRECISAO[end.geoPrecisao ?? ''] ?? 16;
+      this.initLeaflet(coords.lat, coords.lng, label, zoom).catch(() => {
+        this.destroyMap();
+        this.showGoogleEmbed(query);
+      });
       return;
     }
 
@@ -147,7 +164,7 @@ export class ClienteMapaComponent implements OnDestroy {
     this.loading.set(false);
   }
 
-  private async initLeaflet(lat: number, lng: number, label: string): Promise<void> {
+  private async initLeaflet(lat: number, lng: number, label: string, zoom: number): Promise<void> {
     // Garante o container no DOM (ramo @else do template) antes de montar o mapa.
     this.mode.set('idle');
     this.googleEmbedUrl.set(null);
@@ -160,7 +177,9 @@ export class ClienteMapaComponent implements OnDestroy {
       return;
     }
 
-    const L = await import('leaflet');
+    // Leaflet 1.x é CommonJS: no build de produção a API fica em `default`.
+    const leaflet = await import('leaflet');
+    const L = (leaflet as unknown as { default?: typeof leaflet }).default ?? leaflet;
     if (this.destroyed) {
       return;
     }
@@ -178,7 +197,7 @@ export class ClienteMapaComponent implements OnDestroy {
     this.map = L.map(container, {
       scrollWheelZoom: false,
       attributionControl: true,
-    }).setView([lat, lng], 16);
+    }).setView([lat, lng], zoom);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
