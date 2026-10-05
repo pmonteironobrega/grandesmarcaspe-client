@@ -95,14 +95,20 @@ export class SeoService {
     this.markUnindexable(404, NOT_FOUND_TITLE);
   }
 
-  /** 4xx from the API means the URL does not exist; anything else is a transient failure. */
+  /**
+   * 4xx from the API means the URL does not exist; anything else is a transient failure.
+   * Transient failures only become 503 + noindex on the server: in the browser there is no
+   * status to set, and crawlers that render JS would index a noindex caused by a flaky request.
+   */
   markError(error: unknown): void {
     const status = error instanceof HttpErrorResponse ? error.status : 0;
     if (status >= 400 && status < 500) {
       this.markNotFound();
       return;
     }
-    this.markUnindexable(503, DEFAULT_PAGE_TITLE);
+    if (this.responseInit) {
+      this.markUnindexable(503, DEFAULT_PAGE_TITLE);
+    }
   }
 
   private markUnindexable(status: number, title: string): void {

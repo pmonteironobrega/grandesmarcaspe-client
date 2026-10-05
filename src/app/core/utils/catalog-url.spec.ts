@@ -109,6 +109,10 @@ describe('catalog-url', () => {
         bairro: 'boa-viagem',
       });
     });
+
+    it('rejects a numeric tail from legacy pagination', () => {
+      expect(parseListFiltersFromLegacyPath('c/academias/pe/10')).toBeNull();
+    });
   });
 
   describe('buildListUrlFromFilters', () => {

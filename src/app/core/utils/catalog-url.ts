@@ -39,7 +39,7 @@ export function parseListFiltersFromLegacyPath(path: string): ClienteListFilters
   }
 
   const uf = parts[parts.length - 1].toLowerCase();
-  if (uf.length !== 2) {
+  if (!/^[a-z]{2}$/.test(uf)) {
     return null;
   }
 

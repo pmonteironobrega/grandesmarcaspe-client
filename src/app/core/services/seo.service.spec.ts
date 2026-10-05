@@ -89,4 +89,14 @@ describe('SeoService', () => {
 
     expect(responseInit.status).toBe(503);
   });
+
+  it('should keep the page indexable on transient API failures in the browser', () => {
+    TestBed.resetTestingModule();
+    const browserService = TestBed.inject(SeoService);
+    browserService.apply({ title: 'T', description: 'D', canonicalUrl: 'https://x/y' });
+
+    browserService.markError(new HttpErrorResponse({ status: 0 }));
+
+    expect(robots()).toBe('index, follow');
+  });
 });
