@@ -57,8 +57,6 @@ export class HeaderComponent {
 
   constructor() {
     afterNextRender(() => {
-      void this.locationState.detectUfIfNeeded();
-
       this.geographyService.getUfs().subscribe({
         next: (data) => this.ufs.set(data),
         error: () => {

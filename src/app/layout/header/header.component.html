@@ -10,13 +10,7 @@
 
           <button class="btn btn-lg btn-lc" (click)="openModal(modalEstados)">
             Você está em:
-            <strong>
-              @if (locationState.detecting()) {
-                detectando…
-              } @else {
-                {{ locationState.uf() }}
-              }
-            </strong>
+            <strong>{{ locationState.uf() }}</strong>
           </button>
 
         </div>
