@@ -1,4 +1,9 @@
-import { isApiProxyRoute, isServerRenderRoute, shouldProxyToApi } from './cache.middleware';
+import {
+  isApiProxyRoute,
+  isServerRenderRoute,
+  isSsrCacheRoute,
+  shouldProxyToApi,
+} from './cache.middleware';
 
 describe('cache.middleware routing', () => {
   it('identifies dual HTML/JSON server routes', () => {
@@ -6,6 +11,13 @@ describe('cache.middleware routing', () => {
     expect(isServerRenderRoute('/c/academias/pe')).toBeTrue();
     expect(isServerRenderRoute('/busca')).toBeTrue();
     expect(isServerRenderRoute('/sobre')).toBeFalse();
+  });
+
+  it('caches the home and catalog SSR routes, but not static pages', () => {
+    expect(isSsrCacheRoute('/')).toBeTrue();
+    expect(isSsrCacheRoute('/c/academias/pe')).toBeTrue();
+    expect(isSsrCacheRoute('/sobre')).toBeFalse();
+    expect(isServerRenderRoute('/')).toBeFalse();
   });
 
   it('identifies API proxy routes', () => {

@@ -2,7 +2,6 @@ import type { IncomingHttpHeaders } from 'node:http';
 import type { Request, Response, NextFunction } from 'express';
 
 export const PRERENDER_ROUTES = new Set([
-  '/',
   '/sobre',
   '/anuncie',
   '/termos-privacidade',
@@ -71,6 +70,11 @@ export function isPrerenderRoute(path: string): boolean {
 
 export function isServerRenderRoute(path: string): boolean {
   return path.startsWith('/c/') || path.startsWith('/r/') || path === '/busca';
+}
+
+/** Rendered per request with catalog data (the build host cannot reach the API). */
+export function isSsrCacheRoute(path: string): boolean {
+  return path === '/' || isServerRenderRoute(path);
 }
 
 export function isApiProxyRoute(path: string): boolean {

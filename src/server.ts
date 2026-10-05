@@ -14,6 +14,7 @@ import {
   getSsrCacheTtl,
   isPrerenderRoute,
   isServerRenderRoute,
+  isSsrCacheRoute,
   isStaticAsset,
   setCachedSsrResponse,
   createApiProxyMiddleware,
@@ -114,7 +115,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   const ttl = getSsrCacheTtl();
   const cacheKey = req.originalUrl;
 
-  if (ttl > 0 && isServerRenderRoute(req.path)) {
+  if (ttl > 0 && isSsrCacheRoute(req.path)) {
     const cached = getCachedSsrResponse(cacheKey);
     if (cached) {
       res.setHeader('X-SSR-Cache', 'HIT');
@@ -146,7 +147,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
           response.headers.set('vary', 'Accept, Sec-Fetch-Dest');
         }
 
-        if (ttl > 0 && isServerRenderRoute(req.path)) {
+        if (ttl > 0 && isSsrCacheRoute(req.path)) {
           const body = Buffer.from(await response.clone().arrayBuffer());
           const headers: Record<string, string> = {};
           response.headers.forEach((value, key) => {
