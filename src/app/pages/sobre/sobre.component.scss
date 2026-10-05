@@ -1,3 +1,6 @@
-.estados-localidades {
-  border-radius: 20px;
+@use '../../../../public/variables/variables.scss' as *;
+
+.sobre-assinatura {
+  font-size: 1.25rem;
+  color: $laranja-escuro;
 }

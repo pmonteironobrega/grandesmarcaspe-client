@@ -56,7 +56,7 @@ export const routes: Routes = [
   { path: 'c/:categoriaSlug/:a/:b/:c', component: CategoriaListComponent, data: { awaitContent: true } },
   { path: 'c/:categoriaSlug/:a/:b/:c/:d', component: CategoriaListComponent, data: { awaitContent: true } },
 
-  { path: 'sobre', component: SobreComponent, title: 'Sobre | GrandesMarcasPE' },
+  { path: 'sobre', component: SobreComponent, title: 'Quem Somos | GrandesMarcasPE' },
 
   { path: 'anuncie', component: AnunciePageComponent, title: 'Anuncie seu negócio | GrandesMarcasPE' },
 
