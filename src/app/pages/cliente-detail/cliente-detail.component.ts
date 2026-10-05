@@ -1,13 +1,9 @@
 import {
-  afterNextRender,
   Component,
   computed,
-  ElementRef,
   inject,
-  Injector,
   OnInit,
   signal,
-  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -16,7 +12,6 @@ import { CatalogService } from '../../core/services/catalog.service';
 import { SeoService } from '../../core/services/seo.service';
 import { buildClienteSeoPayload } from '../../core/utils/cliente-seo';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
-import { AppScrollService } from '../../core/services/app-scroll.service';
 import { ClienteDetail } from '../../core/models/cliente-detail.model';
 import { ClienteListItem } from '../../core/models/cliente-list-item.model';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
@@ -96,11 +91,7 @@ export class ClienteDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private catalogService = inject(CatalogService);
   private routeTransition = inject(RouteTransitionService);
-  private appScroll = inject(AppScrollService);
   private seo = inject(SeoService);
-  private injector = inject(Injector);
-
-  @ViewChild('clienteNome') clienteNome?: ElementRef<HTMLElement>;
 
   cliente = signal<ClienteDetail | null>(null);
 
@@ -170,7 +161,6 @@ export class ClienteDetailComponent implements OnInit {
 
           this.loading.set(false);
           this.routeTransition.releaseContent();
-          this.scheduleScrollToName();
 
         },
 
@@ -291,29 +281,6 @@ export class ClienteDetailComponent implements OnInit {
   }
 
 
-
-  private getScrollNameOffset(): number {
-    const breadcrumb = document.querySelector(
-      '.section-breadcrumb--sticky',
-    ) as HTMLElement | null;
-    return (breadcrumb?.offsetHeight ?? 0) + 16;
-  }
-
-  private scheduleScrollToName(): void {
-    afterNextRender(
-      () => {
-        requestAnimationFrame(() => {
-          setTimeout(() => {
-            const el = this.clienteNome?.nativeElement;
-            if (el) {
-              this.appScroll.scrollToElement(el, this.getScrollNameOffset());
-            }
-          }, 250);
-        });
-      },
-      { injector: this.injector },
-    );
-  }
 
   /** Same categoria in the same cidade first, topped up with the rest of the UF. */
   private loadRelacionados(detail: ClienteDetail): void {
