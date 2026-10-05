@@ -60,6 +60,18 @@ describe('AutocompleteFieldComponent', () => {
     expect(component.inputText()).toBe('rest');
   });
 
+  it('should clear the label when selection and options are reset together', () => {
+    fixture.componentRef.setInput('selectedValue', 'academias');
+    fixture.detectChanges();
+    expect(component.inputText()).toBe('academias');
+
+    fixture.componentRef.setInput('selectedValue', null);
+    fixture.componentRef.setInput('options', []);
+    fixture.detectChanges();
+
+    expect(component.inputText()).toBe('');
+  });
+
   it('should navigate options with arrow keys and select with Enter', () => {
     component.onFocus();
     expect(component.highlightedIndex()).toBe(0);

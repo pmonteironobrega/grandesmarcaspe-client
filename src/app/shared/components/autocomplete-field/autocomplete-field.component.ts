@@ -54,6 +54,8 @@ export class AutocompleteFieldComponent {
   });
 
   private previousSelectedValue: string | null = null;
+  /** Options may be emptied together with the selection, so the label is kept here. */
+  private selectedLabel = '';
 
   constructor() {
     effect(() => {
@@ -68,19 +70,18 @@ export class AutocompleteFieldComponent {
 
       if (!value) {
         if (previousValue) {
-          const previousOption = items.find((item) => item.value === previousValue);
-          const formattedPrevious = previousOption
-            ? this.labelFormat()(previousOption.label)
-            : '';
-          if (this.inputText() === formattedPrevious || !this.inputText().trim()) {
+          // Keep text the user is typing; drop only the label of the cleared selection.
+          if (this.inputText() === this.selectedLabel || !this.inputText().trim()) {
             this.inputText.set('');
           }
+          this.selectedLabel = '';
         }
         return;
       }
 
       const option = items.find((item) => item.value === value);
-      this.inputText.set(option ? this.labelFormat()(option.label) : '');
+      this.selectedLabel = option ? this.labelFormat()(option.label) : '';
+      this.inputText.set(this.selectedLabel);
     });
   }
 
@@ -186,7 +187,8 @@ export class AutocompleteFieldComponent {
 
   selectOption(option: AutocompleteOption): void {
     this.skipSync = true;
-    this.inputText.set(this.labelFormat()(option.label));
+    this.selectedLabel = this.labelFormat()(option.label);
+    this.inputText.set(this.selectedLabel);
     this.selectionChange.emit(option.value);
     this.closeList();
     this.skipSync = false;
