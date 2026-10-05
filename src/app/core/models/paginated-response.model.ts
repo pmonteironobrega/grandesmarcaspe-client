@@ -35,6 +35,30 @@ export interface PaginatedClientes {
   };
 }
 
+export interface LugaresGeografia {
+  uf: { sigla: string; nome: string };
+  cidade: { slug: string; nome: string };
+  bairro: { slug: string; nome: string } | null;
+}
+
+export interface LugaresCategoria {
+  slug: string;
+  nome: string;
+  total: number;
+}
+
+export interface PaginatedLugares {
+  data: ClienteListItem[];
+  categorias: LugaresCategoria[];
+  meta: {
+    page: number;
+    perPage: number;
+    total: number;
+    totalPages: number;
+    geografia: LugaresGeografia;
+  };
+}
+
 export interface BuscaCategoriaGroup {
   categoria: {
     id: number;

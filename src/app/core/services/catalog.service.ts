@@ -5,8 +5,13 @@ import { Categoria } from '../models/categoria.model';
 import { ClienteDetail } from '../models/cliente-detail.model';
 import { ClienteListItem } from '../models/cliente-list-item.model';
 import { BUSCA_PAGE_SIZE } from '../constants/catalog';
-import { buildClienteDetailPath } from '../utils/catalog-url';
-import { PaginatedClientes, PaginatedBusca, BuscaParams } from '../models/paginated-response.model';
+import { buildClienteDetailPath, buildLugaresUrl } from '../utils/catalog-url';
+import {
+  PaginatedClientes,
+  PaginatedBusca,
+  BuscaParams,
+  PaginatedLugares,
+} from '../models/paginated-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +31,17 @@ export class CatalogService {
     const normalized = path.startsWith('/') ? path.slice(1) : path;
     const query = page >= 2 ? `?page=${page}` : '';
     return this.http.get<PaginatedClientes>(this.buildUrl(`${normalized}${query}`));
+  }
+
+  getLugares(
+    cidadeSlug: string,
+    bairroSlug: string | null,
+    uf: string,
+    page = 1,
+  ): Observable<PaginatedLugares> {
+    return this.http.get<PaginatedLugares>(
+      this.buildUrl(buildLugaresUrl(cidadeSlug, bairroSlug, uf, page)),
+    );
   }
 
   getClienteDetail(

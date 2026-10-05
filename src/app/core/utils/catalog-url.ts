@@ -158,6 +158,33 @@ export function buildClienteDetailPath(
   return `r/${clienteSlug}/${geo}/${uf.toLowerCase()}`;
 }
 
+/** Legacy `/r/lugares/{cidade}[/{bairro}]/{uf}` listing of every categoria in the area. */
+export function buildLugaresRoute(
+  cidadeSlug: string,
+  bairroSlug: string | null | undefined,
+  uf: string,
+  page = 1,
+): ListRoute {
+  const commands = ['/r', 'lugares', cidadeSlug];
+  if (bairroSlug) {
+    commands.push(bairroSlug);
+  }
+  commands.push(uf.toLowerCase());
+  const queryParams: Record<string, string> = page >= 2 ? { page: String(page) } : {};
+  return { commands, queryParams };
+}
+
+export function buildLugaresUrl(
+  cidadeSlug: string,
+  bairroSlug: string | null | undefined,
+  uf: string,
+  page = 1,
+): string {
+  const { commands } = buildLugaresRoute(cidadeSlug, bairroSlug, uf, page);
+  const query = page >= 2 ? `?page=${page}` : '';
+  return `${commands.join('/')}${query}`;
+}
+
 export function buildClienteDetailUrlFromListItem(cliente: ClienteListItem): string | null {
   const cidade = cliente.endereco?.cidade?.slug;
   const bairro = cliente.endereco?.bairro?.slug;

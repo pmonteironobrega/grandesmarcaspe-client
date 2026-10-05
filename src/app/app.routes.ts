@@ -14,6 +14,9 @@ const loadCategoriaList = () =>
 const loadClienteDetail = () =>
   import('./pages/cliente-detail/cliente-detail.component').then((m) => m.ClienteDetailComponent);
 
+const loadLugaresList = () =>
+  import('./pages/lugares-list/lugares-list.component').then((m) => m.LugaresListComponent);
+
 export const routes: Routes = [
 
   {
@@ -22,6 +25,9 @@ export const routes: Routes = [
     title: HOME_TITLE,
     data: { awaitContent: true },
   },
+
+  { path: 'r/lugares/:cidadeSlug/:bairroSlug/:uf', loadComponent: loadLugaresList, data: { awaitContent: true } },
+  { path: 'r/lugares/:cidadeSlug/:uf', loadComponent: loadLugaresList, data: { awaitContent: true } },
 
   {
     path: 'r/:clienteSlug/:cidadeSlug/:bairroSlug/:uf',
