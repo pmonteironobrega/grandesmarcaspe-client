@@ -6,6 +6,7 @@ import { filter } from 'rxjs/operators';
 import { CatalogService } from '../../core/services/catalog.service';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
 import { SeoService } from '../../core/services/seo.service';
+import { LocationStateService } from '../../core/services/location-state.service';
 import { PaginatedClientes } from '../../core/models/paginated-response.model';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
 import { EmpreendimentoCardComponent } from '../../shared/components/empreendimento-card/empreendimento-card.component';
@@ -43,6 +44,7 @@ export class CategoriaListComponent implements OnInit {
   private catalogService = inject(CatalogService);
   private routeTransition = inject(RouteTransitionService);
   private seo = inject(SeoService);
+  private locationState = inject(LocationStateService);
 
   listagem = signal<PaginatedClientes | null>(null);
   heading = signal('');
@@ -80,6 +82,9 @@ export class CategoriaListComponent implements OnInit {
             this.seo.apply(seo);
           }
 
+          if (response.meta.filters.uf) {
+            this.locationState.setUf(response.meta.filters.uf);
+          }
           this.listagem.set(response);
           this.heading.set(seo.heading);
           this.breadcrumb.set(this.buildBreadcrumb(response));

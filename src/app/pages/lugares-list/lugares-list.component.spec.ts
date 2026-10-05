@@ -4,6 +4,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideRouter, Router } from '@angular/router';
 import { LugaresListComponent } from './lugares-list.component';
 import { PaginatedLugares } from '../../core/models/paginated-response.model';
+import { LocationStateService } from '../../core/services/location-state.service';
 
 const buildResponse = (bairro: boolean, page = 1): PaginatedLugares => ({
   data: [],
@@ -30,6 +31,7 @@ describe('LugaresListComponent', () => {
   const flushCategoriasPopulares = (): void => {
     httpMock
       .match((request) => request.url.startsWith('/catalog/categorias-populares'))
+      .filter((req) => !req.cancelled)
       .forEach((req) => req.flush([]));
   };
 
@@ -73,13 +75,18 @@ describe('LugaresListComponent', () => {
     await router.navigateByUrl('/r/lugares/cidade-exemplo/pe?page=2');
     fixture.detectChanges();
 
-    httpMock.expectOne('/r/lugares/cidade-exemplo/pe?page=2').flush(buildResponse(false, 2));
+    const response = buildResponse(false, 2);
+    response.meta.geografia.uf = { sigla: 'sp', nome: 'São Paulo' };
+    localStorage.removeItem('gmpe-uf');
+    httpMock.expectOne('/r/lugares/cidade-exemplo/pe?page=2').flush(response);
     fixture.detectChanges();
     flushCategoriasPopulares();
 
-    expect(component.heading()).toBe('Estabelecimentos em Cidade Exemplo - PE');
+    expect(component.heading()).toBe('Estabelecimentos em Cidade Exemplo - SP');
+    expect(TestBed.inject(LocationStateService).uf()).toBe('SP');
+    localStorage.removeItem('gmpe-uf');
     expect(component.pageRoute(component.lugares()!, 3)).toEqual({
-      commands: ['/r', 'lugares', 'cidade-exemplo', 'pe'],
+      commands: ['/r', 'lugares', 'cidade-exemplo', 'sp'],
       queryParams: { page: '3' },
     });
   });

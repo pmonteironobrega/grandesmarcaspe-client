@@ -7,6 +7,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideRouter, Router } from '@angular/router';
 
 import { CategoriaListComponent } from './categoria-list.component';
+import { LocationStateService } from '../../core/services/location-state.service';
 
 describe('CategoriaListComponent', () => {
   let component: CategoriaListComponent;
@@ -93,6 +94,27 @@ describe('CategoriaListComponent', () => {
     flushCategoriasPopulares();
 
     expect(component.listagem()?.meta.filters.cidade).toBe('recife');
+  });
+
+  it('switches the header UF to the listing UF', async () => {
+    localStorage.removeItem('gmpe-uf');
+    await router.navigateByUrl('/c/academias/sp');
+    fixture.detectChanges();
+
+    httpMock.expectOne('/c/academias/sp').flush({
+      data: [],
+      meta: {
+        page: 1,
+        perPage: 10,
+        total: 0,
+        totalPages: 0,
+        filters: { categoria: 'academias', uf: 'sp', cidade: null, bairro: null },
+      },
+    });
+    flushCategoriasPopulares();
+
+    expect(TestBed.inject(LocationStateService).uf()).toBe('SP');
+    localStorage.removeItem('gmpe-uf');
   });
 
   it('buildListRoute should keep page in queryParams, not path commands', () => {
