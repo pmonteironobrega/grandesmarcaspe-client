@@ -2,35 +2,17 @@ import { Routes } from '@angular/router';
 
 import { HomeComponent } from './pages/home/home.component';
 
-import { CategoriaListComponent } from './pages/categoria-list/categoria-list.component';
-
-import { ClienteDetailComponent } from './pages/cliente-detail/cliente-detail.component';
-
-import { SobreComponent } from './pages/sobre/sobre.component';
-
-import { AnunciePageComponent } from './pages/anuncie/anuncie-page.component';
-
-import { TermosPrivacidadeComponent } from './pages/termos-privacidade/termos-privacidade.component';
-
-import { FaleConoscoPageComponent } from './pages/fale-conosco/fale-conosco.component';
-
-import { BuscaResultsComponent } from './pages/busca-results/busca-results.component';
-
-import { LoginPageComponent } from './pages/login/login-page.component';
-
-import { CadastroPageComponent } from './pages/cadastro/cadastro-page.component';
-
-import { AuthCallbackComponent } from './pages/auth-callback/auth-callback.component';
-
-import { PerfilPageComponent } from './pages/perfil/perfil-page.component';
-
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 import { authGuard } from './core/guards/auth.guard';
 
 import { HOME_TITLE } from './core/utils/home-seo';
 
+const loadCategoriaList = () =>
+  import('./pages/categoria-list/categoria-list.component').then((m) => m.CategoriaListComponent);
 
+const loadClienteDetail = () =>
+  import('./pages/cliente-detail/cliente-detail.component').then((m) => m.ClienteDetailComponent);
 
 export const routes: Routes = [
 
@@ -43,41 +25,84 @@ export const routes: Routes = [
 
   {
     path: 'r/:clienteSlug/:cidadeSlug/:bairroSlug/:uf',
-    component: ClienteDetailComponent,
+    loadComponent: loadClienteDetail,
     data: { awaitContent: true },
   },
 
   {
     path: 'r/:clienteSlug/:cidadeSlug/:uf',
-    component: ClienteDetailComponent,
+    loadComponent: loadClienteDetail,
     data: { awaitContent: true },
   },
 
-  { path: 'c/:categoriaSlug/:a', component: CategoriaListComponent, data: { awaitContent: true } },
-  { path: 'c/:categoriaSlug/:a/:b', component: CategoriaListComponent, data: { awaitContent: true } },
-  { path: 'c/:categoriaSlug/:a/:b/:c', component: CategoriaListComponent, data: { awaitContent: true } },
-  { path: 'c/:categoriaSlug/:a/:b/:c/:d', component: CategoriaListComponent, data: { awaitContent: true } },
+  { path: 'c/:categoriaSlug/:a', loadComponent: loadCategoriaList, data: { awaitContent: true } },
+  { path: 'c/:categoriaSlug/:a/:b', loadComponent: loadCategoriaList, data: { awaitContent: true } },
+  { path: 'c/:categoriaSlug/:a/:b/:c', loadComponent: loadCategoriaList, data: { awaitContent: true } },
+  { path: 'c/:categoriaSlug/:a/:b/:c/:d', loadComponent: loadCategoriaList, data: { awaitContent: true } },
 
-  { path: 'sobre', component: SobreComponent, title: 'Quem Somos | GrandesMarcasPE' },
+  {
+    path: 'sobre',
+    loadComponent: () => import('./pages/sobre/sobre.component').then((m) => m.SobreComponent),
+    title: 'Quem Somos | GrandesMarcasPE',
+  },
 
-  { path: 'anuncie', component: AnunciePageComponent, title: 'Anuncie seu negócio | GrandesMarcasPE' },
+  {
+    path: 'anuncie',
+    loadComponent: () =>
+      import('./pages/anuncie/anuncie-page.component').then((m) => m.AnunciePageComponent),
+    title: 'Anuncie seu negócio | GrandesMarcasPE',
+  },
 
-  { path: 'termos-privacidade', component: TermosPrivacidadeComponent, title: 'Termos e Privacidade | GrandesMarcasPE' },
+  {
+    path: 'termos-privacidade',
+    loadComponent: () =>
+      import('./pages/termos-privacidade/termos-privacidade.component').then(
+        (m) => m.TermosPrivacidadeComponent,
+      ),
+    title: 'Termos e Privacidade | GrandesMarcasPE',
+  },
 
-  { path: 'fale-conosco', component: FaleConoscoPageComponent, title: 'Fale Conosco | GrandesMarcasPE' },
+  {
+    path: 'fale-conosco',
+    loadComponent: () =>
+      import('./pages/fale-conosco/fale-conosco.component').then((m) => m.FaleConoscoPageComponent),
+    title: 'Fale Conosco | GrandesMarcasPE',
+  },
 
-  { path: 'login', component: LoginPageComponent, data: { awaitContent: true, transitionLayout: 'form' } },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login-page.component').then((m) => m.LoginPageComponent),
+    data: { awaitContent: true, transitionLayout: 'form' },
+  },
 
-  { path: 'cadastro', component: CadastroPageComponent, data: { awaitContent: true, transitionLayout: 'form' } },
+  {
+    path: 'cadastro',
+    loadComponent: () =>
+      import('./pages/cadastro/cadastro-page.component').then((m) => m.CadastroPageComponent),
+    data: { awaitContent: true, transitionLayout: 'form' },
+  },
 
-  { path: 'auth/callback', component: AuthCallbackComponent, data: { awaitContent: true, transitionLayout: 'form' } },
+  {
+    path: 'auth/callback',
+    loadComponent: () =>
+      import('./pages/auth-callback/auth-callback.component').then((m) => m.AuthCallbackComponent),
+    data: { awaitContent: true, transitionLayout: 'form' },
+  },
 
-  { path: 'perfil', component: PerfilPageComponent, canActivate: [authGuard], data: { awaitContent: true, transitionLayout: 'form' } },
+  {
+    path: 'perfil',
+    loadComponent: () => import('./pages/perfil/perfil-page.component').then((m) => m.PerfilPageComponent),
+    canActivate: [authGuard],
+    data: { awaitContent: true, transitionLayout: 'form' },
+  },
 
-  { path: 'busca', component: BuscaResultsComponent, data: { awaitContent: true } },
+  {
+    path: 'busca',
+    loadComponent: () =>
+      import('./pages/busca-results/busca-results.component').then((m) => m.BuscaResultsComponent),
+    data: { awaitContent: true },
+  },
 
   { path: '**', component: NotFoundComponent },
 
 ];
-
-

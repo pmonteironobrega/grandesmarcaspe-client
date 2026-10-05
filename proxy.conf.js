@@ -1,4 +1,4 @@
-const API_TARGET = 'http://localhost:3000';
+const API_TARGET = process.env.API_TARGET ?? 'http://localhost:3000';
 
 /**
  * Dual HTML/JSON routes (/c, /r, /busca): navigations stay in the SPA;
