@@ -1,21 +1,19 @@
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppScrollService {
   private platformId = inject(PLATFORM_ID);
+  private document = inject(DOCUMENT);
 
   scrollToTop(): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
 
-    const scrollEl = this.getScrollContainer();
-    if (scrollEl) {
-      scrollEl.scrollTop = 0;
-    }
+    this.document.defaultView?.scrollTo({ top: 0, left: 0 });
   }
 
   scrollToElement(element: HTMLElement, offsetPx = 16): void {
@@ -23,18 +21,12 @@ export class AppScrollService {
       return;
     }
 
-    const scrollEl = this.getScrollContainer();
-    if (!scrollEl) {
+    const win = this.document.defaultView;
+    if (!win) {
       return;
     }
 
-    const scrollRect = scrollEl.getBoundingClientRect();
-    const elementRect = element.getBoundingClientRect();
-    const relativeTop = elementRect.top - scrollRect.top + scrollEl.scrollTop;
-    scrollEl.scrollTop = Math.max(0, relativeTop - offsetPx);
-  }
-
-  private getScrollContainer(): HTMLElement | null {
-    return document.querySelector('.app-scroll');
+    const top = element.getBoundingClientRect().top + win.scrollY;
+    win.scrollTo({ top: Math.max(0, top - offsetPx), left: 0 });
   }
 }
