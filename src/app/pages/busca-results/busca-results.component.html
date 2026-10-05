@@ -33,6 +33,12 @@
         </div>
       </div>
 
+      @let hasResults = result.meta.groupedByCategoria ? !!result.groups?.length : result.data.length > 0;
+
+      @if (hasResults) {
+        <app-ad-slot [slot]="adSlots.detalhesTopo" />
+      }
+
       @if (result.meta.groupedByCategoria) {
         @if (result.groups?.length) {
           @for (group of result.groups; track group.categoria.id) {
@@ -84,7 +90,13 @@
             </div>
           }
         </div>
+      }
 
+      @if (hasResults) {
+        <app-ad-slot [slot]="adSlots.detalhesConteudo" />
+      }
+
+      @if (!result.meta.groupedByCategoria) {
         @if (result.meta.totalPages > 1) {
           <nav class="mt-5" aria-label="Paginação">
             <ul class="pagination justify-content-center">

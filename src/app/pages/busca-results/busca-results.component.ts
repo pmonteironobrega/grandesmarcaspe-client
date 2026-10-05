@@ -10,6 +10,8 @@ import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcru
 import { EmpreendimentoCardComponent } from '../../shared/components/empreendimento-card/empreendimento-card.component';
 import { CategoriasPopularesComponent } from '../../shared/components/categorias-populares/categorias-populares.component';
 import { AnuncieBannerComponent } from '../../shared/components/anuncie-banner/anuncie-banner.component';
+import { AdSlotComponent } from '../../shared/components/ad-slot/ad-slot.component';
+import { ADSENSE_SLOTS } from '../../core/constants/adsense';
 import {
   buildBuscaRouteFromFilters,
   buildBuscaUrl,
@@ -30,6 +32,7 @@ import { capitalizeWords } from '../../core/utils/format-text';
     EmpreendimentoCardComponent,
     CategoriasPopularesComponent,
     AnuncieBannerComponent,
+    AdSlotComponent,
   ],
   templateUrl: './busca-results.component.html',
   styleUrl: './busca-results.component.scss',
@@ -47,6 +50,7 @@ export class BuscaResultsComponent implements OnInit {
   breadcrumb = signal<{ page: string; router: string | BuscaRoute }[]>([]);
   buildBuscaRoute = buildBuscaRouteFromFilters;
   readonly formatCategoriaNome = capitalizeWords;
+  readonly adSlots = ADSENSE_SLOTS;
 
   paginationPages(currentPage: number, totalPages: number): number[] {
     return buildPaginationWindow(currentPage, totalPages);
