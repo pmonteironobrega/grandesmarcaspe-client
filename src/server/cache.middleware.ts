@@ -114,7 +114,14 @@ export function shouldProxyToApi(req: {
     return true;
   }
 
-  const accept = String(req.headers.accept ?? '');
+  const accept = String(req.headers.accept ?? '').toLowerCase();
+
+  // Paths that are also pages: crawlers and link-preview bots (bingbot, facebookexternalhit,
+  // WhatsApp) send `Accept: */*` without Sec-Fetch-Dest and must get the HTML page.
+  if (isServerRenderRoute(req.path)) {
+    return accept.includes('application/json');
+  }
+
   if (accept.includes('text/html')) {
     return false;
   }

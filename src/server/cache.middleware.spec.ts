@@ -53,4 +53,29 @@ describe('cache.middleware routing', () => {
       }),
     ).toBeTrue();
   });
+
+  it('serves the HTML page to crawlers and link-preview bots on page paths', () => {
+    const bots = [
+      { accept: '*/*' },
+      {},
+      { accept: 'text/plain' },
+    ];
+
+    for (const headers of bots) {
+      expect(shouldProxyToApi({ path: '/c/imobiliarias/pe', headers })).toBeFalse();
+      expect(
+        shouldProxyToApi({ path: '/r/academia-exemplo/recife/boa-viagem/pe', headers }),
+      ).toBeFalse();
+      expect(shouldProxyToApi({ path: '/busca', headers })).toBeFalse();
+    }
+  });
+
+  it('keeps proxying API-only paths for generic Accept headers', () => {
+    expect(
+      shouldProxyToApi({ path: '/catalog/destaques', headers: { accept: '*/*' } }),
+    ).toBeTrue();
+    expect(
+      shouldProxyToApi({ path: '/clientes/123/marca.jpg', headers: { accept: 'image/*' } }),
+    ).toBeTrue();
+  });
 });
