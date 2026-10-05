@@ -71,9 +71,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.get('/sitemap.xml', async (_req, res) => {
+async function proxySitemap(apiPath: string, res: Response): Promise<void> {
   try {
-    const response = await fetch(`${apiUrl}/catalog/sitemap.xml`, {
+    const response = await fetch(`${apiUrl}${apiPath}`, {
       headers: { accept: 'application/xml' },
     });
 
@@ -89,7 +89,14 @@ app.get('/sitemap.xml', async (_req, res) => {
     console.error('Sitemap proxy error:', error);
     res.status(500).send('Sitemap unavailable');
   }
-});
+}
+
+// Index pointing to /sitemaps/paginas.xml and /sitemaps/clientes-N.xml.
+app.get('/sitemap.xml', (_req, res) => proxySitemap('/catalog/sitemap.xml', res));
+
+app.get(/^\/sitemaps\/([a-z0-9-]+\.xml)$/, (req, res) =>
+  proxySitemap(`/catalog/sitemaps/${req.params[0]}`, res),
+);
 
 app.use(createApiProxyMiddleware(apiUrl));
 
