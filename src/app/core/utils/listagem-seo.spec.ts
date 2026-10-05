@@ -103,7 +103,7 @@ describe('listagem SEO helpers', () => {
       buildListagem({ categoria: 'pet-shops', cidade: 'cabo-de-santo-agostinho' }, { total: 0, totalPages: 0 }, []),
     );
 
-    expect(seo.heading).toBe('Pet Shops em Cabo De Santo Agostinho - PE');
+    expect(seo.heading).toBe('Pet Shops em Cabo de Santo Agostinho - PE');
     expect(seo.robots).toBe('noindex, follow');
   });
 
