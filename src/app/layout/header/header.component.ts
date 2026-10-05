@@ -14,13 +14,11 @@ import { GeographyService } from '../../core/services/geography.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Uf } from '../../core/models/geography.model';
 import { BuscaAvancadaComponent } from '../../shared/components/busca-avancada/busca-avancada.component';
-import { parseListFiltersFromLegacyPath } from '../../core/utils/catalog-url';
 import {
-  buildBuscaUrl,
-  buildBuscaQueryFromGeoFilters,
-  buildBuscaUrlFromGeoFilters,
-  parseBuscaParamsFromQuery,
-} from '../../core/utils/busca-url';
+  buildListUrlFromFilters,
+  parseListFiltersFromLegacyPath,
+} from '../../core/utils/catalog-url';
+import { buildBuscaUrl, parseBuscaParamsFromQuery } from '../../core/utils/busca-url';
 import { resolveUserPhotoUrl } from '../../core/utils/user-photo';
 
 @Component({
@@ -55,7 +53,6 @@ export class HeaderComponent {
   modalRef?: BsModalRef;
   buscaMessage = '';
   termoBusca = signal('');
-  private lastGeoSearchQuery = signal('');
   ufs = signal<Uf[]>([]);
 
   constructor() {
@@ -119,38 +116,25 @@ export class HeaderComponent {
     );
   }
 
+  /**
+   * Busca avançada is independent from the text box: it browses the legacy listing
+   * pages (`/c/{categoria}/[cidade/[bairro/]]{uf}`) and clears any typed text.
+   */
   onBuscaFiltersChange(): void {
     this.buscaMessage = '';
     const filters = this.buscaAvancada?.getFilters();
-    const termo = this.termoBusca().trim();
-    const lastGeo = this.lastGeoSearchQuery().trim();
 
     if (filters) {
-      const labels = this.buscaAvancada?.getFilterLabels();
-      const geoQuery = buildBuscaQueryFromGeoFilters(filters, labels).trim();
-      const geoDriven = termo.length < 2 || termo === lastGeo || termo === geoQuery;
-      if (termo.length >= 2 && !geoDriven) {
-        return;
-      }
-      this.termoBusca.set(geoQuery);
-      this.lastGeoSearchQuery.set(geoQuery);
-      void this.router.navigateByUrl(buildBuscaUrlFromGeoFilters(filters, labels));
-      this.syncAdvancedSearchPanel();
+      this.termoBusca.set('');
+      this.isOpen = true;
+      void this.router.navigateByUrl(buildListUrlFromFilters(filters));
       return;
     }
 
-    if (!(this.buscaAvancada?.hasAnyFilter() ?? false)) {
-      if (!termo || termo === lastGeo) {
-        this.termoBusca.set('');
-      }
-      this.lastGeoSearchQuery.set('');
+    if (this.isListRoute()) {
+      this.isOpen = false;
+      void this.router.navigateByUrl('/');
     }
-
-    if (this.termoBusca().trim().length >= 2) {
-      return;
-    }
-
-    this.navigateFromGeoFilters();
   }
 
   limparBusca(): void {
@@ -161,7 +145,6 @@ export class HeaderComponent {
 
   private clearSearchState(): void {
     this.termoBusca.set('');
-    this.lastGeoSearchQuery.set('');
     this.buscaMessage = '';
     this.buscaAvancada?.clearFilters();
   }
@@ -171,58 +154,31 @@ export class HeaderComponent {
     return path === '/busca' || path.startsWith('/c/');
   }
 
+  private isListRoute(): boolean {
+    return this.router.url.split('?')[0].startsWith('/c/');
+  }
+
+  /** Text search only uses the typed text; advanced filters are reset. */
   buscar(): void {
     const termo = this.termoBusca().trim();
-    const partial = this.buscaAvancada?.getPartialFilters();
-    const uf = this.locationState.uf().toLowerCase();
 
     if (termo.length >= 2) {
       this.buscaMessage = '';
+      this.buscaAvancada?.clearFilters();
+      this.isOpen = false;
       void this.router.navigateByUrl(
-        buildBuscaUrl({
-          q: termo,
-          uf,
-          categoria: partial?.categoria ?? null,
-          cidade: partial?.cidade ?? null,
-          bairro: partial?.bairro ?? null,
-        }),
+        buildBuscaUrl({ q: termo, uf: this.locationState.uf().toLowerCase() }),
       );
-      this.syncAdvancedSearchPanel();
       return;
     }
 
     if (this.buscaAvancada?.getFilters()) {
-      this.buscaMessage = '';
-      const filters = this.buscaAvancada.getFilters()!;
-      const labels = this.buscaAvancada.getFilterLabels();
-      const geoQuery = buildBuscaQueryFromGeoFilters(filters, labels);
-      this.termoBusca.set(geoQuery);
-      this.lastGeoSearchQuery.set(geoQuery);
-      void this.router.navigateByUrl(buildBuscaUrlFromGeoFilters(filters, labels));
-      this.syncAdvancedSearchPanel();
+      this.onBuscaFiltersChange();
       return;
     }
 
     this.buscaMessage =
       'Digite ao menos 2 caracteres ou selecione uma categoria para buscar.';
-  }
-
-  private navigateFromGeoFilters(): void {
-    const filters = this.buscaAvancada?.getFilters();
-    if (!filters) {
-      if (this.isSearchRoute()) {
-        void this.router.navigateByUrl('/');
-        this.isOpen = false;
-      } else {
-        this.syncAdvancedSearchPanel();
-      }
-      return;
-    }
-
-    void this.router.navigateByUrl(
-      buildBuscaUrlFromGeoFilters(filters, this.buscaAvancada?.getFilterLabels()),
-    );
-    this.syncAdvancedSearchPanel();
   }
 
   private syncSearchFromRoute(): void {
@@ -237,6 +193,7 @@ export class HeaderComponent {
     if (path.startsWith('c/')) {
       const filters = parseListFiltersFromLegacyPath(path);
       if (filters) {
+        this.termoBusca.set('');
         this.buscaAvancada?.setFiltersFromRoute({
           categoria: filters.categoria,
           cidade: filters.cidade,
@@ -250,35 +207,20 @@ export class HeaderComponent {
       const params = parseBuscaParamsFromQuery(urlTree.queryParams);
       if (params) {
         this.termoBusca.set(params.q);
-        this.lastGeoSearchQuery.set(params.q);
-        this.buscaAvancada?.setFiltersFromRoute({
-          categoria: params.categoria ?? null,
-          cidade: params.cidade ?? null,
-          bairro: params.bairro ?? null,
-        });
+        this.buscaAvancada?.clearFilters();
       }
     }
   }
 
   private syncAdvancedSearchPanel(): void {
-    const hasGeoFilters =
-      (this.buscaAvancada?.hasAnyFilter() ?? false) || this.hasActiveGeoFiltersFromRoute();
-    this.isOpen = hasGeoFilters;
+    this.isOpen =
+      (this.buscaAvancada?.hasAnyFilter() ?? false) || this.hasActiveListFiltersFromRoute();
   }
 
-  private hasActiveGeoFiltersFromRoute(): boolean {
+  private hasActiveListFiltersFromRoute(): boolean {
     const urlTree = this.router.parseUrl(this.router.url);
     const path = urlTree.root.children['primary']?.segments.map((s) => s.path).join('/') ?? '';
 
-    if (path.startsWith('c/')) {
-      return parseListFiltersFromLegacyPath(path) !== null;
-    }
-
-    if (path === 'busca') {
-      const params = parseBuscaParamsFromQuery(urlTree.queryParams);
-      return !!(params?.categoria || params?.cidade || params?.bairro);
-    }
-
-    return false;
+    return path.startsWith('c/') && parseListFiltersFromLegacyPath(path) !== null;
   }
 }

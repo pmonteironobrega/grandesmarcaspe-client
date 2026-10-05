@@ -132,114 +132,89 @@ describe('HeaderComponent', () => {
 
 
 
-  it('buscar should navigate to /busca when only categoria is set', () => {
-
-    const buscaAvancada = {
-
-      hasAdvancedFilters: () => true,
-
-      getPartialFilters: () => ({
-
-        categoria: 'academias',
-
-        cidade: null,
-
-        bairro: null,
-
-        uf: 'pe',
-
-      }),
-
-      getFilters: () => ({
-
-        categoria: 'academias',
-
-        uf: 'pe',
-
-        cidade: null,
-
-        bairro: null,
-
-      }),
-
-      getFilterLabels: () => ({ categoria: 'Academias' }),
-
+  it('buscar should ignore and reset advanced filters when text is provided', () => {
+    const clearFilters = jasmine.createSpy('clearFilters');
+    component.buscaAvancada = {
+      clearFilters,
+      getFilters: () => ({ categoria: 'academias', uf: 'pe', cidade: 'recife', bairro: null }),
       hasAnyFilter: () => true,
-
-    } as BuscaAvancadaComponent;
-
-    component.buscaAvancada = buscaAvancada;
+      hasAdvancedFilters: () => true,
+    } as unknown as BuscaAvancadaComponent;
+    component.isOpen = true;
+    component.termoBusca.set('padaria');
 
     component.buscar();
 
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/busca?q=Academias&uf=pe&categoria=academias');
-
+    expect(clearFilters).toHaveBeenCalled();
+    expect(component.isOpen).toBeFalse();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/busca?q=padaria&uf=pe');
   });
 
-  it('onBuscaFiltersChange should navigate to /busca when categoria is selected', () => {
-    const buscaAvancada = {
-      getFilters: () => ({
-        categoria: 'academias',
-        uf: 'pe',
-        cidade: null,
-        bairro: null,
-      }),
-      getFilterLabels: () => ({ categoria: 'Academias' }),
+  it('buscar should open the category listing when only filters are set', () => {
+    component.buscaAvancada = {
+      getFilters: () => ({ categoria: 'academias', uf: 'pe', cidade: null, bairro: null }),
       hasAnyFilter: () => true,
-    } as BuscaAvancadaComponent;
+      hasAdvancedFilters: () => true,
+    } as unknown as BuscaAvancadaComponent;
 
-    component.buscaAvancada = buscaAvancada;
+    component.buscar();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/c/academias/pe');
+  });
+
+  it('onBuscaFiltersChange should open the legacy listing and clear typed text', () => {
+    component.termoBusca.set('padaria');
+    component.buscaAvancada = {
+      getFilters: () => ({ categoria: 'academias', uf: 'pe', cidade: 'recife', bairro: 'boa-viagem' }),
+      hasAnyFilter: () => true,
+    } as unknown as BuscaAvancadaComponent;
 
     component.onBuscaFiltersChange();
 
-    expect(component.termoBusca()).toBe('Academias');
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/busca?q=Academias&uf=pe&categoria=academias');
+    expect(component.termoBusca()).toBe('');
     expect(component.isOpen).toBeTrue();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/c/academias/recife/boa-viagem/pe');
   });
 
-  it('onBuscaFiltersChange should switch categoria after a geo search query', () => {
-    component.termoBusca.set('Academias');
-    (component as unknown as { lastGeoSearchQuery: { set: (value: string) => void } }).lastGeoSearchQuery.set(
-      'Academias',
-    );
-
-    const buscaAvancada = {
-      getFilters: () => ({
-        categoria: 'oticas',
-        uf: 'pe',
-        cidade: null,
-        bairro: null,
-      }),
-      getFilterLabels: () => ({ categoria: 'Óticas' }),
-      hasAnyFilter: () => true,
-    } as BuscaAvancadaComponent;
-
-    component.buscaAvancada = buscaAvancada;
-
-    component.onBuscaFiltersChange();
-
-    expect(component.termoBusca()).toBe('Óticas');
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/busca?q=%C3%93ticas&uf=pe&categoria=oticas');
-  });
-
-  it('onBuscaFiltersChange should not navigate when text search is active', () => {
-    component.termoBusca.set('academia');
-
-    const buscaAvancada = {
-      getFilters: () => ({
-        categoria: 'academias',
-        uf: 'pe',
-        cidade: null,
-        bairro: null,
-      }),
-      getFilterLabels: () => ({ categoria: 'Academias' }),
-    } as BuscaAvancadaComponent;
-
-    component.buscaAvancada = buscaAvancada;
+  it('onBuscaFiltersChange should not navigate when filters are cleared outside a listing', () => {
+    spyOnProperty(router, 'url', 'get').and.returnValue('/busca?q=padaria&uf=pe');
+    component.buscaAvancada = {
+      getFilters: () => null,
+      hasAnyFilter: () => false,
+    } as unknown as BuscaAvancadaComponent;
 
     component.onBuscaFiltersChange();
 
     expect(router.navigateByUrl).not.toHaveBeenCalled();
+  });
+
+  it('syncSearchFromRoute should keep only the text on /busca', () => {
+    const clearFilters = jasmine.createSpy('clearFilters');
+    const setFiltersFromRoute = jasmine.createSpy('setFiltersFromRoute');
+    component.buscaAvancada = { clearFilters, setFiltersFromRoute } as unknown as BuscaAvancadaComponent;
+    spyOnProperty(router, 'url', 'get').and.returnValue('/busca?q=padaria&uf=pe&categoria=padarias');
+
+    (component as unknown as { syncSearchFromRoute: () => void }).syncSearchFromRoute();
+
+    expect(component.termoBusca()).toBe('padaria');
+    expect(clearFilters).toHaveBeenCalled();
+    expect(setFiltersFromRoute).not.toHaveBeenCalled();
+  });
+
+  it('syncSearchFromRoute should fill filters and clear text on /c/ listing', () => {
+    component.termoBusca.set('padaria');
+    const setFiltersFromRoute = jasmine.createSpy('setFiltersFromRoute');
+    component.buscaAvancada = { setFiltersFromRoute } as unknown as BuscaAvancadaComponent;
+    spyOnProperty(router, 'url', 'get').and.returnValue('/c/academias/recife/pe');
+
+    (component as unknown as { syncSearchFromRoute: () => void }).syncSearchFromRoute();
+
+    expect(component.termoBusca()).toBe('');
+    expect(setFiltersFromRoute).toHaveBeenCalledWith({
+      categoria: 'academias',
+      cidade: 'recife',
+      bairro: null,
+    });
   });
 
   it('limparBusca should reset criteria and navigate home', () => {
