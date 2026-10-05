@@ -3,6 +3,7 @@ import {
   buildClienteDetailPath,
   resolveClienteImageUrl,
 } from './catalog-url';
+import { buildClienteListagemLinks } from './cliente-listagem-links';
 import { buildClientePageTitle } from './cliente-page-title';
 import { capitalizeWords } from './format-text';
 
@@ -18,7 +19,8 @@ export interface ClienteSeoPayload {
   description: string;
   canonicalUrl: string;
   imageUrl: string;
-  jsonLd: Record<string, unknown>;
+  /** `[LocalBusiness, BreadcrumbList]`. */
+  jsonLd: Record<string, unknown>[];
 }
 
 export function buildClienteCanonicalUrl(siteUrl: string, detail: ClienteDetail): string {
@@ -59,12 +61,42 @@ export function buildClienteSeoPayload(
     description,
     canonicalUrl,
     imageUrl,
-    jsonLd: buildClienteLocalBusinessJsonLd(context, detail, {
-      title,
-      description,
-      canonicalUrl,
-      imageUrl,
-    }),
+    jsonLd: [
+      buildClienteLocalBusinessJsonLd(context, detail, {
+        title,
+        description,
+        canonicalUrl,
+        imageUrl,
+      }),
+      buildClienteBreadcrumbJsonLd(context.siteUrl, detail, canonicalUrl),
+    ],
+  };
+}
+
+/** Mirrors the visible breadcrumb: Início › Categoria (UF) › Cidade › Cliente. */
+function buildClienteBreadcrumbJsonLd(
+  siteUrl: string,
+  detail: ClienteDetail,
+  canonicalUrl: string,
+): Record<string, unknown> {
+  const base = normalizeSiteUrl(siteUrl);
+  const links = buildClienteListagemLinks(detail);
+  const crumbs = [
+    { name: 'Início', item: `${base}/` },
+    ...[links.uf, links.cidade]
+      .filter((link) => link !== null)
+      .map((link) => ({ name: link.label, item: `${base}${link.url}` })),
+    { name: detail.nome.trim(), item: canonicalUrl },
+  ];
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((crumb, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      ...crumb,
+    })),
   };
 }
 

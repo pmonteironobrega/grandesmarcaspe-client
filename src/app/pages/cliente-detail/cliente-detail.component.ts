@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CatalogService } from '../../core/services/catalog.service';
 import { SeoService } from '../../core/services/seo.service';
@@ -34,12 +34,14 @@ import { StarRatingInlineComponent } from '../../shared/components/star-rating-i
 import { ClienteMapaComponent } from '../../shared/components/cliente-mapa/cliente-mapa.component';
 import { AdSlotComponent } from '../../shared/components/ad-slot/ad-slot.component';
 import { ADSENSE_SLOTS } from '../../core/constants/adsense';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import {
   buildClienteDefaultImagePath,
-  buildListUrlFromFilters,
   buildClienteMarcaPath,
   resolveClienteImageUrl,
 } from '../../core/utils/catalog-url';
+import { buildClienteListagemLinks } from '../../core/utils/cliente-listagem-links';
 import { buildSocialLinks } from '../../core/utils/social-links';
 import {
   buildTelUrl,
@@ -63,6 +65,8 @@ const RELACIONADOS_LIMIT = 6;
     CommonModule,
 
     FormsModule,
+
+    RouterLink,
 
     BreadcrumbComponent,
 
@@ -109,6 +113,16 @@ export class ClienteDetailComponent implements OnInit {
   breadcrumb = signal<{ page: string; router: string }[]>([]);
 
   readonly galeriaSlides = computed(() => this.buildGaleriaSlides(this.cliente()));
+
+  readonly listagemLinks = computed(() => {
+    const detail = this.cliente();
+    return detail ? buildClienteListagemLinks(detail) : { uf: null, cidade: null, bairro: null };
+  });
+
+  readonly vejaTambem = computed(() => {
+    const { bairro, cidade, uf } = this.listagemLinks();
+    return [bairro, cidade, uf].filter((link) => link !== null);
+  });
 
   readonly buildSocialLinks = buildSocialLinks;
   readonly isCelular = isCelular;
@@ -212,38 +226,13 @@ export class ClienteDetailComponent implements OnInit {
 
 
   private buildBreadcrumb(detail: ClienteDetail): { page: string; router: string }[] {
-    const crumbs: { page: string; router: string }[] = [];
-
-
-
-    if (detail.categoria && detail.endereco?.uf?.sigla) {
-
-      crumbs.push({
-
-        page: detail.categoria.nome,
-
-        router: buildListUrlFromFilters({
-
-          categoria: detail.categoria.slug,
-
-          uf: detail.endereco.uf.sigla.toLowerCase(),
-
-          cidade: null,
-
-          bairro: null,
-
-        }),
-
-      });
-
-    }
-
-
+    const { uf, cidade } = buildClienteListagemLinks(detail);
+    const crumbs = [uf, cidade]
+      .filter((link) => link !== null)
+      .map((link) => ({ page: link.page, router: link.url }));
 
     crumbs.push({ page: detail.nome, router: '' });
-
     return crumbs;
-
   }
 
 
@@ -326,36 +315,31 @@ export class ClienteDetailComponent implements OnInit {
     );
   }
 
+  /** Same categoria in the same cidade first, topped up with the rest of the UF. */
   private loadRelacionados(detail: ClienteDetail): void {
-
-    const categoriaSlug = detail.categoria?.slug;
-
-    const uf = detail.endereco?.uf?.sigla?.toLowerCase();
-
-
-
-    if (!categoriaSlug || !uf) {
-
+    const { uf, cidade } = buildClienteListagemLinks(detail);
+    if (!uf) {
       return;
-
     }
 
+    const fetchItems = (url: string) =>
+      this.catalogService.getClientesByLegacyPath(url).pipe(
+        map((response) => response.data),
+        catchError(() => of<ClienteListItem[]>([])),
+      );
 
-
-    this.catalogService.getClientesByLegacyPath(`c/${categoriaSlug}/${uf}`).subscribe({
-
-      next: (response) => {
-
-        const filtered = response.data
-          .filter((item) => item.slug !== detail.slug)
-          .slice(0, RELACIONADOS_LIMIT);
-
-        this.relacionados.set(filtered);
-
-      },
-
-    });
-
+    forkJoin([cidade ? fetchItems(cidade.url) : of<ClienteListItem[]>([]), fetchItems(uf.url)])
+      .subscribe(([daCidade, daUf]) => {
+        const seen = new Set<number>([detail.id]);
+        const merged = [...daCidade, ...daUf].filter((item) => {
+          if (seen.has(item.id) || item.slug === detail.slug) {
+            return false;
+          }
+          seen.add(item.id);
+          return true;
+        });
+        this.relacionados.set(merged.slice(0, RELACIONADOS_LIMIT));
+      });
   }
 
 }

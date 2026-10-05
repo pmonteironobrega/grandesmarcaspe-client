@@ -74,11 +74,34 @@ describe('cliente SEO helpers', () => {
     );
     expect(payload.canonicalUrl).toContain('/r/academia-corpo-e-energia/recife/boa-viagem/pe');
     expect(payload.imageUrl).toContain('/clientes/1/marca.jpg');
-    expect(payload.jsonLd['@type']).toEqual(['LocalBusiness', 'ProfessionalService']);
-    expect(payload.jsonLd['telephone']).toBe('+5581999999999');
-    expect(payload.jsonLd['aggregateRating']).toEqual(
-      jasmine.objectContaining({ ratingValue: 4 }),
-    );
+    const [business] = payload.jsonLd;
+    expect(business['@type']).toEqual(['LocalBusiness', 'ProfessionalService']);
+    expect(business['telephone']).toBe('+5581999999999');
+    expect(business['aggregateRating']).toEqual(jasmine.objectContaining({ ratingValue: 4 }));
+  });
+
+  it('should build breadcrumb json-ld through categoria and cidade listings', () => {
+    const [, breadcrumb] = buildClienteSeoPayload(seoContext, buildDetail()).jsonLd;
+
+    expect(breadcrumb['@type']).toBe('BreadcrumbList');
+    expect(breadcrumb['itemListElement']).toEqual([
+      jasmine.objectContaining({ position: 1, name: 'Início' }),
+      jasmine.objectContaining({
+        position: 2,
+        name: 'Academias em Pernambuco',
+        item: 'https://www.grandesmarcaspe.com.br/c/academias/pe',
+      }),
+      jasmine.objectContaining({
+        position: 3,
+        name: 'Academias em Recife - PE',
+        item: 'https://www.grandesmarcaspe.com.br/c/academias/recife/pe',
+      }),
+      jasmine.objectContaining({
+        position: 4,
+        name: 'Academia Corpo e Energia',
+        item: 'https://www.grandesmarcaspe.com.br/r/academia-corpo-e-energia/recife/boa-viagem/pe',
+      }),
+    ]);
   });
 
   it('should truncate long meta descriptions', () => {

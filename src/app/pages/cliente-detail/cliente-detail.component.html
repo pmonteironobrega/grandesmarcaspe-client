@@ -46,7 +46,15 @@
 
           @if (detail.categoria) {
             <div class="mt-2">
-              <span class="badge badge-pill bg-le cl-wt pb-1">{{ detail.categoria.nome }}</span>
+              @if (listagemLinks().cidade; as cidadeLink) {
+                <a
+                  [routerLink]="cidadeLink.url"
+                  class="badge badge-pill bg-le cl-wt pb-1 text-decoration-none"
+                  [attr.title]="cidadeLink.label"
+                >{{ detail.categoria.nome }}</a>
+              } @else {
+                <span class="badge badge-pill bg-le cl-wt pb-1">{{ detail.categoria.nome }}</span>
+              }
             </div>
           }
         </div>
@@ -257,7 +265,10 @@
 
             <div class="col">
 
-              <h4 class="font-weight-bold">Mais em {{ detail.categoria?.nome }}</h4>
+              @let cidadeRelacionados = listagemLinks().cidade;
+              <h4 class="font-weight-bold">
+                Mais {{ detail.categoria?.nome }}@if (cidadeRelacionados) { em {{ cidadeRelacionados.page }}}
+              </h4>
 
             </div>
 
@@ -279,6 +290,19 @@
 
         </div>
 
+      }
+
+      @if (vejaTambem().length) {
+        <nav class="section-veja-tambem mt-4" aria-label="Listagens relacionadas">
+          <h4 class="font-weight-bold">Veja também</h4>
+          <ul class="list-unstyled mb-0">
+            @for (link of vejaTambem(); track link.url) {
+              <li class="mt-2">
+                <a [routerLink]="link.url" class="cl-le font-weight-bold">{{ link.label }}</a>
+              </li>
+            }
+          </ul>
+        </nav>
       }
 
     </div>
