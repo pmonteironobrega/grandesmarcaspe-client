@@ -8,6 +8,8 @@ import { SITE_TITLE_BRAND } from '../utils/cliente-page-title';
 export const DEFAULT_PAGE_TITLE = 'Grandes Marcas PE';
 export const DEFAULT_DESCRIPTION =
   'Encontre os melhores estabelecimentos de Pernambuco no Grandes Marcas PE.';
+/** 1200×630 PNG: social networks do not render SVG previews. */
+export const DEFAULT_SHARE_IMAGE_PATH = '/img/og-image.png';
 
 const JSON_LD_SCRIPT_ID = 'gmpe-jsonld';
 const NOT_FOUND_TITLE = `Página não encontrada | ${SITE_TITLE_BRAND}`;
@@ -78,16 +80,13 @@ export class SeoService {
       this.meta.updateTag({ property: 'og:url', content: page.canonicalUrl });
     }
 
-    this.meta.updateTag({
-      name: 'twitter:card',
-      content: page.imageUrl ? 'summary_large_image' : 'summary',
-    });
+    const imageUrl =
+      page.imageUrl ?? `${normalizeSiteUrl(environment.siteUrl)}${DEFAULT_SHARE_IMAGE_PATH}`;
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
     this.meta.updateTag({ name: 'twitter:title', content: page.title });
     this.meta.updateTag({ name: 'twitter:description', content: page.description });
-    if (page.imageUrl) {
-      this.meta.updateTag({ property: 'og:image', content: page.imageUrl });
-      this.meta.updateTag({ name: 'twitter:image', content: page.imageUrl });
-    }
+    this.meta.updateTag({ property: 'og:image', content: imageUrl });
+    this.meta.updateTag({ name: 'twitter:image', content: imageUrl });
 
     this.setJsonLd(page.jsonLd ?? null);
   }

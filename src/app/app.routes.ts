@@ -28,6 +28,8 @@ import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 import { authGuard } from './core/guards/auth.guard';
 
+import { HOME_TITLE } from './core/utils/home-seo';
+
 
 
 export const routes: Routes = [
@@ -35,7 +37,7 @@ export const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    title: 'GrandesMarcasPE | O guia de endereços online',
+    title: HOME_TITLE,
     data: { awaitContent: true },
   },
 

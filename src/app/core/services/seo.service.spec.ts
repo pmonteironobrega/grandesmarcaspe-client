@@ -43,6 +43,13 @@ describe('SeoService', () => {
     expect(TestBed.inject(Title).getTitle()).toBe('Titulo');
   });
 
+  it('should fall back to the default share image', () => {
+    service.apply({ title: 'T', description: 'D', canonicalUrl: null });
+
+    const image = document.head.querySelector('meta[property="og:image"]')?.getAttribute('content');
+    expect(image).toBe(`${environment.siteUrl.replace(/\/$/, '')}/img/og-image.png`);
+  });
+
   it('should reset to path canonical without query on navigation', () => {
     service.apply({ title: 'X', description: 'Y', canonicalUrl: 'https://x/y', jsonLd: {} });
     service.resetForUrl('/sobre?utm_source=teste');
