@@ -8,6 +8,9 @@ module.exports = {
       exec_mode: 'fork',
       instances: 1,
       autorestart: true,
+      // Recicla antes de a VPS entrar em swap. O cache SSR tem teto próprio;
+      // este limite cobre qualquer outro crescimento do processo.
+      max_memory_restart: '768M',
       // Runtime config comes from environments/.env.production (written by CI).
       env_production: {
         NODE_ENV: 'production',

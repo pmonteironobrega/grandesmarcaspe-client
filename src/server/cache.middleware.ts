@@ -38,26 +38,116 @@ export interface SsrCacheEntry {
   expiresAt: number;
 }
 
+/**
+ * Páginas SSR já renderizadas. O TTL sozinho não libera memória: o Google pede
+ * cada URL uma vez, e a entrada vencida só era removida se a mesma URL voltasse.
+ * Qualquer acesso varre o que expirou. Quantidade e bytes têm teto; acima dele
+ * a página continua sendo renderizada e respondida, só não fica retida.
+ */
 const ssrCache = new Map<string, SsrCacheEntry>();
+let ssrCacheBytes = 0;
+
+const DEFAULT_SSR_CACHE_MAX_ENTRIES = 400;
+const DEFAULT_SSR_CACHE_MAX_BYTES = 32 * 1024 * 1024;
 
 export function getSsrCacheTtl(): number {
   const ttl = parseInt(process.env['SSR_CACHE_TTL'] ?? '300', 10);
   return ttl > 0 ? ttl * 1000 : 0;
 }
 
-export function getCachedSsrResponse(cacheKey: string): SsrCacheEntry | undefined {
-  const cached = ssrCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached;
+function readCacheLimit(name: string, fallback: number): number {
+  const raw = globalThis.process?.env?.[name];
+  if (raw === undefined || raw.trim() === '') {
+    return fallback;
   }
-  if (cached) {
-    ssrCache.delete(cacheKey);
+  const value = Number.parseInt(raw, 10);
+  if (!Number.isFinite(value) || value < 0) {
+    return fallback;
   }
-  return undefined;
+  return value;
 }
 
-export function setCachedSsrResponse(cacheKey: string, entry: SsrCacheEntry): void {
+/** `SSR_CACHE_MAX_ENTRIES`. `0` desliga a retenção. */
+export function getSsrCacheMaxEntries(): number {
+  return readCacheLimit('SSR_CACHE_MAX_ENTRIES', DEFAULT_SSR_CACHE_MAX_ENTRIES);
+}
+
+/** `SSR_CACHE_MAX_BYTES`. `0` desliga a retenção. */
+export function getSsrCacheMaxBytes(): number {
+  return readCacheLimit('SSR_CACHE_MAX_BYTES', DEFAULT_SSR_CACHE_MAX_BYTES);
+}
+
+export function getSsrCacheStats(): { entries: number; bytes: number } {
+  return { entries: ssrCache.size, bytes: ssrCacheBytes };
+}
+
+export function clearSsrCache(): void {
+  ssrCache.clear();
+  ssrCacheBytes = 0;
+}
+
+function removeCachedSsrResponse(cacheKey: string): void {
+  const cached = ssrCache.get(cacheKey);
+  if (!cached) {
+    return;
+  }
+  ssrCacheBytes -= cached.body.byteLength;
+  ssrCache.delete(cacheKey);
+}
+
+function sweepExpiredSsrResponses(now: number): void {
+  for (const [cacheKey, cached] of ssrCache) {
+    if (cached.expiresAt <= now) {
+      removeCachedSsrResponse(cacheKey);
+    }
+  }
+}
+
+function evictOverflowingSsrResponses(maxEntries: number, maxBytes: number): void {
+  while (
+    ssrCache.size > 0 &&
+    (ssrCache.size > maxEntries || ssrCacheBytes > maxBytes)
+  ) {
+    const oldest = ssrCache.keys().next().value;
+    if (oldest === undefined) {
+      break;
+    }
+    removeCachedSsrResponse(oldest);
+  }
+}
+
+export function getCachedSsrResponse(cacheKey: string): SsrCacheEntry | undefined {
+  sweepExpiredSsrResponses(Date.now());
+  const cached = ssrCache.get(cacheKey);
+  if (!cached) {
+    return undefined;
+  }
+  // Map preserves insertion order; reinserting marks this URL as recently used.
+  ssrCache.delete(cacheKey);
+  ssrCache.set(cacheKey, cached);
+  return cached;
+}
+
+export function setCachedSsrResponse(
+  cacheKey: string,
+  entry: SsrCacheEntry,
+  limits?: { maxEntries: number; maxBytes: number },
+): void {
+  if (entry.status >= 500) {
+    return;
+  }
+
+  const maxEntries = limits?.maxEntries ?? getSsrCacheMaxEntries();
+  const maxBytes = limits?.maxBytes ?? getSsrCacheMaxBytes();
+  if (maxEntries < 1 || maxBytes < 1 || entry.body.byteLength > maxBytes) {
+    return;
+  }
+
+  sweepExpiredSsrResponses(Date.now());
+  removeCachedSsrResponse(cacheKey);
   ssrCache.set(cacheKey, entry);
+  ssrCacheBytes += entry.body.byteLength;
+  evictOverflowingSsrResponses(maxEntries, maxBytes);
 }
 
 export function isStaticAsset(url: string): boolean {

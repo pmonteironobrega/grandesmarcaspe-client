@@ -1,8 +1,13 @@
 import {
+  clearSsrCache,
+  getCachedSsrResponse,
+  getSsrCacheStats,
   isApiProxyRoute,
   isServerRenderRoute,
   isSsrCacheRoute,
+  setCachedSsrResponse,
   shouldProxyToApi,
+  type SsrCacheEntry,
 } from './cache.middleware';
 
 describe('cache.middleware routing', () => {
@@ -89,5 +94,67 @@ describe('cache.middleware routing', () => {
     expect(
       shouldProxyToApi({ path: '/clientes/123/marca.jpg', headers: { accept: 'image/*' } }),
     ).toBeTrue();
+  });
+});
+
+describe('SSR response cache bounds', () => {
+  const limits = { maxEntries: 2, maxBytes: 100 };
+
+  function entry(body: string, expiresAt = Date.now() + 60_000, status = 200): SsrCacheEntry {
+    return {
+      body: { byteLength: body.length, toString: () => body } as Buffer,
+      headers: {},
+      status,
+      expiresAt,
+    };
+  }
+
+  beforeEach(() => {
+    clearSsrCache();
+  });
+
+  it('returns a fresh page and drops it after the TTL without another request for that URL', () => {
+    const home = entry('home');
+    setCachedSsrResponse('/', home, limits);
+
+    expect(getCachedSsrResponse('/')?.body.toString()).toBe('home');
+
+    home.expiresAt = Date.now() - 1;
+    setCachedSsrResponse('/c/academias/pe', entry('lista'), limits);
+
+    expect(getCachedSsrResponse('/')).toBeUndefined();
+    expect(getSsrCacheStats()).toEqual({ entries: 1, bytes: 5 });
+  });
+
+  it('evicts the least recently used page when the entry cap is reached', () => {
+    setCachedSsrResponse('/r/a', entry('a'), limits);
+    setCachedSsrResponse('/r/b', entry('bb'), limits);
+    getCachedSsrResponse('/r/a');
+    setCachedSsrResponse('/r/c', entry('ccc'), limits);
+
+    expect(getCachedSsrResponse('/r/b')).toBeUndefined();
+    expect(getCachedSsrResponse('/r/a')?.body.toString()).toBe('a');
+    expect(getCachedSsrResponse('/r/c')?.body.toString()).toBe('ccc');
+  });
+
+  it('evicts older pages when the byte cap is reached', () => {
+    const byteLimits = { maxEntries: 10, maxBytes: 10 };
+    setCachedSsrResponse('/r/a', entry('12345'), byteLimits);
+    setCachedSsrResponse('/r/b', entry('123456'), byteLimits);
+
+    expect(getCachedSsrResponse('/r/a')).toBeUndefined();
+    expect(getSsrCacheStats()).toEqual({ entries: 1, bytes: 6 });
+  });
+
+  it('does not retain a page larger than the byte cap or a server error', () => {
+    const tight = { maxEntries: 2, maxBytes: 4 };
+    setCachedSsrResponse('/r/ok', entry('ok'), tight);
+    setCachedSsrResponse('/r/grande', entry('12345'), tight);
+    setCachedSsrResponse('/r/erro', entry('x', Date.now() + 60_000, 500), tight);
+
+    expect(getSsrCacheStats().entries).toBe(1);
+    expect(getCachedSsrResponse('/r/ok')?.body.toString()).toBe('ok');
+    expect(getCachedSsrResponse('/r/grande')).toBeUndefined();
+    expect(getCachedSsrResponse('/r/erro')).toBeUndefined();
   });
 });
