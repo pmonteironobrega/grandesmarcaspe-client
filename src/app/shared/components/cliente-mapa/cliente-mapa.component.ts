@@ -2,6 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 import {
   afterNextRender,
   Component,
+  DestroyRef,
   effect,
   ElementRef,
   inject,
@@ -44,6 +45,8 @@ export class ClienteMapaComponent implements OnDestroy {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly injector = inject(Injector);
+  private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly endereco = input.required<ClienteEndereco>();
 
@@ -63,7 +66,26 @@ export class ClienteMapaComponent implements OnDestroy {
   constructor() {
     afterNextRender(
       () => {
-        this.browserReady.set(true);
+        const host = this.host.nativeElement;
+        if (typeof IntersectionObserver === 'undefined') {
+          this.browserReady.set(true);
+          return;
+        }
+
+        // Leaflet and the Google embed read layout and open another origin.
+        // Wait until the map is near the viewport so that work stays off the first paint.
+        const observer = new IntersectionObserver(
+          (entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) {
+              return;
+            }
+            observer.disconnect();
+            this.browserReady.set(true);
+          },
+          { rootMargin: '240px 0px' },
+        );
+        observer.observe(host);
+        this.destroyRef.onDestroy(() => observer.disconnect());
       },
       { injector: this.injector },
     );
