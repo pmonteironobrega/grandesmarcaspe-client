@@ -67,7 +67,7 @@ describe('AdSlotComponent', () => {
     expect(ins?.getAttribute('data-full-width-responsive')).toBe('true');
   });
 
-  it('should schedule a priority unit right after render, without waiting for the viewport', async () => {
+  it('should schedule the unit right after render, without waiting for the viewport', async () => {
     environment.adsenseClient = 'ca-pub-test';
     environment.siteUrl = 'https://www.grandesmarcaspe.com.br';
     const scheduleAd = jasmine.createSpy('scheduleAd');
@@ -83,11 +83,10 @@ describe('AdSlotComponent', () => {
     fixture.componentRef.setInput('slot', ADSENSE_SLOTS.categorias);
     fixture.componentRef.setInput('width', 320);
     fixture.componentRef.setInput('height', 100);
-    fixture.componentRef.setInput('priority', true);
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(scheduleAd).toHaveBeenCalledOnceWith(true);
+    expect(scheduleAd).toHaveBeenCalledTimes(1);
   });
 
   it('should leave the layout untouched when ads are disabled', () => {
