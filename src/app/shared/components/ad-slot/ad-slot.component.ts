@@ -18,17 +18,23 @@ import { environment } from '../../../../environments/environment';
 /**
  * AdSense unit. The `<ins>` is rendered only in the browser: AdSense rewrites it,
  * which would break SSR hydration if it were part of the server HTML.
- * `detalhesTopo` keeps its reserved height. The unit itself is taken out of
- * flow so AdSense can measure the full width; a responsive unit measured inside
- * the reserved box stays blank on a mobile reload. The box only grows when the
- * ad is taller than the reserve, and it never collapses.
+ * `detalhesTopo` keeps its reserved height. Only that unit is taken out of
+ * flow, so AdSense can measure the full width: a responsive unit measured
+ * inside the reserved box stays blank on a mobile reload. The box only grows
+ * when the ad is taller than the reserve, and it never collapses.
+ * Other units stay in normal flow. Pulling them out hides a banner that sits
+ * above a heading, because the heading then paints in the same spot.
  */
 @Component({
   selector: 'app-ad-slot',
   standalone: true,
   template: `
     @if (visible() || reservedHeight()) {
-      <div class="ad-slot text-center my-3" [style.min-height.px]="boxHeight()">
+      <div
+        class="ad-slot text-center my-3"
+        [class.ad-slot--reserved]="reservedHeight()"
+        [style.min-height.px]="boxHeight()"
+      >
         @if (visible()) {
           <div class="ad-slot__fill" #fill>
             @if (width() && height()) {
@@ -57,11 +63,11 @@ import { environment } from '../../../../environments/environment';
     }
   `,
   styles: `
-    .ad-slot {
+    .ad-slot--reserved {
       position: relative;
     }
 
-    .ad-slot__fill {
+    .ad-slot--reserved .ad-slot__fill {
       position: absolute;
       top: 0;
       left: 0;
