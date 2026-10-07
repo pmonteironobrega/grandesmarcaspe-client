@@ -130,10 +130,10 @@ export class SeoService {
   /**
    * Permanent redirect to a URL that exists. Used when a paginated URL is past the last page,
    * so crawlers consolidate on the real listing instead of following a redirect into a 404.
+   * The body must not say noindex: Google then drops the URL instead of following Location.
    * Returns false in the browser, where there is no response status to set.
    */
   redirectPermanently(location: string): boolean {
-    this.meta.updateTag({ name: 'robots', content: 'noindex, follow' });
     this.setCanonical(null);
     this.removeSocialTags();
     this.setJsonLd(null);
@@ -150,8 +150,9 @@ export class SeoService {
 
   /**
    * 4xx from the API means the URL does not exist; anything else is a transient failure.
-   * Transient failures only become 503 + noindex on the server: in the browser there is no
-   * status to set, and crawlers that render JS would index a noindex caused by a flaky request.
+   * Transient failures become 503 without noindex. noindex makes Google drop the URL
+   * ("Excluded by noindex") instead of retrying the same address.
+   * In the browser there is no status to set, and a flaky request must not change robots.
    */
   markError(error: unknown): void {
     const status = error instanceof HttpErrorResponse ? error.status : 0;
@@ -159,9 +160,14 @@ export class SeoService {
       this.markNotFound();
       return;
     }
-    if (this.responseInit) {
-      this.markUnindexable(503, DEFAULT_PAGE_TITLE);
+    if (!this.responseInit) {
+      return;
     }
+
+    this.responseInit.status = 503;
+    this.setCanonical(null);
+    this.removeSocialTags();
+    this.setJsonLd(null);
   }
 
   private markUnindexable(status: number, title: string): void {

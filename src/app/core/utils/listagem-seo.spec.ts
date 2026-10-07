@@ -78,6 +78,7 @@ describe('listagem SEO helpers', () => {
 
     expect(seo.title).toBe('Academias em Recife - PE - Página 2 | GrandesMarcasPE');
     expect(seo.canonicalUrl).toBe('https://www.example.com.br/c/academias/recife/pe?page=2');
+    expect(seo.robots).toBe('index, follow');
   });
 
   it('should build breadcrumb and item list json-ld', () => {

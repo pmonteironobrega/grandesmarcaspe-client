@@ -89,13 +89,24 @@ describe('SeoService', () => {
       providers: [{ provide: RESPONSE_INIT, useValue: init }],
     });
 
-    const redirected = TestBed.inject(SeoService).redirectPermanently(
+    const redirected = TestBed.inject(SeoService);
+    redirected.apply({
+      title: 'Página 15',
+      description: 'Listagem',
+      canonicalUrl: 'https://www.example.com.br/c/supermercados/vitoria-de-santo-antao/pe?page=15',
+      robots: 'index, follow',
+    });
+    const didRedirect = redirected.redirectPermanently(
       '/c/supermercados/vitoria-de-santo-antao/pe',
     );
+    const redirectedRobots = TestBed.inject(DOCUMENT)
+      .head.querySelector('meta[name="robots"]')
+      ?.getAttribute('content');
 
-    expect(redirected).toBe(true);
+    expect(didRedirect).toBe(true);
     expect(init.status).toBe(301);
     expect(headers.get('Location')).toBe('/c/supermercados/vitoria-de-santo-antao/pe');
+    expect(redirectedRobots).toBe('index, follow');
   });
 
   it('should set 404 status and noindex for API 404', () => {
@@ -115,10 +126,19 @@ describe('SeoService', () => {
     expect(JSON.parse(serialized)).toEqual(payload);
   });
 
-  it('should set 503 for API failures so crawlers retry', () => {
+  it('should set 503 for API failures so crawlers retry without dropping the URL', () => {
+    service.apply({
+      title: 'Farmácias em Pernambuco - Página 2',
+      description: 'Listagem',
+      canonicalUrl: 'https://www.example.com.br/c/farmacias-e-drogarias/pe?page=2',
+      robots: 'index, follow',
+    });
+
     service.markError(new HttpErrorResponse({ status: 0 }));
 
     expect(responseInit.status).toBe(503);
+    expect(robots()).toBe('index, follow');
+    expect(canonical()).toBeNull();
   });
 
   it('should keep the page indexable on transient API failures in the browser', () => {
