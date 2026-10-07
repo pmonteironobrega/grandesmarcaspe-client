@@ -160,8 +160,6 @@
 
                 <app-cliente-mapa [endereco]="detail.endereco" />
 
-                <app-ad-slot [slot]="adSlots.detalhesMapa" [responsive]="true" />
-
                 <a
                   [href]="googleMapsUrl(detail)"
                   target="_blank"
@@ -170,6 +168,8 @@
                 >
                   Abrir no Google Maps
                 </a>
+
+                <app-ad-slot [slot]="adSlots.detalhesMapa" [responsive]="true" />
 
               </div>
 
