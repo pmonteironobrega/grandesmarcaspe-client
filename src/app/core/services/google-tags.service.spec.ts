@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
-import { GoogleTagsService } from './google-tags.service';
+import { GoogleTagsService, runAfterPageLoad } from './google-tags.service';
 
 describe('GoogleTagsService', () => {
   it('should not load Google scripts outside the production host', () => {
@@ -14,5 +14,24 @@ describe('GoogleTagsService', () => {
     expect(service.adsEnabled).toBeFalse();
     expect(document.querySelector('script[src*="googletagmanager.com"]')).toBeNull();
     expect(document.querySelector('script[src*="googlesyndication.com"]')).toBeNull();
+  });
+
+  it('should wait for the load event before starting a third-party script', () => {
+    let ran = false;
+    const listeners = new Map<string, () => void>();
+    const win = {
+      document: { readyState: 'loading' },
+      addEventListener: (type: string, listener: () => void) => listeners.set(type, listener),
+      requestIdleCallback: (callback: () => void) => callback(),
+      setTimeout: () => 0,
+    } as unknown as Window;
+
+    runAfterPageLoad(win, () => {
+      ran = true;
+    });
+
+    expect(ran).toBeFalse();
+    listeners.get('load')?.();
+    expect(ran).toBeTrue();
   });
 });

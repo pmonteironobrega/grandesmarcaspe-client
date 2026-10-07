@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 
-import { HomeComponent } from './pages/home/home.component';
-
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 import { authGuard } from './core/guards/auth.guard';
@@ -21,7 +19,7 @@ export const routes: Routes = [
 
   {
     path: '',
-    component: HomeComponent,
+    loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
     title: HOME_TITLE,
     data: { awaitContent: true },
   },
