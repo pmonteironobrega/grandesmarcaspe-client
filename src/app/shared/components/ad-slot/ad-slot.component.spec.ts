@@ -33,10 +33,14 @@ describe('AdSlotComponent', () => {
     const fixture = setup(ADSENSE_SLOTS.categorias, 'www.grandesmarcaspe.com.br');
     const box = fixture.nativeElement.querySelector('.ad-slot') as HTMLElement | null;
 
+    const ins = fixture.nativeElement.querySelector('ins.adsbygoogle') as HTMLElement | null;
+
     expect(box).not.toBeNull();
     expect(box?.style.minHeight).toBe('100px');
-    expect(fixture.nativeElement.querySelector('ins.adsbygoogle')).toBeNull();
-    expect(fixture.nativeElement.querySelector('[data-ad-format]')).toBeNull();
+    expect(ins).not.toBeNull();
+    expect(ins?.style.width).toBe('320px');
+    expect(ins?.style.height).toBe('100px');
+    expect(ins?.getAttribute('data-ad-format')).toBeNull();
   });
 
   it('should leave the layout untouched when ads are disabled', () => {

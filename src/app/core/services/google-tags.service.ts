@@ -1,5 +1,5 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { inject, Injectable, NgZone, PLATFORM_ID } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 declare global {
@@ -20,9 +20,12 @@ declare global {
 })
 export class GoogleTagsService {
   private readonly document = inject(DOCUMENT);
+  private readonly ngZone = inject(NgZone);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly onProductionHost = this.isBrowser && isProductionHost(this.document.location.hostname);
   private adsenseLoaded = false;
+  private pendingPushes = 0;
+  private pushScheduled = false;
 
   get analyticsEnabled(): boolean {
     return this.onProductionHost && !!environment.googleAnalyticsId;
@@ -59,20 +62,51 @@ export class GoogleTagsService {
       return;
     }
     this.adsenseLoaded = true;
-    this.runAfterLoad(() =>
-      this.appendScript(
-        `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
-        true,
+    this.ngZone.runOutsideAngular(() =>
+      this.runAfterLoad(() =>
+        this.appendScript(
+          `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
+          true,
+        ),
       ),
     );
   }
 
-  pushAd(): void {
+  /**
+   * Fills the next `<ins>` after the browser has painted.
+   * AdSense reads offsetWidth. Doing that in the same turn as an Angular
+   * update forces a reflow, and doing it inside the zone schedules another
+   * update. Slots that scroll into view later share one flush per frame.
+   */
+  scheduleAd(): void {
+    if (!this.adsEnabled) {
+      return;
+    }
     const win = this.document.defaultView;
     if (!win) {
       return;
     }
-    (win.adsbygoogle = win.adsbygoogle || []).push({});
+
+    this.pendingPushes += 1;
+    if (this.pushScheduled) {
+      return;
+    }
+    this.pushScheduled = true;
+    this.loadAdsense();
+
+    this.ngZone.runOutsideAngular(() => {
+      runAfterPageLoad(win, () => {
+        const flush = () => {
+          const count = this.pendingPushes;
+          this.pendingPushes = 0;
+          this.pushScheduled = false;
+          for (let index = 0; index < count; index += 1) {
+            (win.adsbygoogle = win.adsbygoogle || []).push({});
+          }
+        };
+        win.requestAnimationFrame(() => win.requestAnimationFrame(flush));
+      });
+    });
   }
 
   /** Third-party scripts start after the document load, on an idle slice. */
