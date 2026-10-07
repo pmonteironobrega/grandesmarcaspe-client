@@ -7,14 +7,16 @@ import { environment } from '../../../../environments/environment';
 /**
  * AdSense unit. The `<ins>` is rendered only in the browser: AdSense rewrites it,
  * which would break SSR hydration if it were part of the server HTML.
- * `detalhesTopo` still reserves its height in that first HTML so the page does not jump.
+ * `detalhesTopo` reserves height in that first HTML, then drops it before the
+ * ad request. A responsive unit measured inside the reserved box stays blank
+ * on a mobile reload.
  */
 @Component({
   selector: 'app-ad-slot',
   standalone: true,
   template: `
     @if (visible() || reservedHeight()) {
-      <div class="ad-slot text-center my-3" [style.min-height.px]="reservedHeight()">
+      <div class="ad-slot text-center my-3" [style.min-height.px]="visible() ? null : reservedHeight()">
         @if (visible()) {
           @if (width() && height()) {
             <ins
