@@ -47,7 +47,11 @@ export class GoogleTagsService {
     win.gtag('js', new Date());
     win.gtag('config', id);
 
-    this.appendScript(`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`);
+    // The stub above is tiny. gtag.js itself is parsed on the main thread, so it
+    // waits until after load instead of competing with hydration (that is the TBT).
+    this.runAfterLoad(() =>
+      this.appendScript(`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`),
+    );
   }
 
   loadAdsense(): void {
@@ -55,9 +59,11 @@ export class GoogleTagsService {
       return;
     }
     this.adsenseLoaded = true;
-    this.appendScript(
-      `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
-      true,
+    this.runAfterLoad(() =>
+      this.appendScript(
+        `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
+        true,
+      ),
     );
   }
 
@@ -69,6 +75,15 @@ export class GoogleTagsService {
     (win.adsbygoogle = win.adsbygoogle || []).push({});
   }
 
+  /** Third-party scripts start after the document load, on an idle slice. */
+  private runAfterLoad(task: () => void): void {
+    const win = this.document.defaultView;
+    if (!win) {
+      return;
+    }
+    runAfterPageLoad(win, task);
+  }
+
   private appendScript(src: string, crossOrigin = false): void {
     const script = this.document.createElement('script');
     script.async = true;
@@ -78,6 +93,27 @@ export class GoogleTagsService {
     }
     this.document.head.appendChild(script);
   }
+}
+
+export function runAfterPageLoad(win: Window, task: () => void): void {
+  const start = () => {
+    const idle = (
+      win as Window & {
+        requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+      }
+    ).requestIdleCallback;
+    if (idle) {
+      idle.call(win, () => task(), { timeout: 2000 });
+      return;
+    }
+    win.setTimeout(task, 1);
+  };
+
+  if (win.document.readyState === 'complete') {
+    start();
+    return;
+  }
+  win.addEventListener('load', start, { once: true });
 }
 
 export function isProductionHost(hostname: string): boolean {

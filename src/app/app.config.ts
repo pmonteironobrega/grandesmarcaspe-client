@@ -5,7 +5,7 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
-import { provideClientHydration, withEventReplay, withHttpTransferCacheOptions } from '@angular/platform-browser';
+import { provideClientHydration, withHttpTransferCacheOptions } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
@@ -36,7 +36,6 @@ export const appConfig: ApplicationConfig = {
         includeRequestsWithAuthHeaders: false,
         filter: (req) => req.method === 'GET',
       }),
-      withEventReplay(),
     ),
     importProvidersFrom(ModalModule.forRoot(), CollapseModule.forRoot()),
     provideHttpClient(
