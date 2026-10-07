@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
-import { GoogleTagsService, runAfterPageLoad } from './google-tags.service';
+import { GoogleTagsService, runAfterPageLoad, runOnFirstInteraction } from './google-tags.service';
 
 describe('GoogleTagsService', () => {
   it('should not load Google scripts outside the production host', () => {
@@ -33,5 +33,24 @@ describe('GoogleTagsService', () => {
     expect(ran).toBeFalse();
     listeners.get('load')?.();
     expect(ran).toBeTrue();
+  });
+
+  it('should run once on the first user interaction and stop listening', () => {
+    let runs = 0;
+    const listeners = new Map<string, () => void>();
+    const win = {
+      addEventListener: (type: string, listener: () => void) => listeners.set(type, listener),
+      removeEventListener: (type: string) => listeners.delete(type),
+    } as unknown as Window;
+
+    runOnFirstInteraction(win, () => {
+      runs += 1;
+    });
+
+    expect(runs).toBe(0);
+    expect(listeners.has('scroll')).toBeTrue();
+    listeners.get('pointerdown')?.();
+    expect(runs).toBe(1);
+    expect(listeners.size).toBe(0);
   });
 });
