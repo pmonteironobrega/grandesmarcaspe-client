@@ -23,11 +23,9 @@ export class GoogleTagsService {
   private readonly ngZone = inject(NgZone);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly onProductionHost = this.isBrowser && isProductionHost(this.document.location.hostname);
-  private adsenseRequested = false;
-  private adsenseAppended = false;
+  private adsenseLoaded = false;
   private pendingPushes = 0;
-  private priorityFlushScheduled = false;
-  private deferredFlushScheduled = false;
+  private pushScheduled = false;
 
   get analyticsEnabled(): boolean {
     return this.onProductionHost && !!environment.googleAnalyticsId;
@@ -59,31 +57,28 @@ export class GoogleTagsService {
     );
   }
 
-  /** `immediate` skips the wait for the load event (top units above the fold). */
-  loadAdsense(immediate = false): void {
-    if (!this.adsEnabled) {
+  loadAdsense(): void {
+    if (!this.adsEnabled || this.adsenseLoaded) {
       return;
     }
-    if (immediate) {
-      this.ngZone.runOutsideAngular(() => this.appendAdsenseScript());
-      return;
-    }
-    if (this.adsenseRequested) {
-      return;
-    }
-    this.adsenseRequested = true;
-    this.ngZone.runOutsideAngular(() => this.runAfterLoad(() => this.appendAdsenseScript()));
+    this.adsenseLoaded = true;
+    this.ngZone.runOutsideAngular(() =>
+      this.appendScript(
+        `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
+        true,
+      ),
+    );
   }
 
   /**
-   * Fills the next `<ins>` after the browser has painted.
-   * Priority units (top of the page) go right after hydration; the others wait
-   * for the load event and an idle slice so they do not compete with it.
+   * Fills the next `<ins>` right after the page renders, once the browser has painted.
+   * Every unit loads with the page: waiting for the load event or the viewport made
+   * ads pop in while the user scrolled.
    * AdSense reads offsetWidth. Doing that in the same turn as an Angular
    * update forces a reflow, and doing it inside the zone schedules another
-   * update. Slots that scroll into view later share one flush per frame.
+   * update. Units rendered in the same pass share one flush.
    */
-  scheduleAd(priority = false): void {
+  scheduleAd(): void {
     if (!this.adsEnabled) {
       return;
     }
@@ -93,47 +88,23 @@ export class GoogleTagsService {
     }
 
     this.pendingPushes += 1;
-    if (priority ? this.priorityFlushScheduled : this.deferredFlushScheduled) {
+    if (this.pushScheduled) {
       return;
     }
-    this.loadAdsense(priority);
-
-    const flush = () => {
-      const count = this.pendingPushes;
-      this.pendingPushes = 0;
-      for (let index = 0; index < count; index += 1) {
-        (win.adsbygoogle = win.adsbygoogle || []).push({});
-      }
-    };
-    const afterPaint = (done: () => void) =>
-      win.requestAnimationFrame(() =>
-        win.requestAnimationFrame(() => {
-          done();
-          flush();
-        }),
-      );
+    this.pushScheduled = true;
+    this.loadAdsense();
 
     this.ngZone.runOutsideAngular(() => {
-      if (priority) {
-        this.priorityFlushScheduled = true;
-        afterPaint(() => (this.priorityFlushScheduled = false));
-        return;
-      }
-      this.deferredFlushScheduled = true;
-      runAfterPageLoad(win, () => afterPaint(() => (this.deferredFlushScheduled = false)));
+      const flush = () => {
+        const count = this.pendingPushes;
+        this.pendingPushes = 0;
+        this.pushScheduled = false;
+        for (let index = 0; index < count; index += 1) {
+          (win.adsbygoogle = win.adsbygoogle || []).push({});
+        }
+      };
+      win.requestAnimationFrame(() => win.requestAnimationFrame(flush));
     });
-  }
-
-  private appendAdsenseScript(): void {
-    if (this.adsenseAppended) {
-      return;
-    }
-    this.adsenseAppended = true;
-    this.adsenseRequested = true;
-    this.appendScript(
-      `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
-      true,
-    );
   }
 
   /** Third-party scripts start after the document load, on an idle slice. */

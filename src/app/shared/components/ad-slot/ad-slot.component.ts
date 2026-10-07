@@ -3,8 +3,6 @@ import {
   afterNextRender,
   Component,
   computed,
-  DestroyRef,
-  ElementRef,
   inject,
   input,
 } from '@angular/core';
@@ -14,9 +12,8 @@ import { environment } from '../../../../environments/environment';
 /**
  * AdSense unit. A fixed unit keeps its size in the first HTML. A responsive
  * unit uses the display snippet (`data-ad-format="auto"`) and does not reserve
- * a height, because AdSense chooses the size. The script runs after paint and
- * outside Angular: right away for priority units, otherwise once the slot is
- * near the viewport and the page has loaded.
+ * a height, because AdSense chooses the size. Every unit loads with the page,
+ * after paint and outside Angular.
  */
 @Component({
   selector: 'app-ad-slot',
@@ -51,16 +48,12 @@ import { environment } from '../../../../environments/environment';
 export class AdSlotComponent {
   private readonly googleTags = inject(GoogleTagsService);
   private readonly location = inject(PlatformLocation);
-  private readonly host = inject(ElementRef<HTMLElement>);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly slot = input.required<string>();
   readonly width = input<number>();
   readonly height = input<number>();
   /** Responsive display unit. Omit width and height. */
   readonly responsive = input(false);
-  /** Top-of-page unit: loads right after hydration instead of after the page load event. */
-  readonly priority = input(false);
 
   readonly adClient = environment.adsenseClient;
 
@@ -84,29 +77,9 @@ export class AdSlotComponent {
 
   constructor() {
     afterNextRender(() => {
-      if (!this.googleTags.adsEnabled || !this.enabled()) {
-        return;
+      if (this.googleTags.adsEnabled && this.enabled()) {
+        this.googleTags.scheduleAd();
       }
-
-      const start = () => this.googleTags.scheduleAd(this.priority());
-      const host = this.host.nativeElement;
-      if (this.priority() || typeof IntersectionObserver === 'undefined') {
-        start();
-        return;
-      }
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (!entries.some((entry) => entry.isIntersecting)) {
-            return;
-          }
-          observer.disconnect();
-          start();
-        },
-        { rootMargin: '200px 0px' },
-      );
-      observer.observe(host);
-      this.destroyRef.onDestroy(() => observer.disconnect());
     });
   }
 }
