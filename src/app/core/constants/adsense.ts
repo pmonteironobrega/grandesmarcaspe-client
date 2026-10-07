@@ -6,4 +6,6 @@ export const ADSENSE_SLOTS = {
   categorias: '5893017257',
   /** Guiadosestadoscategoria3 — /c/ listings, before the footer, 250x250 */
   categoria3: '1323216850',
+  /** Guiadosestados_lugares_300x600 — detail page, after Veja também */
+  lugares: '6754128851',
 } as const;
