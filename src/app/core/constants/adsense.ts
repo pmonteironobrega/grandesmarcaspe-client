@@ -2,6 +2,8 @@
 export const ADSENSE_SLOTS = {
   /** Guiadosestadoshome2 — home, after Mais Acessados, 468x60 */
   homeBanner: '1602418455',
+  /** Home 3 Rodapé — home, before Categorias mais populares, responsive */
+  homeRodape: '2051495917',
   /** GuiadosEstadoscategorias — 320x100 */
   categorias: '5893017257',
   /** Guiadosestadoscategoria3 — /c/ listings, before the footer, 250x250 */
