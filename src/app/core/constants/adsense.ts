@@ -8,4 +8,6 @@ export const ADSENSE_SLOTS = {
   categoria3: '1323216850',
   /** Guiadosestados_lugares_300x600 — detail page, after Veja também */
   lugares: '6754128851',
+  /** GrandesMarcasPE_detalhes_2 — detail page, below the map, responsive */
+  detalhesMapa: '9718911578',
 } as const;
