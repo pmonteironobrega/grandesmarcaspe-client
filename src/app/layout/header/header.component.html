@@ -113,7 +113,11 @@
                             aria-label="Buscar"
                             class="btn btn-lg btn-gradient float-right w-100 btn-search">
                       <span class="btn-search__label">Buscar</span>
-                      <img src="/img/search-icon.svg" alt="" aria-hidden="true" class="img-fluid">
+                      <svg class="btn-search__icon" width="30" height="30" viewBox="0 0 21770 21770" aria-hidden="true">
+                        <path fill="#fff" d="M8030 7410c-180,-180 -480,-180 -670,0 -680,680 -1010,1640 -920,2610 30,240 230,430 470,430 20,0 30,-10 50,-10 260,-20 450,-250 420,-510 -70,-700 170,-1370 650,-1850 180,-190 180,-480 0,-670z"/>
+                        <path fill="#fff" d="M9900 4510c-2970,0 -5390,2420 -5390,5390 0,2970 2420,5380 5390,5380 2970,0 5380,-2410 5380,-5380 0,-2970 -2410,-5390 -5380,-5390zm0 9830c-2450,0 -4450,-1990 -4450,-4440 0,-2450 2000,-4450 4450,-4450 2450,0 4440,2000 4440,4450 0,2450 -1990,4440 -4440,4440z"/>
+                        <path fill="#fff" d="M17120 16460l-3420 -3430c-180,-180 -480,-180 -670,0 -180,190 -180,490 0,670l3430 3420c90,90 210,140 330,140 120,0 240,-50 330,-140 190,-180 190,-480 0,-660z"/>
+                      </svg>
                     </button>
 
                   </div>
@@ -152,7 +156,7 @@
 
         <div class="col-12">
 
-          <button type="button" (click)="toggleMenu()" [attr.aria-expanded]="isOpen" aria-controls="busca-avancada" class="cl-le d-block btn-busca-avancada">Busca Avançada <span><img src="/img/arrow-right.svg" alt="" aria-hidden="true" class="img-fluid"></span></button>
+          <button type="button" (click)="toggleMenu()" [attr.aria-expanded]="isOpen" aria-controls="busca-avancada" class="cl-le d-block btn-busca-avancada">Busca Avançada <svg class="btn-busca-avancada__icon" width="10" height="12" viewBox="0 0 10300 11900" aria-hidden="true"><polygon fill="#F77363" points="10300,6000 5200,8900 0,11900 0,6000 0,0 5200,3000"/></svg></button>
 
         </div>
 

@@ -57,6 +57,13 @@
   text-align: center;
   color: $laranja-escuro !important;
   cursor: pointer;
+
+  &__icon {
+    width: 10px;
+    height: 12px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
 }
 
 .busca-avancada {
@@ -172,10 +179,12 @@
     border-radius: 30px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+  }
 
-    img {
-      max-width: 30px;
-    }
+  .btn-search__icon {
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
   }
 
   a {
@@ -216,10 +225,11 @@
 
     button.btn-search {
       padding: 0.5rem 1rem;
+    }
 
-      img {
-        max-width: 22px;
-      }
+    .btn-search__icon {
+      width: 22px;
+      height: 22px;
     }
   }
 
