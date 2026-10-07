@@ -49,7 +49,7 @@
       </div>
 
       @if (result.data.length) {
-        <app-ad-slot [slot]="adSlots.categorias" />
+        <app-ad-slot [slot]="adSlots.categorias" [width]="320" [height]="100" />
       }
 
 
@@ -75,10 +75,6 @@
         }
 
       </div>
-
-      @if (result.data.length) {
-        <app-ad-slot [slot]="adSlots.categorias2" />
-      }
 
       @if (result.meta.totalPages > 1) {
 
@@ -133,10 +129,6 @@
 
         </nav>
 
-      }
-
-      @if (result.data.length) {
-        <app-ad-slot [slot]="adSlots.categoria3" />
       }
 
     }
