@@ -143,4 +143,10 @@
 
 <app-categorias-populares></app-categorias-populares>
 
+@if (listagem()) {
+  <div class="container">
+    <app-ad-slot [slot]="adSlots.categoria3" [width]="250" [height]="250" />
+  </div>
+}
+
 
