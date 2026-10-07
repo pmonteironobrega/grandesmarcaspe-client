@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, inject, signal } from '@angular/core';
 import {
   NavigationCancel,
   NavigationEnd,
@@ -14,6 +14,7 @@ import { RouteTransitionService } from './core/services/route-transition.service
 import { AppScrollService } from './core/services/app-scroll.service';
 import { SeoService } from './core/services/seo.service';
 import { GoogleTagsService } from './core/services/google-tags.service';
+import { WebMcpService } from './core/services/webmcp.service';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +32,8 @@ export class App {
 
   constructor() {
     inject(GoogleTagsService).initAnalytics();
+    const webMcp = inject(WebMcpService);
+    afterNextRender(() => webMcp.register());
 
     this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
       if (event instanceof NavigationStart) {

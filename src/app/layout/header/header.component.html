@@ -97,19 +97,23 @@
 
               <div class="col-12">
 
-                <div class="input-group flex-nowrap">
+                <form class="input-group flex-nowrap" role="search" (ngSubmit)="buscar()"
+                      toolname="buscar_estabelecimentos"
+                      tooldescription="Busca estabelecimentos e empresas no guia Grandes Marcas PE por nome, categoria, descrição, slogan ou localização, na UF selecionada no site."
+                      toolautosubmit>
 
                   <input type="search" class="form-control input-gm search-input"
                          placeholder="Busque por nome, categoria, descrição, slogan ou localização"
                          name="termoBusca"
                          enterkeyhint="search"
                          [ngModel]="termoBusca()" (ngModelChange)="termoBusca.set($event)"
-                         (keydown.enter)="buscar()"
+                         (keydown.enter)="!canSearch() && buscar()"
+                         toolparamdescription="Texto da busca, com ao menos 2 caracteres (ex.: academia, pizzaria em Boa Viagem)."
                          aria-label="Termo de busca">
 
                   <div class="input-group-append ipa-search">
 
-                    <button type="button" (click)="buscar()" [disabled]="!canSearch()"
+                    <button type="submit" [disabled]="!canSearch()"
                             aria-label="Buscar"
                             class="btn btn-lg btn-gradient float-right w-100 btn-search">
                       <span class="btn-search__label">Buscar</span>
@@ -122,7 +126,7 @@
 
                   </div>
 
-                </div>
+                </form>
 
               </div>
 
