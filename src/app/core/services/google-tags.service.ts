@@ -63,17 +63,16 @@ export class GoogleTagsService {
     }
     this.adsenseLoaded = true;
     this.ngZone.runOutsideAngular(() =>
-      this.runAfterLoad(() =>
-        this.appendScript(
-          `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
-          true,
-        ),
+      this.appendScript(
+        `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
+        true,
       ),
     );
   }
 
   /**
-   * Fills the next `<ins>` after the browser has painted.
+   * Fills the next `<ins>` after the browser has painted. It does not wait for the
+   * window load event: the top units are above the fold and must not lag behind images.
    * AdSense reads offsetWidth. Doing that in the same turn as an Angular
    * update forces a reflow, and doing it inside the zone schedules another
    * update. Slots that scroll into view later share one flush per frame.
@@ -95,17 +94,15 @@ export class GoogleTagsService {
     this.loadAdsense();
 
     this.ngZone.runOutsideAngular(() => {
-      runAfterPageLoad(win, () => {
-        const flush = () => {
-          const count = this.pendingPushes;
-          this.pendingPushes = 0;
-          this.pushScheduled = false;
-          for (let index = 0; index < count; index += 1) {
-            (win.adsbygoogle = win.adsbygoogle || []).push({});
-          }
-        };
-        win.requestAnimationFrame(() => win.requestAnimationFrame(flush));
-      });
+      const flush = () => {
+        const count = this.pendingPushes;
+        this.pendingPushes = 0;
+        this.pushScheduled = false;
+        for (let index = 0; index < count; index += 1) {
+          (win.adsbygoogle = win.adsbygoogle || []).push({});
+        }
+      };
+      win.requestAnimationFrame(() => win.requestAnimationFrame(flush));
     });
   }
 
