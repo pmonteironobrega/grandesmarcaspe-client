@@ -26,8 +26,6 @@ export class GoogleTagsService {
   private adsenseLoaded = false;
   private pendingPushes = 0;
   private pushScheduled = false;
-  private interacted = false;
-  private interactionQueue: Array<() => void> = [];
 
   get analyticsEnabled(): boolean {
     return this.onProductionHost && !!environment.googleAnalyticsId;
@@ -65,23 +63,20 @@ export class GoogleTagsService {
     }
     this.adsenseLoaded = true;
     this.ngZone.runOutsideAngular(() =>
-      this.afterFirstInteraction(() =>
-        this.runAfterLoad(() =>
-          this.appendScript(
-            `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
-            true,
-          ),
+      this.runAfterLoad(() =>
+        this.appendScript(
+          `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
+          true,
         ),
       ),
     );
   }
 
   /**
-   * Fills the next `<ins>` after the first user interaction, once the browser has painted.
-   * AdSense measures the page while laying out its iframes (forced reflows), so that work
-   * stays out of the initial load. Doing it in the same turn as an Angular update forces
-   * a reflow too, and doing it inside the zone schedules another update.
-   * Slots that scroll into view later share one flush per frame.
+   * Fills the next `<ins>` after the browser has painted.
+   * AdSense reads offsetWidth. Doing that in the same turn as an Angular
+   * update forces a reflow, and doing it inside the zone schedules another
+   * update. Slots that scroll into view later share one flush per frame.
    */
   scheduleAd(): void {
     if (!this.adsEnabled) {
@@ -100,40 +95,17 @@ export class GoogleTagsService {
     this.loadAdsense();
 
     this.ngZone.runOutsideAngular(() => {
-      this.afterFirstInteraction(() =>
-        runAfterPageLoad(win, () => {
-          const flush = () => {
-            const count = this.pendingPushes;
-            this.pendingPushes = 0;
-            this.pushScheduled = false;
-            for (let index = 0; index < count; index += 1) {
-              (win.adsbygoogle = win.adsbygoogle || []).push({});
-            }
-          };
-          win.requestAnimationFrame(() => win.requestAnimationFrame(flush));
-        }),
-      );
-    });
-  }
-
-  private afterFirstInteraction(task: () => void): void {
-    const win = this.document.defaultView;
-    if (!win) {
-      return;
-    }
-    if (this.interacted) {
-      task();
-      return;
-    }
-    this.interactionQueue.push(task);
-    if (this.interactionQueue.length > 1) {
-      return;
-    }
-    runOnFirstInteraction(win, () => {
-      this.interacted = true;
-      const tasks = this.interactionQueue;
-      this.interactionQueue = [];
-      tasks.forEach((queued) => queued());
+      runAfterPageLoad(win, () => {
+        const flush = () => {
+          const count = this.pendingPushes;
+          this.pendingPushes = 0;
+          this.pushScheduled = false;
+          for (let index = 0; index < count; index += 1) {
+            (win.adsbygoogle = win.adsbygoogle || []).push({});
+          }
+        };
+        win.requestAnimationFrame(() => win.requestAnimationFrame(flush));
+      });
     });
   }
 
@@ -176,17 +148,6 @@ export function runAfterPageLoad(win: Window, task: () => void): void {
     return;
   }
   win.addEventListener('load', start, { once: true });
-}
-
-const INTERACTION_EVENTS = ['scroll', 'wheel', 'pointerdown', 'touchstart', 'keydown', 'mousemove'];
-
-export function runOnFirstInteraction(win: Window, task: () => void): void {
-  const options: AddEventListenerOptions = { passive: true, capture: true };
-  const handler = () => {
-    INTERACTION_EVENTS.forEach((type) => win.removeEventListener(type, handler, options));
-    task();
-  };
-  INTERACTION_EVENTS.forEach((type) => win.addEventListener(type, handler, options));
 }
 
 export function isProductionHost(hostname: string): boolean {
