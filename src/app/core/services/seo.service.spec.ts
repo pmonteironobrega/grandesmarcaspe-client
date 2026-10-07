@@ -43,6 +43,20 @@ describe('SeoService', () => {
     expect(TestBed.inject(Title).getTitle()).toBe('Titulo');
   });
 
+  it('should preload the detail image and drop it on navigation', () => {
+    service.setLcpImage('/clientes/1/marca.jpg');
+
+    const link = document.head.querySelector('link[data-gmpe-lcp="image"]');
+    expect(link?.getAttribute('rel')).toBe('preload');
+    expect(link?.getAttribute('as')).toBe('image');
+    expect(link?.getAttribute('fetchpriority')).toBe('high');
+    expect(link?.getAttribute('href')).toBe('/clientes/1/marca.jpg');
+
+    service.resetForUrl('/c/academias/pe');
+
+    expect(document.head.querySelector('link[data-gmpe-lcp="image"]')).toBeNull();
+  });
+
   it('should fall back to the default share image', () => {
     service.apply({ title: 'T', description: 'D', canonicalUrl: null });
 
@@ -65,6 +79,23 @@ describe('SeoService', () => {
 
     expect(robots()).toBe('noindex, follow');
     expect(canonical()).toBeNull();
+  });
+
+  it('should 301 to the listing that exists', () => {
+    const headers = new Headers();
+    const init = { status: 200, headers };
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [{ provide: RESPONSE_INIT, useValue: init }],
+    });
+
+    const redirected = TestBed.inject(SeoService).redirectPermanently(
+      '/c/supermercados/vitoria-de-santo-antao/pe',
+    );
+
+    expect(redirected).toBe(true);
+    expect(init.status).toBe(301);
+    expect(headers.get('Location')).toBe('/c/supermercados/vitoria-de-santo-antao/pe');
   });
 
   it('should set 404 status and noindex for API 404', () => {

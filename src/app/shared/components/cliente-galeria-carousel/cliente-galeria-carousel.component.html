@@ -1,28 +1,47 @@
 <section class="cliente-galeria" aria-label="Galeria de fotos">
-  @if (!carouselReady()) {
-    @if (slides()[0]; as firstSlide) {
-      <div class="cliente-galeria__slide">
-        <img [src]="firstSlide.url" [alt]="firstSlide.alt" loading="eager" (error)="onImageError($event)">
-      </div>
+  <div class="cliente-galeria__viewport">
+    <div class="cliente-galeria__track" #track (scroll)="onTrackScroll()">
+      @for (slide of slides(); track slide.id; let first = $first) {
+        <div class="cliente-galeria__slide">
+          <img
+            [src]="slide.url"
+            [alt]="slide.alt"
+            [attr.loading]="first ? 'eager' : 'lazy'"
+            [attr.fetchpriority]="first ? 'high' : 'low'"
+            (error)="onImageError($event)"
+          >
+        </div>
+      }
+    </div>
+
+    @if (slides().length > 1) {
+      <button
+        type="button"
+        class="cliente-galeria__nav cliente-galeria__nav--prev"
+        aria-label="Foto anterior"
+        (click)="scrollBy(-1)"
+      >«</button>
+      <button
+        type="button"
+        class="cliente-galeria__nav cliente-galeria__nav--next"
+        aria-label="Próxima foto"
+        (click)="scrollBy(1)"
+      >»</button>
     }
-  } @else if (slides().length > 1) {
-    @for (key of [carouselKey()]; track key) {
-      <owl-carousel-o
-        [options]="carouselOptions()"
-        class="cliente-galeria__carousel owl-theme"
-      >
-        @for (slide of slides(); track slide.id) {
-          <ng-template carouselSlide [id]="slide.id">
-            <div class="cliente-galeria__slide">
-              <img [src]="slide.url" [alt]="slide.alt" loading="lazy" (error)="onImageError($event)">
-            </div>
-          </ng-template>
-        }
-      </owl-carousel-o>
-    }
-  } @else if (slides()[0]; as singleSlide) {
-    <div class="cliente-galeria__slide">
-      <img [src]="singleSlide.url" [alt]="singleSlide.alt" loading="eager" (error)="onImageError($event)">
+  </div>
+
+  @if (slides().length > 1) {
+    <div class="cliente-galeria__dots">
+      @for (slide of slides(); track slide.id; let i = $index) {
+        <button
+          type="button"
+          class="cliente-galeria__dot"
+          [class.is-active]="activeIndex() === i"
+          [attr.aria-label]="'Foto ' + (i + 1)"
+          [attr.aria-current]="activeIndex() === i ? 'true' : null"
+          (click)="scrollTo(i)"
+        ></button>
+      }
     </div>
   }
 </section>

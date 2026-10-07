@@ -1,4 +1,5 @@
-import { Component, inject, signal, effect, computed } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, inject, signal, effect, computed, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CatalogService } from '../../../core/services/catalog.service';
@@ -16,6 +17,7 @@ import { capitalizeWords } from '../../../core/utils/format-text';
 export class CategoriasPopularesComponent {
   private catalogService = inject(CatalogService);
   private locationState = inject(LocationStateService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   categorias = signal<Categoria[]>([]);
   readonly ufSlug = computed(() => this.locationState.uf().toLowerCase());
@@ -24,6 +26,9 @@ export class CategoriasPopularesComponent {
   constructor() {
     effect((onCleanup) => {
       const uf = this.ufSlug();
+      if (!this.isBrowser) {
+        return;
+      }
       const sub = this.catalogService.getCategoriasPopulares(uf).subscribe({
         next: (data) => this.categorias.set(data),
       });

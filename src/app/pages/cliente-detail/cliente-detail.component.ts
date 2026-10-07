@@ -3,9 +3,10 @@ import {
   computed,
   inject,
   OnInit,
+  PLATFORM_ID,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CatalogService } from '../../core/services/catalog.service';
@@ -91,6 +92,7 @@ export class ClienteDetailComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
   private catalogService = inject(CatalogService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private routeTransition = inject(RouteTransitionService);
   private seo = inject(SeoService);
   private locationState = inject(LocationStateService);
@@ -160,6 +162,7 @@ export class ClienteDetailComponent implements OnInit {
               detail,
             ),
           );
+          this.seo.setLcpImage(this.galeriaSlides()[0]?.url ?? null);
 
           this.breadcrumb.set(this.buildBreadcrumb(detail));
 
@@ -173,6 +176,7 @@ export class ClienteDetailComponent implements OnInit {
         error: (err: unknown) => {
 
           this.error.set(true);
+          this.seo.setLcpImage(null);
           this.seo.markError(err);
 
           this.loading.set(false);
@@ -281,6 +285,9 @@ export class ClienteDetailComponent implements OnInit {
 
   /** Same categoria in the same cidade first, topped up with the rest of the UF. */
   private loadRelacionados(detail: ClienteDetail): void {
+    if (!this.isBrowser) {
+      return;
+    }
     const { uf, cidade } = buildClienteListagemLinks(detail);
     if (!uf) {
       return;

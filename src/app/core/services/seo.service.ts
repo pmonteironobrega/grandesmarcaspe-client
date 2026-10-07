@@ -12,6 +12,7 @@ export const DEFAULT_DESCRIPTION =
 export const DEFAULT_SHARE_IMAGE_PATH = '/img/og-image.png';
 
 const JSON_LD_SCRIPT_ID = 'gmpe-jsonld';
+const LCP_LINK_SELECTOR = 'link[data-gmpe-lcp="image"]';
 const NOT_FOUND_TITLE = `Página não encontrada | ${SITE_TITLE_BRAND}`;
 const NOINDEX_PATH_PREFIXES = ['/busca', '/login', '/cadastro', '/perfil', '/auth'];
 
@@ -55,6 +56,7 @@ export class SeoService {
     this.meta.updateTag({ name: 'description', content: DEFAULT_DESCRIPTION });
     this.removeSocialTags();
     this.setJsonLd(null);
+    this.setLcpImage(null);
 
     if (indexable) {
       this.meta.removeTag("name='robots'");
@@ -91,8 +93,59 @@ export class SeoService {
     this.setJsonLd(page.jsonLd ?? null);
   }
 
+  /**
+   * Preloads the image the detail page paints first. The href must be the same
+   * URL as the gallery `<img>`, which is a site path and not the og:image host.
+   */
+  setLcpImage(url: string | null): void {
+    const head = this.document.head;
+    const existing = head.querySelector<HTMLLinkElement>(LCP_LINK_SELECTOR);
+
+    if (!url) {
+      existing?.remove();
+      return;
+    }
+
+    const link = existing ?? this.document.createElement('link');
+    link.setAttribute('rel', 'preload');
+    link.setAttribute('as', 'image');
+    link.setAttribute('fetchpriority', 'high');
+    link.setAttribute('data-gmpe-lcp', 'image');
+    link.setAttribute('href', url);
+
+    if (!existing) {
+      const before = head.querySelector('link[rel="stylesheet"], style');
+      if (before) {
+        head.insertBefore(link, before);
+      } else {
+        head.appendChild(link);
+      }
+    }
+  }
+
   markNotFound(): void {
     this.markUnindexable(404, NOT_FOUND_TITLE);
+  }
+
+  /**
+   * Permanent redirect to a URL that exists. Used when a paginated URL is past the last page,
+   * so crawlers consolidate on the real listing instead of following a redirect into a 404.
+   * Returns false in the browser, where there is no response status to set.
+   */
+  redirectPermanently(location: string): boolean {
+    this.meta.updateTag({ name: 'robots', content: 'noindex, follow' });
+    this.setCanonical(null);
+    this.removeSocialTags();
+    this.setJsonLd(null);
+
+    const headers = this.responseInit?.headers;
+    if (!this.responseInit || !(headers instanceof Headers)) {
+      return false;
+    }
+
+    this.responseInit.status = 301;
+    headers.set('Location', location);
+    return true;
   }
 
   /**

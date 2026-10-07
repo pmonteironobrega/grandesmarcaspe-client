@@ -1,4 +1,5 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, effect, inject, input, output, PLATFORM_ID, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AvaliacaoService } from '../../../core/services/avaliacao.service';
 import { AvaliacaoResumo } from '../../../core/models/avaliacao.model';
@@ -47,6 +48,7 @@ export class StarRatingInlineComponent {
   resumoChange = output<AvaliacaoResumo | null>();
 
   private avaliacaoService = inject(AvaliacaoService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   media = signal(0);
   total = signal(0);
@@ -58,8 +60,13 @@ export class StarRatingInlineComponent {
   constructor() {
     effect(() => {
       const id = this.clienteId();
-      if (id) {
-        this.syncUserRating(id);
+      const nota = this.fallbackNota();
+      if (!id) {
+        return;
+      }
+      this.syncUserRating(id);
+      this.media.set(nota);
+      if (this.isBrowser) {
         this.loadResumo(id);
       }
     });

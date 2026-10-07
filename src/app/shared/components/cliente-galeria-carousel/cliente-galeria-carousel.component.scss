@@ -3,7 +3,24 @@
 .cliente-galeria {
   width: 100%;
 
+  &__viewport {
+    position: relative;
+  }
+
+  &__track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   &__slide {
+    flex: 0 0 100%;
     width: 100%;
     height: $cliente-galeria-height;
     display: flex;
@@ -14,6 +31,8 @@
     background-color: $cinza-claro;
     box-sizing: border-box;
     padding: 10px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 
     img {
       max-width: 100%;
@@ -26,87 +45,61 @@
     }
   }
 
-  &__carousel {
-    position: relative;
+  &__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: $laranja-escuro;
+    color: #fff;
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    z-index: 2;
+    cursor: pointer;
 
-    ::ng-deep {
-      .owl-nav {
-        margin-top: 0;
+    &:hover {
+      background: $laranja-claro;
+      color: $preto;
+    }
 
-        button.owl-prev,
-        button.owl-next {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 52px;
-          height: 52px;
-          margin: 0;
-          padding: 0;
-          border-radius: 50%;
-          border: 2px solid #fff;
-          background: $laranja-escuro !important;
-          color: #fff !important;
-          font-size: 34px;
-          font-weight: 700;
-          line-height: 1;
-          opacity: 1 !important;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-          transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-          z-index: 2;
+    &--prev {
+      left: 16px;
+    }
 
-          &:hover {
-            background: $laranja-claro !important;
-            color: $preto !important;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-          }
+    &--next {
+      right: 16px;
+    }
+  }
 
-          span {
-            line-height: 1;
-            margin-top: -2px;
-          }
-        }
+  &__dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 14px;
+  }
 
-        button.owl-prev {
-          left: 16px;
-        }
+  &__dot {
+    width: 12px;
+    height: 12px;
+    margin: 5px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #b8b8b8;
+    cursor: pointer;
 
-        button.owl-next {
-          right: 16px;
-        }
-
-        button.disabled {
-          opacity: 0.45 !important;
-        }
-      }
-
-      .owl-dots {
-        margin-top: 14px;
-
-        .owl-dot span {
-          width: 12px;
-          height: 12px;
-          margin: 5px;
-          background: #b8b8b8;
-        }
-
-        .owl-dot.active span,
-        .owl-dot:hover span {
-          background: $laranja-escuro;
-        }
-      }
-
-      .owl-stage-outer {
-        height: $cliente-galeria-height;
-        border-radius: $radius-card;
-        overflow: hidden;
-      }
-
-      .owl-item {
-        height: $cliente-galeria-height;
-      }
+    &.is-active,
+    &:hover {
+      background: $laranja-escuro;
     }
   }
 }

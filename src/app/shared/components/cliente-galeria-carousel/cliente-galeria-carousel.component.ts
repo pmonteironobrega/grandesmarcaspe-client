@@ -1,13 +1,4 @@
-import {
-  afterNextRender,
-  Component,
-  computed,
-  inject,
-  Injector,
-  input,
-  signal,
-} from '@angular/core';
-import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
+import { Component, ElementRef, signal, viewChild, input } from '@angular/core';
 import { buildClienteDefaultImagePath } from '../../../core/utils/catalog-url';
 
 export interface GaleriaSlide {
@@ -19,48 +10,43 @@ export interface GaleriaSlide {
 @Component({
   selector: 'app-cliente-galeria-carousel',
   standalone: true,
-  imports: [CarouselModule],
   templateUrl: './cliente-galeria-carousel.component.html',
   styleUrl: './cliente-galeria-carousel.component.scss',
 })
 export class ClienteGaleriaCarouselComponent {
-  private readonly injector = inject(Injector);
-
   readonly slides = input.required<GaleriaSlide[]>();
 
-  readonly carouselReady = signal(false);
+  readonly activeIndex = signal(0);
 
-  readonly carouselKey = computed(() => this.slides().map((slide) => slide.id).join('|'));
+  private readonly track = viewChild<ElementRef<HTMLElement>>('track');
 
-  readonly carouselOptions = computed<Partial<OwlOptions>>(() => {
-    const multiple = this.slides().length > 1;
+  scrollBy(direction: -1 | 1): void {
+    const count = this.slides().length;
+    if (count < 2) {
+      return;
+    }
+    const next = (this.activeIndex() + direction + count) % count;
+    this.scrollTo(next);
+  }
 
-    return {
-      loop: multiple,
-      items: 1,
-      margin: 0,
-      mouseDrag: multiple,
-      touchDrag: multiple,
-      pullDrag: false,
-      dots: multiple,
-      nav: multiple,
-      navSpeed: 400,
-      navText: ['«', '»'],
-      autoplay: false,
-      smartSpeed: 450,
-      responsive: {
-        0: { items: 1 },
-      },
-    };
-  });
+  scrollTo(index: number): void {
+    const track = this.track()?.nativeElement;
+    if (!track) {
+      return;
+    }
+    track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' });
+    this.activeIndex.set(index);
+  }
 
-  constructor() {
-    afterNextRender(
-      () => {
-        this.carouselReady.set(true);
-      },
-      { injector: this.injector },
-    );
+  onTrackScroll(): void {
+    const track = this.track()?.nativeElement;
+    if (!track) {
+      return;
+    }
+    const width = track.clientWidth || 1;
+    const index = Math.round(track.scrollLeft / width);
+    const last = Math.max(0, this.slides().length - 1);
+    this.activeIndex.set(Math.min(last, Math.max(0, index)));
   }
 
   onImageError(event: Event): void {

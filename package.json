@@ -33,12 +33,12 @@
     "@angular/platform-server": "^20.3.6",
     "@angular/router": "^20.3.6",
     "@angular/ssr": "^20.3.6",
+    "bootstrap": "4.0.0",
     "compression": "^1.7.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "leaflet": "^1.9.4",
     "ngx-bootstrap": "^20.0.0",
-    "ngx-owl-carousel-o": "^20.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

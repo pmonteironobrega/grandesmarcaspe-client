@@ -1,4 +1,5 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, computed, effect, inject, input, PLATFORM_ID, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -20,11 +21,12 @@ export class ComentariosSectionComponent {
   clienteId = input.required<number>();
 
   private comentarioService = inject(ComentarioService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private auth = inject(AuthService);
   private router = inject(Router);
 
   comentarios = signal<Comentario[]>([]);
-  loading = signal(true);
+  loading = signal(false);
   submitting = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
@@ -43,7 +45,7 @@ export class ComentariosSectionComponent {
   constructor() {
     effect(() => {
       const id = this.clienteId();
-      if (id) {
+      if (id && this.isBrowser) {
         this.loadComentarios(id);
       }
     });

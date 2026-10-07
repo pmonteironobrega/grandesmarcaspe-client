@@ -80,7 +80,7 @@ export class GoogleTagsService {
   }
 }
 
-function isProductionHost(hostname: string): boolean {
+export function isProductionHost(hostname: string): boolean {
   const siteHost = new URL(environment.siteUrl).hostname;
   const apexHost = siteHost.replace(/^www\./, '');
   return hostname === siteHost || hostname === apexHost;

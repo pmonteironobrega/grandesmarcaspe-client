@@ -1,4 +1,5 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, effect, inject, input, PLATFORM_ID, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AvaliacaoService } from '../../../core/services/avaliacao.service';
 import { Avaliacao } from '../../../core/models/avaliacao.model';
@@ -14,6 +15,7 @@ export class AvaliacoesSectionComponent {
   clienteId = input.required<number>();
 
   private avaliacaoService = inject(AvaliacaoService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   avaliacoes = signal<Avaliacao[]>([]);
   loading = signal(true);
@@ -21,7 +23,7 @@ export class AvaliacoesSectionComponent {
   constructor() {
     effect(() => {
       const id = this.clienteId();
-      if (id) {
+      if (id && this.isBrowser) {
         this.loadAvaliacoes(id);
       }
     });
