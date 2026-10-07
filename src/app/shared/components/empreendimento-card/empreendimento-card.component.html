@@ -8,6 +8,8 @@
         <img
           [src]="imageUrl()"
           [alt]="cliente.nome"
+          width="400"
+          height="220"
           class="listing-thumbnail__img"
           loading="lazy"
           (error)="onImageError($event)"
@@ -49,6 +51,8 @@
       <img
         [src]="imageUrl()"
         [alt]="cliente.nome"
+        width="400"
+        height="220"
         class="listing-thumbnail__img"
         loading="lazy"
         (error)="onImageError($event)"

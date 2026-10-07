@@ -8,6 +8,8 @@
             [alt]="slide.alt"
             [attr.loading]="first ? 'eager' : 'lazy'"
             [attr.fetchpriority]="first ? 'high' : 'low'"
+            width="960"
+            height="280"
             (error)="onImageError($event)"
           >
         </div>
