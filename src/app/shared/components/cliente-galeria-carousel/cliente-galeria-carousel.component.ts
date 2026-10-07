@@ -1,5 +1,9 @@
 import { afterNextRender, Component, DestroyRef, ElementRef, inject, input, signal, viewChild } from '@angular/core';
-import { buildClienteDefaultImagePath } from '../../../core/utils/catalog-url';
+import {
+  buildClienteDefaultImagePath,
+  CLIENTE_GALLERY_WIDTH,
+  withClienteImageWidth,
+} from '../../../core/utils/catalog-url';
 
 export interface GaleriaSlide {
   id: string;
@@ -91,6 +95,6 @@ export class ClienteGaleriaCarouselComponent {
       return;
     }
     img.dataset['fallbackApplied'] = 'true';
-    img.src = buildClienteDefaultImagePath();
+    img.src = withClienteImageWidth(buildClienteDefaultImagePath(), CLIENTE_GALLERY_WIDTH);
   }
 }

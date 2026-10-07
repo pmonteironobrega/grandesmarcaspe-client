@@ -2,9 +2,11 @@ import {
   buildClienteDetailPath,
   buildListRouteFromFilters,
   buildListUrlFromFilters,
+  nextClienteMarcaFallbackUrl,
   parseListFiltersFromLegacyPath,
   resolveClienteImageUrl,
   resolveImageUrl,
+  withClienteImageWidth,
 } from './catalog-url';
 
 
@@ -166,6 +168,20 @@ describe('catalog-url', () => {
       expect(
         resolveClienteImageUrl(10, 'nologo.png', 'https://api.catalog.pmonteirodev.com.br'),
       ).toBe('https://api.catalog.pmonteirodev.com.br/clientes/default.png');
+    });
+  });
+
+  describe('withClienteImageWidth', () => {
+    it('adds the width the image endpoint caches', () => {
+      expect(withClienteImageWidth('/clientes/10/marca.jpg', 400)).toBe(
+        '/clientes/10/marca.jpg?w=400',
+      );
+    });
+
+    it('keeps the width when the marca file is missing', () => {
+      expect(nextClienteMarcaFallbackUrl(10, '/clientes/10/marca.jpg?w=400')).toBe(
+        '/clientes/10/marca.jpeg?w=400',
+      );
     });
   });
 
