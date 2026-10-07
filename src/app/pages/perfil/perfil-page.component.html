@@ -30,10 +30,12 @@
               <img
                 [src]="photoPreviewUrl() ?? profilePhotoUrl()"
                 alt=""
+                width="120"
+                height="120"
                 class="perfil-photo__image"
                 aria-hidden="true">
             } @else {
-              <img src="/img/avatar-usuario.svg" alt="" class="perfil-photo__placeholder" aria-hidden="true">
+              <img src="/img/avatar-usuario.svg" alt="" width="120" height="120" class="perfil-photo__placeholder" aria-hidden="true">
             }
           </button>
 

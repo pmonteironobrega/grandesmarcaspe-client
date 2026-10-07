@@ -15,7 +15,7 @@
       @if (currentAuthorName()) {
         <div class="comentario-form-author mb-3">
           <div class="comentario-avatar comentario-avatar--sm" aria-hidden="true">
-            <img [src]="currentAuthorPhotoUrl() ?? '/img/avatar-usuario.svg'" alt="">
+            <img [src]="currentAuthorPhotoUrl() ?? '/img/avatar-usuario.svg'" alt="" width="36" height="36">
           </div>
           <span>Comentando como <strong>{{ currentAuthorName() }}</strong></span>
         </div>
@@ -66,7 +66,7 @@
       <div class="comentario-item card-rounded mb-3">
         <div class="comentario-layout">
           <div class="comentario-avatar" aria-hidden="true">
-            <img [src]="authorPhotoUrl(comentario.autorFotoCaminho)" alt="">
+            <img [src]="authorPhotoUrl(comentario.autorFotoCaminho)" alt="" width="44" height="44">
           </div>
 
           <div class="comentario-body">
@@ -91,7 +91,7 @@
                 @if (currentAuthorName()) {
                   <div class="comentario-form-author mb-2">
                     <div class="comentario-avatar comentario-avatar--sm" aria-hidden="true">
-                      <img [src]="currentAuthorPhotoUrl() ?? '/img/avatar-usuario.svg'" alt="">
+                      <img [src]="currentAuthorPhotoUrl() ?? '/img/avatar-usuario.svg'" alt="" width="36" height="36">
                     </div>
                     <span>Respondendo como <strong>{{ currentAuthorName() }}</strong></span>
                   </div>
@@ -126,7 +126,7 @@
                   <div class="comentario-resposta card-rounded mb-2">
                     <div class="comentario-layout">
                       <div class="comentario-avatar comentario-avatar--sm" aria-hidden="true">
-                        <img [src]="authorPhotoUrl(resposta.autorFotoCaminho)" alt="">
+                        <img [src]="authorPhotoUrl(resposta.autorFotoCaminho)" alt="" width="36" height="36">
                       </div>
 
                       <div class="comentario-body">

@@ -31,9 +31,9 @@
                   dropdownToggle
                   [attr.aria-label]="'Menu da conta: ' + (auth.currentUser()?.nome ?? 'Usuário')">
                   @if (profilePhotoUrl()) {
-                    <img [src]="profilePhotoUrl()" alt="" class="header-account__avatar" aria-hidden="true">
+                    <img [src]="profilePhotoUrl()" alt="" width="44" height="44" class="header-account__avatar" aria-hidden="true">
                   } @else {
-                    <img src="/img/avatar-usuario.svg" alt="" class="header-account__avatar" aria-hidden="true">
+                    <img src="/img/avatar-usuario.svg" alt="" width="44" height="44" class="header-account__avatar" aria-hidden="true">
                   }
                 </button>
 
