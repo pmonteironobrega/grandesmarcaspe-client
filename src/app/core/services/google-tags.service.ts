@@ -23,9 +23,11 @@ export class GoogleTagsService {
   private readonly ngZone = inject(NgZone);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly onProductionHost = this.isBrowser && isProductionHost(this.document.location.hostname);
-  private adsenseLoaded = false;
+  private adsenseRequested = false;
+  private adsenseAppended = false;
   private pendingPushes = 0;
-  private pushScheduled = false;
+  private priorityFlushScheduled = false;
+  private deferredFlushScheduled = false;
 
   get analyticsEnabled(): boolean {
     return this.onProductionHost && !!environment.googleAnalyticsId;
@@ -57,27 +59,31 @@ export class GoogleTagsService {
     );
   }
 
-  loadAdsense(): void {
-    if (!this.adsEnabled || this.adsenseLoaded) {
+  /** `immediate` skips the wait for the load event (top units above the fold). */
+  loadAdsense(immediate = false): void {
+    if (!this.adsEnabled) {
       return;
     }
-    this.adsenseLoaded = true;
-    this.ngZone.runOutsideAngular(() =>
-      this.appendScript(
-        `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
-        true,
-      ),
-    );
+    if (immediate) {
+      this.ngZone.runOutsideAngular(() => this.appendAdsenseScript());
+      return;
+    }
+    if (this.adsenseRequested) {
+      return;
+    }
+    this.adsenseRequested = true;
+    this.ngZone.runOutsideAngular(() => this.runAfterLoad(() => this.appendAdsenseScript()));
   }
 
   /**
-   * Fills the next `<ins>` after the browser has painted. It does not wait for the
-   * window load event: the top units are above the fold and must not lag behind images.
+   * Fills the next `<ins>` after the browser has painted.
+   * Priority units (top of the page) go right after hydration; the others wait
+   * for the load event and an idle slice so they do not compete with it.
    * AdSense reads offsetWidth. Doing that in the same turn as an Angular
    * update forces a reflow, and doing it inside the zone schedules another
    * update. Slots that scroll into view later share one flush per frame.
    */
-  scheduleAd(): void {
+  scheduleAd(priority = false): void {
     if (!this.adsEnabled) {
       return;
     }
@@ -87,23 +93,47 @@ export class GoogleTagsService {
     }
 
     this.pendingPushes += 1;
-    if (this.pushScheduled) {
+    if (priority ? this.priorityFlushScheduled : this.deferredFlushScheduled) {
       return;
     }
-    this.pushScheduled = true;
-    this.loadAdsense();
+    this.loadAdsense(priority);
+
+    const flush = () => {
+      const count = this.pendingPushes;
+      this.pendingPushes = 0;
+      for (let index = 0; index < count; index += 1) {
+        (win.adsbygoogle = win.adsbygoogle || []).push({});
+      }
+    };
+    const afterPaint = (done: () => void) =>
+      win.requestAnimationFrame(() =>
+        win.requestAnimationFrame(() => {
+          done();
+          flush();
+        }),
+      );
 
     this.ngZone.runOutsideAngular(() => {
-      const flush = () => {
-        const count = this.pendingPushes;
-        this.pendingPushes = 0;
-        this.pushScheduled = false;
-        for (let index = 0; index < count; index += 1) {
-          (win.adsbygoogle = win.adsbygoogle || []).push({});
-        }
-      };
-      win.requestAnimationFrame(() => win.requestAnimationFrame(flush));
+      if (priority) {
+        this.priorityFlushScheduled = true;
+        afterPaint(() => (this.priorityFlushScheduled = false));
+        return;
+      }
+      this.deferredFlushScheduled = true;
+      runAfterPageLoad(win, () => afterPaint(() => (this.deferredFlushScheduled = false)));
     });
+  }
+
+  private appendAdsenseScript(): void {
+    if (this.adsenseAppended) {
+      return;
+    }
+    this.adsenseAppended = true;
+    this.adsenseRequested = true;
+    this.appendScript(
+      `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(environment.adsenseClient)}`,
+      true,
+    );
   }
 
   /** Third-party scripts start after the document load, on an idle slice. */

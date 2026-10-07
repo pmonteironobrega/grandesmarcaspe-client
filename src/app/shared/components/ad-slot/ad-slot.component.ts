@@ -14,8 +14,9 @@ import { environment } from '../../../../environments/environment';
 /**
  * AdSense unit. A fixed unit keeps its size in the first HTML. A responsive
  * unit uses the display snippet (`data-ad-format="auto"`) and does not reserve
- * a height, because AdSense chooses the size. The script runs only once the
- * slot is near the viewport, after paint, and outside Angular.
+ * a height, because AdSense chooses the size. The script runs after paint and
+ * outside Angular: right away for priority units, otherwise once the slot is
+ * near the viewport and the page has loaded.
  */
 @Component({
   selector: 'app-ad-slot',
@@ -58,6 +59,8 @@ export class AdSlotComponent {
   readonly height = input<number>();
   /** Responsive display unit. Omit width and height. */
   readonly responsive = input(false);
+  /** Top-of-page unit: loads right after hydration instead of after the page load event. */
+  readonly priority = input(false);
 
   readonly adClient = environment.adsenseClient;
 
@@ -85,9 +88,9 @@ export class AdSlotComponent {
         return;
       }
 
-      const start = () => this.googleTags.scheduleAd();
+      const start = () => this.googleTags.scheduleAd(this.priority());
       const host = this.host.nativeElement;
-      if (typeof IntersectionObserver === 'undefined') {
+      if (this.priority() || typeof IntersectionObserver === 'undefined') {
         start();
         return;
       }

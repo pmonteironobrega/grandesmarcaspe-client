@@ -36,7 +36,7 @@
       @let hasResults = result.meta.groupedByCategoria ? !!result.groups?.length : result.data.length > 0;
 
       @if (hasResults) {
-        <app-ad-slot [slot]="adSlots.categorias" [width]="320" [height]="100" />
+        <app-ad-slot [slot]="adSlots.categorias" [width]="320" [height]="100" [priority]="true" />
       }
 
       @if (result.meta.groupedByCategoria) {

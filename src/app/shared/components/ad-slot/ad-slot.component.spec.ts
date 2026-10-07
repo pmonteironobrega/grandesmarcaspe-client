@@ -1,6 +1,7 @@
 import { PlatformLocation } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ADSENSE_SLOTS } from '../../../core/constants/adsense';
+import { GoogleTagsService } from '../../../core/services/google-tags.service';
 import { environment } from '../../../../environments/environment';
 import { AdSlotComponent } from './ad-slot.component';
 
@@ -64,6 +65,29 @@ describe('AdSlotComponent', () => {
     expect(ins?.getAttribute('data-ad-slot')).toBe(ADSENSE_SLOTS.detalhesMapa);
     expect(ins?.getAttribute('data-ad-format')).toBe('auto');
     expect(ins?.getAttribute('data-full-width-responsive')).toBe('true');
+  });
+
+  it('should schedule a priority unit right after render, without waiting for the viewport', async () => {
+    environment.adsenseClient = 'ca-pub-test';
+    environment.siteUrl = 'https://www.grandesmarcaspe.com.br';
+    const scheduleAd = jasmine.createSpy('scheduleAd');
+
+    TestBed.configureTestingModule({
+      imports: [AdSlotComponent],
+      providers: [
+        { provide: PlatformLocation, useValue: { hostname: 'www.grandesmarcaspe.com.br' } },
+        { provide: GoogleTagsService, useValue: { adsEnabled: true, scheduleAd } },
+      ],
+    });
+    const fixture = TestBed.createComponent(AdSlotComponent);
+    fixture.componentRef.setInput('slot', ADSENSE_SLOTS.categorias);
+    fixture.componentRef.setInput('width', 320);
+    fixture.componentRef.setInput('height', 100);
+    fixture.componentRef.setInput('priority', true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(scheduleAd).toHaveBeenCalledOnceWith(true);
   });
 
   it('should leave the layout untouched when ads are disabled', () => {
