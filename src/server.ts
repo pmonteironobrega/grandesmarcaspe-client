@@ -19,7 +19,7 @@ import {
   setCachedSsrResponse,
   createApiProxyMiddleware,
 } from './server/cache.middleware';
-import { legacyRedirectMiddleware } from './server/legacy-redirect';
+import { createLegacyRedirectMiddleware } from './server/legacy-redirect';
 
 const envProductionPath = join(import.meta.dirname, '../../../environments/.env.production');
 if (existsSync(envProductionPath)) {
@@ -100,7 +100,7 @@ app.get(/^\/sitemaps\/([a-z0-9-]+\.xml)$/, (req, res) =>
   proxySitemap(`/catalog/sitemaps/${req.params[0]}`, res),
 );
 
-app.use(legacyRedirectMiddleware);
+app.use(createLegacyRedirectMiddleware(apiUrl));
 
 app.use(createApiProxyMiddleware(apiUrl));
 

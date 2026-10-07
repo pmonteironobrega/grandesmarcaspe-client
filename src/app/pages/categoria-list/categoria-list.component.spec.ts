@@ -117,6 +117,47 @@ describe('CategoriaListComponent', () => {
     localStorage.removeItem('gmpe-uf');
   });
 
+  it('sends a page past the end back to the first page', async () => {
+    await router.navigateByUrl('/c/supermercados/vitoria-de-santo-antao/pe?page=15');
+    fixture.detectChanges();
+
+    httpMock.expectOne('/c/supermercados/vitoria-de-santo-antao/pe?page=15').flush({
+      data: [],
+      meta: {
+        page: 15,
+        perPage: 10,
+        total: 23,
+        totalPages: 3,
+        filters: {
+          categoria: 'supermercados',
+          uf: 'pe',
+          cidade: 'vitoria-de-santo-antao',
+          bairro: null,
+        },
+      },
+    });
+    flushCategoriasPopulares();
+    await fixture.whenStable();
+
+    expect(router.url.split('?')[0]).toBe('/c/supermercados/vitoria-de-santo-antao/pe');
+    httpMock.expectOne('/c/supermercados/vitoria-de-santo-antao/pe').flush({
+      data: [],
+      meta: {
+        page: 1,
+        perPage: 10,
+        total: 23,
+        totalPages: 3,
+        filters: {
+          categoria: 'supermercados',
+          uf: 'pe',
+          cidade: 'vitoria-de-santo-antao',
+          bairro: null,
+        },
+      },
+    });
+    httpMock.match(() => true).forEach((req) => req.flush([]));
+  });
+
   it('buildListRoute should keep page in queryParams, not path commands', () => {
     const route = component.buildListRoute(
       { categoria: 'academias', uf: 'pe', cidade: null, bairro: null },

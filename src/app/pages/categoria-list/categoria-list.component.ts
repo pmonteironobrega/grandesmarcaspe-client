@@ -14,7 +14,11 @@ import { CategoriasPopularesComponent } from '../../shared/components/categorias
 import { AnuncieBannerComponent } from '../../shared/components/anuncie-banner/anuncie-banner.component';
 import { AdSlotComponent } from '../../shared/components/ad-slot/ad-slot.component';
 import { ADSENSE_SLOTS } from '../../core/constants/adsense';
-import { buildListRouteFromFilters, ListRoute } from '../../core/utils/catalog-url';
+import {
+  buildListRouteFromFilters,
+  buildListUrlFromFilters,
+  ListRoute,
+} from '../../core/utils/catalog-url';
 import { buildPaginationWindow } from '../../core/utils/pagination';
 import { capitalizeWords } from '../../core/utils/format-text';
 import {
@@ -75,12 +79,13 @@ export class CategoriaListComponent implements OnInit {
 
       this.catalogService.getClientesByLegacyPath(path, resolvedPage).subscribe({
         next: (response) => {
-          const seo = buildListagemSeoPayload(environment.siteUrl, response);
-          if (isListagemPageOutOfRange(response)) {
-            this.seo.markNotFound();
-          } else {
-            this.seo.apply(seo);
+          if (response.meta.page >= 2 && isListagemPageOutOfRange(response)) {
+            this.redirectToFirstPage(buildListUrlFromFilters(response.meta.filters, 1));
+            return;
           }
+
+          const seo = buildListagemSeoPayload(environment.siteUrl, response);
+          this.seo.apply(seo);
 
           if (response.meta.filters.uf) {
             this.locationState.setUf(response.meta.filters.uf);
@@ -108,6 +113,14 @@ export class CategoriaListComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => loadListagem());
+  }
+
+  private redirectToFirstPage(target: string): void {
+    this.loading.set(false);
+    this.routeTransition.releaseContent();
+    if (!this.seo.redirectPermanently(target)) {
+      void this.router.navigateByUrl(target, { replaceUrl: true });
+    }
   }
 
   private buildBreadcrumb(response: PaginatedClientes): { page: string; router: string | ListRoute }[] {

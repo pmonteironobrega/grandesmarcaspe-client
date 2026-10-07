@@ -14,7 +14,12 @@ import { CategoriasPopularesComponent } from '../../shared/components/categorias
 import { AnuncieBannerComponent } from '../../shared/components/anuncie-banner/anuncie-banner.component';
 import { AdSlotComponent } from '../../shared/components/ad-slot/ad-slot.component';
 import { ADSENSE_SLOTS } from '../../core/constants/adsense';
-import { buildListRouteFromFilters, buildLugaresRoute, ListRoute } from '../../core/utils/catalog-url';
+import {
+  buildListRouteFromFilters,
+  buildLugaresRoute,
+  buildLugaresUrl,
+  ListRoute,
+} from '../../core/utils/catalog-url';
 import { buildPaginationWindow } from '../../core/utils/pagination';
 import { capitalizeWords } from '../../core/utils/format-text';
 import {
@@ -98,12 +103,19 @@ export class LugaresListComponent implements OnInit {
 
       this.catalogService.getLugares(cidadeSlug, bairroSlug, uf, resolvedPage).subscribe({
         next: (response) => {
-          const seo = buildLugaresSeoPayload(environment.siteUrl, response);
-          if (isLugaresPageOutOfRange(response)) {
-            this.seo.markNotFound();
-          } else {
-            this.seo.apply(seo);
+          if (response.meta.page >= 2 && isLugaresPageOutOfRange(response)) {
+            const { cidade, bairro, uf } = response.meta.geografia;
+            this.loading.set(false);
+            this.routeTransition.releaseContent();
+            const target = buildLugaresUrl(cidade.slug, bairro?.slug ?? null, uf.sigla, 1);
+            if (!this.seo.redirectPermanently(target)) {
+              void this.router.navigateByUrl(target, { replaceUrl: true });
+            }
+            return;
           }
+
+          const seo = buildLugaresSeoPayload(environment.siteUrl, response);
+          this.seo.apply(seo);
 
           this.locationState.setUf(response.meta.geografia.uf.sigla);
           this.lugares.set(response);
