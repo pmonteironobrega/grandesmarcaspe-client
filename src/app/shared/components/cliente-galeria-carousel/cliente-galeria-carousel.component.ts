@@ -1,4 +1,4 @@
-import { Component, ElementRef, signal, viewChild, input } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { buildClienteDefaultImagePath } from '../../../core/utils/catalog-url';
 
 export interface GaleriaSlide {
@@ -19,6 +19,33 @@ export class ClienteGaleriaCarouselComponent {
   readonly activeIndex = signal(0);
 
   private readonly track = viewChild<ElementRef<HTMLElement>>('track');
+  private readonly destroyRef = inject(DestroyRef);
+  /** Slide width from ResizeObserver, so scroll does not read layout after painting the dots. */
+  private slideWidth = 0;
+  private scrollFrame = 0;
+
+  constructor() {
+    afterNextRender(() => {
+      const track = this.track()?.nativeElement;
+      if (!track || typeof ResizeObserver === 'undefined') {
+        return;
+      }
+
+      const observer = new ResizeObserver((entries) => {
+        const width = entries[0]?.contentRect.width ?? 0;
+        if (width > 0) {
+          this.slideWidth = width;
+        }
+      });
+      observer.observe(track);
+      this.destroyRef.onDestroy(() => {
+        observer.disconnect();
+        if (this.scrollFrame) {
+          cancelAnimationFrame(this.scrollFrame);
+        }
+      });
+    });
+  }
 
   scrollBy(direction: -1 | 1): void {
     const count = this.slides().length;
@@ -34,19 +61,28 @@ export class ClienteGaleriaCarouselComponent {
     if (!track) {
       return;
     }
-    track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' });
+    const width = this.slideWidth || track.clientWidth;
+    track.scrollTo({ left: index * width, behavior: 'smooth' });
     this.activeIndex.set(index);
   }
 
   onTrackScroll(): void {
-    const track = this.track()?.nativeElement;
-    if (!track) {
+    if (this.scrollFrame) {
       return;
     }
-    const width = track.clientWidth || 1;
-    const index = Math.round(track.scrollLeft / width);
-    const last = Math.max(0, this.slides().length - 1);
-    this.activeIndex.set(Math.min(last, Math.max(0, index)));
+    this.scrollFrame = requestAnimationFrame(() => {
+      this.scrollFrame = 0;
+      const track = this.track()?.nativeElement;
+      if (!track) {
+        return;
+      }
+      const width = this.slideWidth || track.clientWidth || 1;
+      const last = Math.max(0, this.slides().length - 1);
+      const index = Math.min(last, Math.max(0, Math.round(track.scrollLeft / width)));
+      if (index !== this.activeIndex()) {
+        this.activeIndex.set(index);
+      }
+    });
   }
 
   onImageError(event: Event): void {
