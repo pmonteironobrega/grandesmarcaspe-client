@@ -59,6 +59,19 @@ export function parseListFiltersFromLegacyPath(path: string): ClienteListFilters
 
 export const DEFAULT_CLIENTE_MARCA_CAMINHO = 'clientes/default.png';
 
+/** Card thumbnail. About 200px on screen; 400 covers a 2x display. */
+export const CLIENTE_THUMB_WIDTH = 400;
+/** Detail gallery. 960 covers a phone at 2x and the desktop column. */
+export const CLIENTE_GALLERY_WIDTH = 960;
+
+/** Asks the API for a WebP derivative at one of the widths it caches. */
+export function withClienteImageWidth(url: string, width: number): string {
+  const [path, query = ''] = url.split('?');
+  const params = new URLSearchParams(query);
+  params.set('w', String(width));
+  return `${path}?${params.toString()}`;
+}
+
 export const CLIENTE_MARCA_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif'] as const;
 
 function isNologoPath(caminho: string): boolean {
@@ -124,15 +137,28 @@ export function resolveClienteImageUrl(
   return path;
 }
 
+function imageWidthQuery(url: string): string | null {
+  const query = url.split('?')[1];
+  if (!query) {
+    return null;
+  }
+  return new URLSearchParams(query).get('w');
+}
+
+function keepImageWidth(url: string, sourceUrl: string): string {
+  const width = imageWidthQuery(sourceUrl);
+  return width ? withClienteImageWidth(url, Number(width)) : url;
+}
+
 /** Fallback quando `marca.*` não existe — tenta extensões e depois default. */
 export function nextClienteMarcaFallbackUrl(clienteId: number, failedUrl: string): string {
   if (isDefaultClienteImagePath(failedUrl)) {
-    return buildClienteDefaultImagePath();
+    return keepImageWidth(buildClienteDefaultImagePath(), failedUrl);
   }
 
   const match = failedUrl.match(/\/clientes\/(\d+)\/marca\.(\w+)/i);
   if (!match) {
-    return buildClienteDefaultImagePath();
+    return keepImageWidth(buildClienteDefaultImagePath(), failedUrl);
   }
 
   const id = Number(match[1]);
@@ -141,10 +167,10 @@ export function nextClienteMarcaFallbackUrl(clienteId: number, failedUrl: string
   const index = order.indexOf(ext as (typeof order)[number]);
 
   if (index === -1 || index >= order.length - 1) {
-    return buildClienteDefaultImagePath();
+    return keepImageWidth(buildClienteDefaultImagePath(), failedUrl);
   }
 
-  return buildClienteMarcaPath(id, order[index + 1]);
+  return keepImageWidth(buildClienteMarcaPath(id, order[index + 1]), failedUrl);
 }
 
 /** `r/{cliente}/{cidade}/{bairro}/{uf}`, or `r/{cliente}/{cidade}/{uf}` when the endereco has no bairro. */

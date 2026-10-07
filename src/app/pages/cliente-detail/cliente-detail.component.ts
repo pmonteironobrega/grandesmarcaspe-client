@@ -36,7 +36,9 @@ import { catchError, map } from 'rxjs/operators';
 import {
   buildClienteDefaultImagePath,
   buildClienteMarcaPath,
+  CLIENTE_GALLERY_WIDTH,
   resolveClienteImageUrl,
+  withClienteImageWidth,
 } from '../../core/utils/catalog-url';
 import { buildClienteListagemLinks } from '../../core/utils/cliente-listagem-links';
 import { buildSocialLinks } from '../../core/utils/social-links';
@@ -252,7 +254,10 @@ export class ClienteDetailComponent implements OnInit {
     if (detail.imagens?.length) {
       return detail.imagens.map((img, index) => ({
         id: String(img.id),
-        url: this.resolveGaleriaImageUrl(detail.id, img.caminho, index),
+        url: withClienteImageWidth(
+          this.resolveGaleriaImageUrl(detail.id, img.caminho, index),
+          CLIENTE_GALLERY_WIDTH,
+        ),
         alt: `${detail.nome} - foto ${index + 1}`,
       }));
     }
@@ -260,7 +265,7 @@ export class ClienteDetailComponent implements OnInit {
     return [
       {
         id: 'default',
-        url: buildClienteDefaultImagePath(),
+        url: withClienteImageWidth(buildClienteDefaultImagePath(), CLIENTE_GALLERY_WIDTH),
         alt: detail.nome,
       },
     ];

@@ -7,8 +7,10 @@ import { CommonModule } from '@angular/common';
 import { ClienteListItem } from '../../../core/models/cliente-list-item.model';
 import {
   buildClienteDetailUrlFromListItem,
+  CLIENTE_THUMB_WIDTH,
   nextClienteMarcaFallbackUrl,
   resolveClienteImageUrl,
+  withClienteImageWidth,
 } from '../../../core/utils/catalog-url';
 import { environment } from '../../../../environments/environment';
 
@@ -52,9 +54,9 @@ export class EmpreendimentoCardComponent {
 
   imageUrl(): string {
 
-    return resolveClienteImageUrl(
-      this.cliente.id,
-      this.cliente.imagemPrincipal?.caminho,
+    return withClienteImageWidth(
+      resolveClienteImageUrl(this.cliente.id, this.cliente.imagemPrincipal?.caminho),
+      CLIENTE_THUMB_WIDTH,
     );
 
   }
